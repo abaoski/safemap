@@ -1,0 +1,26 @@
+# SafeMap-PH Backend Dependencies
+# Compatible versions
+
+# Core Flask 
+Flask==2.3.3
+Flask-CORS==4.0.0
+Werkzeug==2.3.7
+
+# Database
+Flask-SQLAlchemy==3.0.5
+SQLAlchemy==2.0.23
+
+# Authentication
+PyJWT==2.8.0
+
+# Password hashing
+bcrypt==4.0.1
+
+# Environment variables
+python-dotenv==1.0.0
+
+# Jina2 (required by Flask)
+Jinja2==3.1.2
+
+# Production
+gunicorn==21.2.0
