@@ -1,6 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  * {
+    font-family: 'DM Sans', sans-serif;
+  }
+}
 
 @layer base {
   :root {
@@ -53,6 +61,11 @@
   * {
     @apply border-border;
   }
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
@@ -63,7 +76,7 @@
 .leaflet-container {
   height: 100%;
   width: 100%;
-  border-radius: var(--radius);
+  border-radius: 0;
 }
 
 /* Hotspot marker colors */
@@ -105,4 +118,20 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Mobile bottom nav padding */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: 70px;
+  }
+}
+
+/* Quick Actions mobile positioning */
+@media (max-width: 767px) {
+  .quick-actions-mobile {
+    left: 50% !important;
+    transform: translateX(-50%);
+    bottom: 90px !important;
+  }
 }

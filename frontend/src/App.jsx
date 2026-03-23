@@ -1,39 +1,137 @@
 import { useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-import { Shield, AlertTriangle, Phone, FileText, MessageCircle, Menu, X, User, LogIn, MapPin } from 'lucide-react'
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import { X, Plus, Minus } from 'lucide-react'
+import myLocationImg from '/src/assets/images/My_location.svg'
+import cityCentralImg from '/src/assets/images/City_central_button.svg'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 
-// Mock data for demonstration
+// Import images properly for Vite
+import logoImg from '/src/assets/images/Logo.svg'
+import reportVectorImg from '/src/assets/images/ft_report.svg'
+import searchImg from '/src/assets/images/search.svg'
+import homeImg from '/src/assets/images/ft_home.svg'
+import mapImg from '/src/assets/images/ft_map.svg'
+import helpImg from '/src/assets/images/ft_help.svg'
+import chatImg from '/src/assets/images/ft_admin-panel.svg'
+import reportAnonQAImg from '/src/assets/images/QA_report.svg'
+import aiAsstQAImg from '/src/assets/images/QA_AI.svg'
+import emergencyQAImg from '/src/assets/images/QA_emergency.svg'
+
+// Mock data for demonstration - General Santos City
 const MOCK_REPORTS = [
-  { id: 1, title: 'Theft Incident', category: 'theft', severity: 'high', lat: 14.607, lng: 121.0, status: 'approved_awareness' },
-  { id: 2, title: 'Suspicious Activity', category: 'suspicious', severity: 'medium', lat: 14.59, lng: 120.98, status: 'verified_pnp' },
-  { id: 3, title: 'Accident', category: 'accident', severity: 'low', lat: 14.61, lng: 120.99, status: 'approved_awareness' },
+  { id: 1, title: 'Theft Incident', category: 'theft', severity: 'high', lat: 6.1167, lng: 125.1667, status: 'approved_awareness' },
+  { id: 2, title: 'Suspicious Activity', category: 'suspicious', severity: 'medium', lat: 6.105, lng: 125.175, status: 'verified_pnp' },
+  { id: 3, title: 'Accident', category: 'accident', severity: 'low', lat: 6.125, lng: 125.16, status: 'approved_awareness' },
 ]
 
-const EMERGENCY_CONTACTS = [
-  { name: 'PNP Emergency', phone: '117', category: 'pnp' },
-  { name: 'VAWC Hotline', phone: '1388', category: 'vawc' },
-  { name: 'DSWD', phone: '02-8931-8101', category: 'dswd' },
-  { name: 'Fire/BFP', phone: '117', category: 'fire' },
-  { name: 'Medical/Red Cross', phone: '143', category: 'medical' },
-]
+// Zoom Controls Component
+function ZoomControls() {
+  const map = useMap()
+  
+  const handleZoomIn = () => {
+    map.zoomIn()
+  }
+  
+  const handleZoomOut = () => {
+    map.zoomOut()
+  }
+  
+  const handleLocation = () => {
+    map.setView([6.1167, 125.1667], 13)
+  }
+  
+  const handleCityCentral = () => {
+    map.setView([6.1167, 125.1667], 12)
+  }
+
+  return (
+    <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
+      {/* City Central */}
+      <button
+        className="w-12 h-12 p-3 rounded-[10px] shadow-[0px_2px_8px_0px_rgba(0,0,0,0.00)] flex items-center justify-center"
+        style={{ backgroundColor: '#ffffff' }}
+        onClick={handleCityCentral}
+      >
+        <img src={cityCentralImg} alt="City Central" className="w-6 h-6" />
+      </button>
+      {/* Zoom In */}
+      <button
+        className="w-12 h-12 p-3 rounded-[10px] shadow-[0px_2px_8px_0px_rgba(0,0,0,0.00)] flex items-center justify-center"
+        style={{ backgroundColor: '#ffffff' }}
+        onClick={handleZoomIn}
+      >
+        <Plus className="w-6 h-6 text-black" />
+      </button>
+      {/* Zoom Out */}
+      <button
+        className="w-12 h-12 p-3 rounded-[10px] shadow-[0px_2px_8px_0px_rgba(0,0,0,0.00)] flex items-center justify-center"
+        style={{ backgroundColor: '#ffffff' }}
+        onClick={handleZoomOut}
+      >
+        <Minus className="w-6 h-6 text-black" />
+      </button>
+      {/* My Location */}
+      <button
+        className="w-12 h-12 p-3 rounded-[10px] shadow-[0px_2px_8px_0px_rgba(0,0,0,0.00)] flex items-center justify-center"
+        style={{ backgroundColor: '#2563eb' }}
+        onClick={handleLocation}
+      >
+        <img src={myLocationImg} alt="My Location" className="w-6 h-6" />
+      </button>
+    </div>
+  )
+}
 
 function App() {
   const [currentView, setCurrentView] = useState('map')
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [showQuickActions, setShowQuickActions] = useState(true)
+  // Default position directly above the Report button
+  const [qaPosition, setQaPosition] = useState({ x: 0, y: 0 })
+  const [isDraggingQA, setIsDraggingQA] = useState(false)
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [dragStartPos, setDragStartPos] = useState({ x: 0, y: 0 })
+
+  // No boundaries for dragging - can move freely
+
+  const handleQADragStart = (e) => {
+    setIsDraggingQA(true)
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY
+    setDragOffset({ x: clientX, y: clientY })
+    setDragStartPos({ x: clientX, y: clientY })
+  }
+
+  const handleQADragMove = (e) => {
+    if (!isDraggingQA) return
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY
+    
+    const deltaX = clientX - dragOffset.x
+    const deltaY = clientY - dragOffset.y
+    
+    // Update position - can move freely in any direction
+    setQaPosition(prev => ({
+      x: prev.x + deltaX,
+      y: prev.y + deltaY
+    }))
+    setDragOffset({ x: clientX, y: clientY })
+  }
+
+  const handleQADragEnd = () => {
+    setIsDraggingQA(false)
+    setDragOffset({ x: 0, y: 0 })
+    setDragStartPos({ x: 0, y: 0 })
+  }
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [chatMessages, setChatMessages] = useState([{ text: 'Hello! How can I help you today?', sender: 'bot' }])
   const [chatInput, setChatInput] = useState('')
-
+  
   const handleSendMessage = () => {
     if (!chatInput.trim()) return
     
     setChatMessages([...chatMessages, { text: chatInput, sender: 'user' }])
     setChatInput('')
     
-    // Simulate bot response
     setTimeout(() => {
       setChatMessages(prev => [...prev, { 
         text: 'I can help you with reporting incidents, viewing the map, or finding emergency contacts. What would you like to do?', 
@@ -43,72 +141,210 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b shadow-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Shield className="h-8 w-8 text-green-600" />
-            <span className="text-xl font-bold text-gray-900">SafeMap PH</span>
-          </div>
+    <div className="h-screen flex flex-col">
+      {/* HEADER */}
+      <header className="bg-white shadow-md z-40">
+        <div className="flex flex-col items-center px-4 py-3 gap-3">
+          <img src={logoImg} alt="SafeMap" className="h-10 w-auto" />
           
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-4">
-            <Button variant="ghost" onClick={() => setCurrentView('map')}>
-              <MapPin className="mr-2 h-4 w-4" /> Map
-            </Button>
-            <Button variant="ghost" onClick={() => setCurrentView('report')}>
-              <FileText className="mr-2 h-4 w-4" /> Report
-            </Button>
-            <Button variant="ghost" onClick={() => setCurrentView('help')}>
-              <Phone className="mr-2 h-4 w-4" /> Get Help
-            </Button>
-            <Button variant="ghost" onClick={() => setIsChatOpen(true)}>
-              <MessageCircle className="mr-2 h-4 w-4" /> Chat
-            </Button>
-            <Button variant="outline">
-              <LogIn className="mr-2 h-4 w-4" /> Login
-            </Button>
-          </nav>
-
-          {/* Mobile Menu Button */}
-          <Button variant="ghost" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            {isMenuOpen ? <X /> : <Menu />}
-          </Button>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden border-t p-4 bg-white space-y-2">
-            <Button variant="ghost" className="w-full justify-start" onClick={() => { setCurrentView('map'); setIsMenuOpen(false) }}>
-              <MapPin className="mr-2 h-4 w-4" /> Map
-            </Button>
-            <Button variant="ghost" className="w-full justify-start" onClick={() => { setCurrentView('report'); setIsMenuOpen(false) }}>
-              <FileText className="mr-2 h-4 w-4" /> Report Incident
-            </Button>
-            <Button variant="ghost" className="w-full justify-start" onClick={() => { setCurrentView('help'); setIsMenuOpen(false) }}>
-              <Phone className="mr-2 h-4 w-4" /> Get Help
-            </Button>
-            <Button variant="ghost" className="w-full justify-start" onClick={() => { setIsChatOpen(true); setIsMenuOpen(false) }}>
-              <MessageCircle className="mr-2 h-4 w-4" /> AI Chat
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              <LogIn className="mr-2 h-4 w-4" /> Login
-            </Button>
+          <div className="w-full max-w-md">
+            <div className="relative">
+              <img src={searchImg} alt="search" className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" />
+              <input 
+                type="text" 
+                placeholder="Search safe zones or locations..." 
+                className="w-full h-10 pl-10 pr-4 bg-gray-100 rounded-full outline-none"
+              />
+            </div>
           </div>
-        )}
+        </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-6">
-        {currentView === 'map' && <MapView />}
-        {currentView === 'report' && <ReportView />}
-        {currentView === 'help' && <HelpView />}
+      {/* MAIN CONTENT - Map */}
+      <main className="flex-1 relative">
+        <MapContainer 
+          center={[6.1167, 125.1667]} 
+          zoom={12}
+          className="h-full w-full"
+          zoomControl={false}
+          maxBounds={[[5.9, 124.9], [6.3, 125.4]]}
+          maxBoundsViscosity={1.0}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <ZoomControls />
+          {MOCK_REPORTS.map(report => (
+            <Marker key={report.id} position={[report.lat, report.lng]}>
+              <Popup>
+                <div className="p-2">
+                  <h3 className="font-semibold">{report.title}</h3>
+                  <p className="text-sm text-gray-600 capitalize">{report.category}</p>
+                  <span className={`inline-block px-2 py-1 text-xs rounded mt-2 ${
+                    report.severity === 'high' ? 'bg-red-100 text-red-800' :
+                    report.severity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-blue-100 text-blue-800'
+                  }`}>
+                    {report.severity}
+                  </span>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+
+        {/* Risk Density Legend */}
+        <div className="absolute top-4 left-4 z-[1000] bg-white/90 rounded-lg shadow-lg p-3">
+          <div className="text-xs font-bold text-gray-500 mb-2">RISK DENSITY</div>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full" />
+              <span className="text-xs">High Risk</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-yellow-500 rounded-full" />
+              <span className="text-xs">Medium</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full" />
+              <span className="text-xs">Low Risk</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Show Quick Actions button when hidden */}
+        {!showQuickActions && (
+          <button
+            className="fixed z-[1001] flex flex-col items-center gap-1 bg-white px-4 py-2 rounded-full shadow-lg"
+            style={{ left: '50%', bottom: '90px', transform: 'translateX(-50%)' }}
+            onClick={() => { setShowQuickActions(true); setQaPosition({ x: 0, y: 0 }); }}
+          >
+            <span className="text-xs text-gray-600 font-medium">Show Quick Actions</span>
+          </button>
+        )}
+
+        {/* Quick Actions - Draggable */}
+        {showQuickActions && (
+        <div 
+          className="fixed z-[1000] w-[90%] max-w-sm touch-none cursor-grab active:cursor-grabbing quick-actions-mobile"
+          tabIndex={-1}
+          onKeyDown={(e) => e.preventDefault()}
+          style={{ 
+            left: `calc(40% + ${qaPosition.x}px)`, 
+            bottom: `calc(90px + ${-qaPosition.y}px)`
+          }}
+          onMouseDown={handleQADragStart}
+          onMouseMove={handleQADragMove}
+          onMouseUp={handleQADragEnd}
+          onMouseLeave={handleQADragEnd}
+          onTouchStart={handleQADragStart}
+          onTouchMove={handleQADragMove}
+          onTouchEnd={handleQADragEnd}
+        >
+          <div className="bg-white rounded-[20px] shadow-[0px_-4px_20px_0px_rgba(0,0,0,0.08)] overflow-hidden">
+            {/* Drag Handle */}
+            <div className="w-10 h-1 mx-auto mt-4 bg-gray-300 rounded-sm cursor-pointer" onClick={() => setShowQuickActions(false)} tabIndex={-1} onKeyDown={(e) => e.preventDefault()} />
+            <div className="px-5 pt-2 pb-3">
+              <div className="flex justify-between items-center mb-3">
+                <div className="text-xl font-bold text-zinc-800 font-['DM_Sans'] tracking-tight">Quick Actions</div>
+                <div className="inline-flex items-center gap-1.5">
+                  <span className="text-blue-900 text-xs font-semibold font-['DM_Sans'] tracking-tight">Live Updates</span>
+                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                </div>
+              </div>
+              <div className="flex justify-around">
+                {/* Report Anon */}
+                <button className="flex flex-col items-center gap-2" onClick={() => setCurrentView('report')}>
+                  <div className="w-24 h-24 px-2.5 py-3 bg-white rounded-2xl flex flex-col justify-start items-center gap-2.5">
+                    <div className="w-10 h-10 p-2 bg-blue-50 rounded-[20px] flex items-center justify-center">
+                      <img src={reportAnonQAImg} alt="Report" className="w-8 h-8" />
+                    </div>
+                    <span className="text-neutral-600 text-xs font-semibold font-['DM_Sans'] tracking-tight">Report Anon</span>
+                  </div>
+                </button>
+                {/* Emergency */}
+                <button className="flex flex-col items-center gap-2" onClick={() => setCurrentView('help')}>
+                  <div className="w-24 h-24 px-3.5 py-3 bg-white rounded-2xl flex flex-col justify-start items-center gap-2.5">
+                    <div className="w-10 h-10 p-2 bg-red-100 rounded-[20px] flex items-center justify-center">
+                      <img src={emergencyQAImg} alt="Emergency" className="w-8 h-8" />
+                    </div>
+                    <span className="text-red-500 text-xs font-semibold font-['DM_Sans'] tracking-tight">Emergency</span>
+                  </div>
+                </button>
+                {/* AI Assistant */}
+                <button className="flex flex-col items-center gap-2" onClick={() => setIsChatOpen(true)}>
+                  <div className="w-24 h-24 px-3 py-3 bg-white rounded-2xl flex flex-col justify-start items-center gap-2.5">
+                    <div className="w-10 h-10 p-2 bg-blue-50 rounded-[20px] flex items-center justify-center">
+                      <img src={aiAsstQAImg} alt="AI" className="w-8 h-8" />
+                    </div>
+                    <span className="text-neutral-600 text-xs font-semibold font-['DM_Sans'] tracking-tight">AI Assistant</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        )}
+
       </main>
+
+      {/* Report Button - Always on top, outside nav */}
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[1001] flex flex-col items-center">
+        <button 
+          onClick={() => setCurrentView('report')}
+          className="flex flex-col items-center gap-1"
+        >
+          <div className="h-12 p-3 bg-blue-950 rounded-[20px] shadow-[0px_4px_16px_0px_rgba(26,42,108,0.40)] outline outline-[3px] outline-white flex items-center justify-center">
+            <img src={reportVectorImg} alt="Report" className="w-6 h-6" />
+          </div>
+          <span className="text-xs text-blue-950 font-medium bg-white px-2 rounded">Report</span>
+        </button>
+      </div>
+
+      {/* BOTTOM NAVIGATION */}
+      <nav className="bg-white shadow-[0_-4px_20px_0px_rgba(0,0,0,0.08)] z-50">
+        <div className="flex items-center justify-around h-16">
+          <button 
+            className={`flex flex-col items-center gap-1 ${currentView === 'map' ? 'text-blue-950' : 'text-gray-400'}`}
+            onClick={() => setCurrentView('map')}
+          >
+            <img src={homeImg} alt="Home" className="w-6 h-6" />
+            <div className="text-xs">Home</div>
+          </button>
+
+          <button 
+            className="flex flex-col items-center gap-1 text-gray-400"
+            onClick={() => setCurrentView('map')}
+          >
+            <img src={mapImg} alt="Map" className="w-6 h-6" />
+            <div className="text-xs">Map</div>
+          </button>
+
+          {/* Spacer for Report button */}
+          <div className="w-14" />
+
+          <button 
+            className="flex flex-col items-center gap-1 text-gray-400"
+            onClick={() => setCurrentView('help')}
+          >
+            <img src={helpImg} alt="Help" className="w-6 h-6" />
+            <div className="text-xs">Help</div>
+          </button>
+
+          <button 
+            className="flex flex-col items-center gap-1 text-gray-400"
+            onClick={() => setIsChatOpen(true)}
+          >
+            <img src={chatImg} alt="Admin" className="w-6 h-6 text-gray-400" />
+            <div className="text-xs text-gray-400">Admin</div>
+          </button>
+        </div>
+      </nav>
 
       {/* Chat Widget */}
       {isChatOpen && (
-        <div className="fixed bottom-4 right-4 w-80 h-96 bg-white rounded-lg shadow-xl border flex flex-col z-50">
+        <div className="fixed bottom-24 right-4 w-80 h-96 bg-white rounded-lg shadow-xl border flex flex-col z-[1001]">
           <div className="p-4 border-b flex items-center justify-between bg-green-600 rounded-t-lg">
             <h3 className="font-semibold text-white">SafeMap Assistant</h3>
             <Button variant="ghost" size="sm" className="text-white hover:bg-green-700" onClick={() => setIsChatOpen(false)}>
@@ -124,299 +360,23 @@ function App() {
               </div>
             ))}
           </div>
-          <div className="p-3 border-t flex gap-2">
-            <Input 
-              placeholder="Ask me anything..." 
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            />
-            <Button onClick={handleSendMessage}>Send</Button>
+          <div className="p-4 border-t">
+            <div className="flex gap-2">
+              <input 
+                type="text" 
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                placeholder="Type a message..." 
+                className="flex-1 border rounded-full px-4 py-2 outline-none focus:border-green-500"
+              />
+              <Button onClick={handleSendMessage} className="rounded-full px-4">
+                Send
+              </Button>
+            </div>
           </div>
         </div>
       )}
-    </div>
-  )
-}
-
-// Map View Component
-function MapView() {
-  const [selectedCategory, setSelectedCategory] = useState('all')
-  
-  const categories = [
-    { value: 'all', label: 'All' },
-    { value: 'theft', label: 'Theft' },
-    { value: 'assault', label: 'Assault' },
-    { value: 'accident', label: 'Accident' },
-    { value: 'suspicious', label: 'Suspicious' },
-  ]
-
-  return (
-    <div className="space-y-4">
-      {/* Filters */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Map Filters</CardTitle>
-          <CardDescription>Filter incidents by category</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {categories.map(cat => (
-              <Button 
-                key={cat.value}
-                variant={selectedCategory === cat.value ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedCategory(cat.value)}
-              >
-                {cat.label}
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Map */}
-      <Card>
-        <CardContent className="p-0">
-          <div className="h-[600px] rounded-lg overflow-hidden">
-            <MapContainer center={[14.5995, 120.9842]} zoom={12} className="h-full w-full">
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              {MOCK_REPORTS.map(report => (
-                <Marker key={report.id} position={[report.lat, report.lng]}>
-                  <Popup>
-                    <div className="p-2">
-                      <h3 className="font-semibold">{report.title}</h3>
-                      <p className="text-sm text-gray-600 capitalize">{report.category}</p>
-                      <span className={`inline-block px-2 py-1 text-xs rounded mt-2 ${
-                        report.severity === 'high' ? 'bg-red-100 text-red-800' :
-                        report.severity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-blue-100 text-blue-800'
-                      }`}>
-                        {report.severity}
-                      </span>
-                    </div>
-                  </Popup>
-                </Marker>
-              ))}
-            </MapContainer>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Legend */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm">Legend</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-red-500"></div>
-              <span>Critical/High</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-orange-500"></div>
-              <span>Medium</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-blue-500"></div>
-              <span>Low</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-green-500"></div>
-              <span>PNP Verified</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
-
-// Report View Component
-function ReportView() {
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    category: '',
-    severity: 'medium',
-    lat: '',
-    lng: '',
-  })
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    alert('Report submitted! Reference code: SMPH-' + Math.random().toString(36).substr(2, 6).toUpperCase())
-  }
-
-  return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-yellow-500" />
-            Submit Incident Report
-          </CardTitle>
-          <CardDescription>
-            Your report is anonymous. Fill in all required fields.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Title *</label>
-              <Input 
-                required
-                placeholder="Brief title of the incident"
-                value={formData.title}
-                onChange={(e) => setFormData({...formData, title: e.target.value})}
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-1">Category *</label>
-              <select 
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                required
-                value={formData.category}
-                onChange={(e) => setFormData({...formData, category: e.target.value})}
-              >
-                <option value="">Select category</option>
-                <option value="theft">Theft/Robbery</option>
-                <option value="assault">Assault</option>
-                <option value="fraud">Fraud</option>
-                <option value="harassment">Harassment</option>
-                <option value="accident">Accident</option>
-                <option value="suspicious">Suspicious Activity</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Description *</label>
-              <textarea 
-                className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                required
-                placeholder="Describe what happened..."
-                value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Latitude *</label>
-                <Input 
-                  required
-                  type="number"
-                  step="any"
-                  placeholder="e.g., 14.5995"
-                  value={formData.lat}
-                  onChange={(e) => setFormData({...formData, lat: e.target.value})}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Longitude *</label>
-                <Input 
-                  required
-                  type="number"
-                  step="any"
-                  placeholder="e.g., 120.9842"
-                  value={formData.lng}
-                  onChange={(e) => setFormData({...formData, lng: e.target.value})}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Severity</label>
-              <select 
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                value={formData.severity}
-                onChange={(e) => setFormData({...formData, severity: e.target.value})}
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="critical">Critical</option>
-              </select>
-            </div>
-
-            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-              <p className="text-sm text-yellow-800">
-                <strong>Note:</strong> Your report will be reviewed by admin staff. 
-                Do not confront suspects directly. In emergencies, dial 911.
-              </p>
-            </div>
-
-            <Button type="submit" className="w-full">Submit Report</Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
-
-// Help View Component
-function HelpView() {
-  return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <Card className="border-red-200 bg-red-50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-red-700">
-            <Phone className="h-5 w-5" />
-            Emergency Hotlines
-          </CardTitle>
-          <CardDescription className="text-red-600">
-            Call these numbers for immediate assistance
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4">
-            {EMERGENCY_CONTACTS.map((contact, i) => (
-              <div key={i} className="flex items-center justify-between p-4 bg-white rounded-lg border">
-                <div>
-                  <h4 className="font-semibold">{contact.name}</h4>
-                  <p className="text-sm text-gray-500 capitalize">{contact.category}</p>
-                </div>
-                <Button variant="destructive" size="lg">
-                  {contact.phone}
-                </Button>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Get Help Now</CardTitle>
-          <CardDescription>Additional resources and support</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Button variant="outline" className="h-auto py-4 flex-col gap-2">
-              <User className="h-6 w-6" />
-              <span>VAWC Desk</span>
-            </Button>
-            <Button variant="outline" className="h-auto py-4 flex-col gap-2">
-              <Shield className="h-6 w-6" />
-              <span>PNP Station</span>
-            </Button>
-            <Button variant="outline" className="h-auto py-4 flex-col gap-2">
-              <Phone className="h-6 w-6" />
-              <span>DSWD Office</span>
-            </Button>
-            <Button variant="outline" className="h-auto py-4 flex-col gap-2">
-              <AlertTriangle className="h-6 w-6" />
-              <span>Crisis Center</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }
