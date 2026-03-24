@@ -49,17 +49,13 @@ export default function IncidentDetailsPage() {
   }
 
   const incidentTypes = [
-    'Theft',
-    'Assault',
-    'Fraud',
+    'Sexual Assault',
+    'Physical Abuse',
+    'Domestic Violence',
     'Harassment',
-    'Vandalism',
-    'Accident',
-    'Fire',
-    'Flood',
-    'Suspicious Activity',
-    'Violence',
-    'Other'
+    'Stalking',
+    'Verbal Abuse',
+    'Emotional Abuse'
   ]
 
   return (

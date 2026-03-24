@@ -15,7 +15,19 @@ function ZoomControls() {
   }
   
   const handleLocation = () => {
-    map.setView([6.1167, 125.1667], 13)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords
+          map.setView([latitude, longitude], 15)
+        },
+        (error) => {
+          alert('Unable to get your location. Please enable location services.')
+        }
+      )
+    } else {
+      alert('Geolocation is not supported by this browser.')
+    }
   }
   
   const handleCityCentral = () => {

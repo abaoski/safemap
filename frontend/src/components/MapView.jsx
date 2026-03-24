@@ -2,11 +2,11 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import ZoomControls from './ZoomControls'
 import RiskLegend from './RiskLegend'
 
-// Mock data for demonstration - General Santos City
+// Mock data for demonstration - General Santos City (GBV incidents only)
 const MOCK_REPORTS = [
-  { id: 1, title: 'Theft Incident', category: 'theft', severity: 'high', lat: 6.1167, lng: 125.1667, status: 'approved_awareness' },
-  { id: 2, title: 'Suspicious Activity', category: 'suspicious', severity: 'medium', lat: 6.105, lng: 125.175, status: 'verified_pnp' },
-  { id: 3, title: 'Accident', category: 'accident', severity: 'low', lat: 6.125, lng: 125.16, status: 'approved_awareness' },
+  { id: 1, title: 'Sexual Assault', category: 'sexual_assault', severity: 'high', lat: 6.1167, lng: 125.1667, status: 'approved_awareness' },
+  { id: 2, title: 'Domestic Violence', category: 'domestic_violence', severity: 'high', lat: 6.105, lng: 125.175, status: 'verified_pnp' },
+  { id: 3, title: 'Harassment', category: 'harassment', severity: 'medium', lat: 6.125, lng: 125.16, status: 'approved_awareness' },
 ]
 
 function MapView() {

@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import ReportPage from './pages/ReportPage'
 import IncidentDetailsPage from './pages/IncidentDetailsPage'
 import LocationDetailsPage from './pages/LocationDetailsPage'
 import ReviewSubmitPage from './pages/ReviewSubmitPage'
 import ReportSuccessPage from './pages/ReportSuccessPage'
 import TrackReportPage from './pages/TrackReportPage'
+import HelpPage from './pages/HelpPage'
 
 // Import modular components
 import Header from './components/Header'
@@ -16,6 +17,7 @@ import ChatWidget from './components/ChatWidget'
 import ReportButton from './components/ReportButton'
 
 function App() {
+  const navigate = useNavigate()
   const [currentView, setCurrentView] = useState('map')
   const [showQuickActions, setShowQuickActions] = useState(true)
   
@@ -42,7 +44,7 @@ function App() {
   }
 
   const handleHelpClick = () => {
-    setCurrentView('help')
+    navigate('/help')
   }
 
   return (
@@ -96,6 +98,7 @@ function App() {
       <Route path="/review-submit" element={<ReviewSubmitPage />} />
       <Route path="/report-success" element={<ReportSuccessPage />} />
       <Route path="/track" element={<TrackReportPage />} />
+      <Route path="/help" element={<HelpPage />} />
     </Routes>
   )
 }
