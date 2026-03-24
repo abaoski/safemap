@@ -1,11 +1,16 @@
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import logoImg from '/src/assets/images/Logo.svg'
 import rptBackImg from '/src/assets/images/rpt_back.svg'
 import rptSafetyImg from '/src/assets/images/rpt_safety.svg'
 import rptImpReminderImg from '/src/assets/images/rpt_imp_reminder.svg'
+import { Checkbox } from "@/components/ui/checkbox"
+import { MapContainer, TileLayer } from 'react-leaflet'
 
 export default function ReportPage() {
   const navigate = useNavigate()
+  const [emergencyChecked, setEmergencyChecked] = useState(false)
+  const [privacyChecked, setPrivacyChecked] = useState(false)
 
   return (
     <div className="w-full h-screen bg-slate-50 overflow-y-auto">
@@ -13,9 +18,9 @@ export default function ReportPage() {
       <div className="relative w-full h-auto p-4">
         <button 
           onClick={() => navigate('/')}
-          className="absolute left-4 top-4 p-2 bg-slate-100 rounded-md"
+          className="absolute left-2 top-4 p-2 hover:bg-gray-100 z-10"
         >
-          <img src={rptBackImg} alt="Back" className="w-3 h-3" />
+          <img src={rptBackImg} alt="Back" className="w-6 h-6" />
         </button>
         
         <div className="flex flex-col items-center pt-8">
@@ -35,10 +40,26 @@ export default function ReportPage() {
         </div>
       </div>
       
-      {/* Image Section */}
+      {/* Map Section - Static Map of General Santos City */}
       <div className="w-full max-w-md mx-auto mt-8 shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)]">
-        <div className="w-full h-56 bg-gray-200 rounded-t-xl overflow-hidden">
-          <img src="https://placehold.co/389x232" alt="Placeholder" className="w-full h-full object-cover" />
+        <div className="w-full h-56 rounded-t-xl overflow-hidden">
+          <MapContainer 
+            center={[6.1167, 125.1667]} 
+            zoom={12} 
+            className="h-full w-full"
+            zoomControl={false}
+            dragging={false}
+            scrollWheelZoom={false}
+            doubleClickZoom={false}
+            boxZoom={false}
+            keyboard={false}
+            tap={false}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+          </MapContainer>
         </div>
         <div className="w-full h-10 bg-white flex items-center px-4">
           <div className="flex items-center gap-2">
@@ -51,19 +72,29 @@ export default function ReportPage() {
       {/* Info Cards */}
       <div className="w-full max-w-md mx-auto mt-8 px-4 flex flex-col gap-4">
         {/* Emergency Protocol */}
-        <div className="w-full h-20 bg-white rounded-2xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-offset-[-1px] outline-gray-200 px-5 py-4 flex items-center gap-3.5">
-          <img src={rptImpReminderImg} alt="Emergency" className="w-6 h-6" />
+        <div className="w-full h-auto bg-white rounded-2xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-offset-[-1px] outline-gray-200 px-5 py-4 flex items-start gap-3.5">
+          <Checkbox 
+            id="emergency" 
+            checked={emergencyChecked} 
+            onCheckedChange={setEmergencyChecked}
+            className="mt-1"
+          />
           <div className="flex flex-col gap-1">
-            <span className="text-zinc-800 text-xs font-medium">Emergency Protocol</span>
+            <label htmlFor="emergency" className="text-zinc-800 text-xs font-medium cursor-pointer">Emergency Protocol</label>
             <span className="text-gray-400 text-xs">If you are in immediate danger, call <span className="text-blue-900 font-bold">911</span> immediately.</span>
           </div>
         </div>
         
         {/* Privacy Rule */}
-        <div className="w-full h-20 bg-white rounded-2xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-offset-[-1px] outline-gray-200 px-5 py-4 flex items-center gap-3.5">
-          <img src={rptImpReminderImg} alt="Privacy" className="w-6 h-6" />
+        <div className="w-full h-auto bg-white rounded-2xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-offset-[-1px] outline-gray-200 px-5 py-4 flex items-start gap-3.5">
+          <Checkbox 
+            id="privacy" 
+            checked={privacyChecked} 
+            onCheckedChange={setPrivacyChecked}
+            className="mt-1"
+          />
           <div className="flex flex-col gap-1">
-            <span className="text-zinc-800 text-xs font-medium">Privacy Rule</span>
+            <label htmlFor="privacy" className="text-zinc-800 text-xs font-medium cursor-pointer">Privacy Rule</label>
             <span className="text-gray-400 text-xs">Your report will be treated with strict confidentiality. We never share your personal information.</span>
           </div>
         </div>
@@ -72,10 +103,17 @@ export default function ReportPage() {
       {/* Submit Button */}
       <div className="w-full max-w-md mx-auto mt-8 px-4 pb-8">
         <button 
-          onClick={() => alert('Report submission functionality coming soon!')}
-          className="w-full h-14 bg-blue-950 rounded-xl shadow-[0px_4px_16px_0px_rgba(26,42,108,0.40)] flex items-center justify-center"
+          onClick={() => {
+            if (!emergencyChecked || !privacyChecked) {
+              alert('Please check both boxes to confirm you have read the guidelines.')
+              return
+            }
+            navigate('/incident-details')
+          }}
+          disabled={!emergencyChecked || !privacyChecked}
+          className="w-full h-14 bg-blue-950 rounded-xl shadow-[0px_4px_16px_0px_rgba(26,42,108,0.40)] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span className="text-white text-base font-semibold font-['DM_Sans'] tracking-tight">Submit Report</span>
+          <span className="text-white text-base font-semibold font-['DM_Sans'] tracking-tight">Start Anonymous Report</span>
         </button>
       </div>
     </div>

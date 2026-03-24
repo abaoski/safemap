@@ -20,7 +20,7 @@ class Report(db.Model):
     # Workflow Status:
     # - pending_review: Unverified & Pending Review (default)
     # - approved_awareness: Approved for Awareness (shows on public heatmap)
-    # - verified_pnp: PNP Confirmed (verified marker + official dashboards)
+    # - verified: Verified (verified marker + official dashboards)
     # - dismissed: Spam/Duplicates (removed from public view)
     status = db.Column(db.String(30), default='pending_review', index=True)
     
@@ -85,7 +85,7 @@ class Report(db.Model):
     STATUS_VALUES = [
         'pending_review',      # Unverified & Pending Review
         'approved_awareness', # Approved for Awareness
-        'verified_pnp',       # PNP Confirmed
+        'verified',           # Verified
         'dismissed'           # Spam/Duplicates
     ]
     
@@ -174,8 +174,8 @@ class Report(db.Model):
         self.remove_personal_details()
     
     def verify_pnp(self, reviewed_by, case_number=None, notes=''):
-        """Mark report as PNP verified"""
-        self.status = 'verified_pnp'
+        """Mark report as verified"""
+        self.status = 'verified'
         self.is_pnp_verified = True
         self.pnp_case_number = case_number
         self.reviewed_by = reviewed_by

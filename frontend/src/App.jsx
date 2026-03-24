@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import ReportPage from './pages/ReportPage'
+import IncidentDetailsPage from './pages/IncidentDetailsPage'
+import LocationDetailsPage from './pages/LocationDetailsPage'
+import ReviewSubmitPage from './pages/ReviewSubmitPage'
+import ReportSuccessPage from './pages/ReportSuccessPage'
+import TrackReportPage from './pages/TrackReportPage'
 
 // Import modular components
 import Header from './components/Header'
@@ -68,8 +73,8 @@ function App() {
             />
           </main>
 
-          {/* Report Button - Always on top, outside nav */}
-          {currentView !== 'report' && <ReportButton />}
+          {/* Report Button - Floating on main page only */}
+          <ReportButton />
 
           {/* Bottom Navigation */}
           <BottomNav
@@ -86,6 +91,11 @@ function App() {
       }
       />
       <Route path="/report" element={<ReportPage />} />
+      <Route path="/incident-details" element={<IncidentDetailsPage />} />
+      <Route path="/location-details" element={<LocationDetailsPage />} />
+      <Route path="/review-submit" element={<ReviewSubmitPage />} />
+      <Route path="/report-success" element={<ReportSuccessPage />} />
+      <Route path="/track" element={<TrackReportPage />} />
     </Routes>
   )
 }

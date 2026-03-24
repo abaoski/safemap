@@ -20,7 +20,7 @@ def get_public_reports():
     city = request.args.get('city')
     
     query = Report.query.filter(
-        Report.status.in_(['approved_awareness', 'verified_pnp'])
+        Report.status.in_(['approved_awareness', 'verified'])
     )
     
     if category:
@@ -317,9 +317,9 @@ def get_report_stats():
     # Total
     total = Report.query.count()
     public_count = Report.query.filter(
-        Report.status.in_(['approved_awareness', 'verified_pnp'])
+        Report.status.in_(['approved_awareness', 'verified'])
     ).count()
-    verified_count = Report.query.filter_by(status='verified_pnp').count()
+    verified_count = Report.query.filter_by(status='verified').count()
     
     return jsonify({
         'total': total,

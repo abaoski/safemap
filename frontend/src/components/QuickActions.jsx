@@ -96,13 +96,13 @@ function QuickActions({
             </div>
           </div>
           <div className="flex justify-around">
-            {/* Report Anon */}
-            <button className="flex flex-col items-center gap-2" onClick={() => navigate('/report')}>
+            {/* Track Report */}
+            <button className="flex flex-col items-center gap-2" onClick={() => navigate('/track')}>
               <div className="w-24 h-24 px-2.5 py-3 bg-white rounded-2xl flex flex-col justify-start items-center gap-2.5">
                 <div className="w-10 h-10 p-2 bg-blue-50 rounded-[20px] flex items-center justify-center">
-                  <img src={reportAnonQAImg} alt="Report" className="w-8 h-8" />
+                  <img src={reportAnonQAImg} alt="Track" className="w-8 h-8" />
                 </div>
-                <span className="text-neutral-600 text-xs font-semibold font-['DM_Sans'] tracking-tight">Report Anon</span>
+                <span className="text-neutral-600 text-xs font-semibold font-['DM_Sans'] tracking-tight">Track Report</span>
               </div>
             </button>
             {/* Emergency */}
