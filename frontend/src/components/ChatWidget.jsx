@@ -1,30 +1,43 @@
 import { BubbleChat } from "flowise-embed-react"
+import { useEffect, useState } from "react"
 
 function ChatWidget() {
+    const [chatKey, setChatKey] = useState(0)
+    const [autoOpen, setAutoOpen] = useState(false)
+    
+    // Handle the open chat event
+    useEffect(() => {
+        const handleOpenChat = () => {
+            console.log('AI Assistant clicked - opening chat...')
+            // Set autoOpen to true and increment key to trigger remount with autoOpen
+            setAutoOpen(true)
+            setChatKey(prev => prev + 1)
+        }
+        
+        window.addEventListener('safemap-open-chat', handleOpenChat)
+        return () => window.removeEventListener('safemap-open-chat', handleOpenChat)
+    }, [])
+
+    console.log('Rendering ChatWidget with key:', chatKey, 'autoOpen:', autoOpen)
+
     return (
         <BubbleChat
+            key={chatKey}
             chatflowid="a465361c-a91f-46a3-9771-81e0caf1472f"
             apiHost="https://cloud.flowiseai.com"
             theme={{
                 button: {
                     backgroundColor: "#1e3a5f",
-                    right: 20,
-                    bottom: 20,
-                    size: 52,
+                    right: 15,
+                    bottom: 270,
+                    size: 48,
                     dragAndDrop: false,
                     iconColor: "#ffffff",
                     autoWindowOpen: {
-                        autoOpen: false,
-                        openDelay: 2,
-                        autoOpenOnMobile: false,
+                        autoOpen: autoOpen,
+                        openDelay: 1,
+                        autoOpenOnMobile: true,
                     },
-                },
-                tooltip: {
-                    showTooltip: true,
-                    tooltipMessage: "Ask SafeMap Assistant 👋",
-                    tooltipBackgroundColor: "#1e3a5f",
-                    tooltipTextColor: "#ffffff",
-                    tooltipFontSize: 14,
                 },
                 chatWindow: {
                     showTitle: true,
@@ -38,7 +51,9 @@ function ChatWidget() {
                     backgroundColor: "#ffffff",
                     height: 620,
                     width: 400,
+                    zIndex: 999,
                     fontSize: 15,
+                    zIndex: 1001,
                     starterPrompts: [
                         "Report Incident",
                         "Track Report",
@@ -89,6 +104,24 @@ function ChatWidget() {
                     },
                 },
                 customCSS: `
+          /* Position chat window */
+          .flowise-chatbot-chat-window,
+          #flowise-chatbot-chat-window,
+          div[class*="chat-window"],
+          div[class*="chatWindow"] {
+            position: fixed !important;
+            top: 200px !important;
+            right: 16px !important;
+            bottom: auto !important;
+            left: auto !important;
+            transform: none !important;
+          }
+          
+          /* Ensure BottomNav and Admin button area is not covered */
+          body {
+            padding-bottom: 80px !important;
+          }
+          
           /* Match DM Sans font from SafeMap design system */
           #flowise-chatbot * {
             font-family: 'DM Sans', sans-serif !important;
