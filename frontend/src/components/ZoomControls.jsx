@@ -35,7 +35,7 @@ function ZoomControls() {
   }
 
   return (
-    <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
+    <div className="absolute top-4 right-4 z-1000 flex flex-col gap-2">
       {/* City Central */}
       <button
         className="w-12 h-12 p-3 rounded-[10px] shadow-[0px_2px_8px_0px_rgba(0,0,0,0.00)] flex items-center justify-center"

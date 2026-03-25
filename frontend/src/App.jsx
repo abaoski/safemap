@@ -27,20 +27,9 @@ function App() {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [dragStartPos, setDragStartPos] = useState({ x: 0, y: 0 })
 
-  // Chat state
-  const [isChatOpen, setIsChatOpen] = useState(false)
-
   // Handlers
   const handleEmergencyClick = () => {
     setCurrentView('help')
-  }
-
-  const handleAIChatClick = () => {
-    setIsChatOpen(true)
-  }
-
-  const handleChatOpen = () => {
-    setIsChatOpen(true)
   }
 
   const handleHelpClick = () => {
@@ -71,7 +60,7 @@ function App() {
               dragStartPos={dragStartPos}
               setDragStartPos={setDragStartPos}
               onEmergencyClick={handleEmergencyClick}
-              onAIChatClick={handleAIChatClick}
+              onAIChatClick={() => {}}
             />
           </main>
 
@@ -81,14 +70,11 @@ function App() {
           {/* Bottom Navigation */}
           <BottomNav
             onHelpClick={handleHelpClick}
-            onChatClick={handleChatOpen}
+            onChatClick={() => {}}
           />
 
-          {/* Chat Widget */}
-          <ChatWidget
-            isOpen={isChatOpen}
-            onClose={() => setIsChatOpen(false)}
-          />
+          {/* Flowise Chat Widget - self-managed bubble */}
+          <ChatWidget />
         </div>
       }
       />

@@ -204,7 +204,7 @@ export default function TrackReportPage() {
           
           {/* Pending Review */}
           <div className="flex gap-3 mb-4">
-            <div className="w-3 h-3 rounded-full bg-amber-500 mt-1.5 flex-shrink-0" />
+            <div className="w-3 h-3 rounded-full bg-amber-500 mt-1.5 shrink-0" />
             <div>
               <div className="text-zinc-800 text-base font-bold font-['DM_Sans']">Pending Review</div>
               <div className="text-gray-400 text-xs">Our team is verifying the details of your report.</div>
@@ -213,7 +213,7 @@ export default function TrackReportPage() {
 
           {/* In Progress */}
           <div className="flex gap-3 mb-4">
-            <div className="w-3 h-3 rounded-full bg-blue-900 mt-1.5 flex-shrink-0" />
+            <div className="w-3 h-3 rounded-full bg-blue-900 mt-1.5 shrink-0" />
             <div>
               <div className="text-zinc-800 text-base font-bold font-['DM_Sans']">In Progress</div>
               <div className="text-gray-400 text-xs">Local authorities have been notified and are responding.</div>
@@ -222,7 +222,7 @@ export default function TrackReportPage() {
 
           {/* Resolved */}
           <div className="flex gap-3">
-            <div className="w-3 h-3 rounded-full bg-green-500 mt-1.5 flex-shrink-0" />
+            <div className="w-3 h-3 rounded-full bg-green-500 mt-1.5 shrink-0" />
             <div>
               <div className="text-zinc-800 text-base font-bold font-['DM_Sans']">Resolved</div>
               <div className="text-gray-400 text-xs">The incident has been cleared or addressed successfully.</div>

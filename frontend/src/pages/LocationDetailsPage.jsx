@@ -210,7 +210,7 @@ export default function LocationDetailsPage() {
           {/* Use My Location Button - Overlay */}
           <button 
             onClick={handleUseMyLocation}
-            className="absolute bottom-4 left-4 right-4 h-10 bg-white rounded-xl border border-gray-200 px-3 flex items-center gap-2 shadow-md z-[1000] cursor-pointer hover:bg-gray-50"
+            className="absolute bottom-4 left-4 right-4 h-10 bg-white rounded-xl border border-gray-200 px-3 flex items-center gap-2 shadow-md z-1000 cursor-pointer hover:bg-gray-50"
           >
             <div className="w-4 h-4 relative overflow-hidden">
               <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -351,7 +351,7 @@ export default function LocationDetailsPage() {
         {/* Stay Anonymous Info Box */}
         <div className="w-full h-24 bg-blue-50 rounded-[10px] border border-blue-600 p-3 mb-6">
           <div className="flex items-start gap-3">
-            <div className="w-5 h-5 mt-0.5 flex-shrink-0">
+            <div className="w-5 h-5 mt-0.5 shrink-0">
               <img src={rptImpReminderImg} alt="Info" className="w-5 h-5" />
             </div>
             <p className="text-justify">

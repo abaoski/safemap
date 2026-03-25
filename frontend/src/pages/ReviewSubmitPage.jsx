@@ -204,7 +204,7 @@ export default function ReviewSubmitPage() {
         {/* Victim / Perpetrator Info */}
         <div className="w-full h-36 bg-blue-50 rounded-[10px] shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] mb-2 overflow-hidden p-4">
           <div className="flex items-start gap-3.5">
-            <div className="w-10 h-10 p-2.5 bg-indigo-50 rounded-md flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 p-2.5 bg-indigo-50 rounded-md flex items-center justify-center shrink-0">
               <div className="w-5 h-5">
                 <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="10" cy="6" r="3" stroke="#1A3A8F" strokeWidth="1.5"/>
@@ -226,7 +226,7 @@ export default function ReviewSubmitPage() {
         <div className="flex items-center gap-3.5">
           <button 
             onClick={() => setConfirmed(!confirmed)}
-            className="w-6 h-6 flex-shrink-0 border-2 border-gray-300 rounded flex items-center justify-center"
+            className="w-6 h-6 shrink-0 border-2 border-gray-300 rounded flex items-center justify-center"
           >
             {confirmed && (
               <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -244,7 +244,7 @@ export default function ReviewSubmitPage() {
       <div className="w-full max-w-md mx-auto px-4 mt-4">
         <div className="w-full h-20 bg-blue-50 rounded-[10px] border border-blue-600 overflow-hidden p-4">
           <div className="flex items-start gap-3.5">
-            <div className="w-5 h-5 flex-shrink-0 mt-0.5">
+            <div className="w-5 h-5 shrink-0 mt-0.5">
               <img src={rptImpReminderImg} alt="Lock" className="w-5 h-5" />
             </div>
             <span className="text-justify text-blue-900 text-xs font-normal font-['DM_Sans']">

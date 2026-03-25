@@ -13,7 +13,7 @@ function Header() {
             <input 
               type="text" 
               placeholder="Search safe zones or locations..." 
-              className="w-full h-10 pl-10 pr-4 bg-gray-100 rounded-full outline-none"
+              className="w-full h-10 pl-10 pr-4 bg-gray-100 rounded-full outline-hidden"
             />
           </div>
         </div>

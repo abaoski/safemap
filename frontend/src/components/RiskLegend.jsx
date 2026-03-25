@@ -1,6 +1,6 @@
 function RiskLegend() {
   return (
-    <div className="absolute top-4 left-4 z-[1000] bg-white/90 rounded-lg shadow-lg p-3">
+    <div className="absolute top-4 left-4 z-1000 bg-white/90 rounded-lg shadow-lg p-3">
       <div className="text-xs font-bold text-gray-500 mb-2">RISK DENSITY</div>
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">

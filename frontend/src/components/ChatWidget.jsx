@@ -1,63 +1,151 @@
-import { useState } from 'react'
-import { X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { BubbleChat } from "flowise-embed-react"
 
-function ChatWidget({ isOpen, onClose }) {
-  const [chatMessages, setChatMessages] = useState([
-    { text: 'Hello! How can I help you today?', sender: 'bot' }
-  ])
-  const [chatInput, setChatInput] = useState('')
+function ChatWidget() {
+    return (
+        <BubbleChat
+            chatflowid="a465361c-a91f-46a3-9771-81e0caf1472f"
+            apiHost="https://cloud.flowiseai.com"
+            theme={{
+                button: {
+                    backgroundColor: "#1e3a5f",
+                    right: 20,
+                    bottom: 20,
+                    size: 52,
+                    dragAndDrop: false,
+                    iconColor: "#ffffff",
+                    autoWindowOpen: {
+                        autoOpen: false,
+                        openDelay: 2,
+                        autoOpenOnMobile: false,
+                    },
+                },
+                tooltip: {
+                    showTooltip: true,
+                    tooltipMessage: "Ask SafeMap Assistant 👋",
+                    tooltipBackgroundColor: "#1e3a5f",
+                    tooltipTextColor: "#ffffff",
+                    tooltipFontSize: 14,
+                },
+                chatWindow: {
+                    showTitle: true,
+                    showAgentMessages: true,
+                    title: "SafeMap Assistant",
+                    titleAvatarSrc:
+                        "https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/google-messages.svg",
+                    welcomeMessage:
+                        "Hi! I'm the SafeMap Assistant 🛡️\n\nHow can I help you today?",
+                    errorMessage: "Something went wrong. Please try again.",
+                    backgroundColor: "#ffffff",
+                    height: 620,
+                    width: 400,
+                    fontSize: 15,
+                    starterPrompts: [
+                        "Report Incident",
+                        "Track Report",
+                        "Hotspot Colors",
+                        "PNP Contact",
+                        "VAWC Hotline",
+                        "Emergency Help",
+                        "Safety Tips",
+                        "Map Filters",
+                    ],
+                    starterPromptFontSize: 13,
+                    clearChatOnReload: false,
+                    renderHTML: true,
+                    botMessage: {
+                        backgroundColor: "#f1f5f9",
+                        textColor: "#0f172a",
+                        showAvatar: true,
+                        avatarSrc:
+                            "https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/google-messages.svg",
+                    },
+                    userMessage: {
+                        backgroundColor: "#3b82f6",
+                        textColor: "#ffffff",
+                        showAvatar: false,
+                    },
+                    textInput: {
+                        placeholder: "Ask me anything about SafeMap…",
+                        backgroundColor: "#ffffff",
+                        textColor: "#0f172a",
+                        sendButtonColor: "#3b82f6",
+                        maxChars: 300,
+                        autoFocus: false,
+                        sendMessageSound: false,
+                        receiveMessageSound: false,
+                    },
+                    feedback: {
+                        color: "#64748b",
+                    },
+                    dateTimeToggle: {
+                        date: true,
+                        time: false,
+                    },
+                    footer: {
+                        textColor: "#303235",
+                        text: "Powered by",
+                        company: "SafeMap",
+                        companyLink: "#",
+                    },
+                },
+                customCSS: `
+          /* Match DM Sans font from SafeMap design system */
+          #flowise-chatbot * {
+            font-family: 'DM Sans', sans-serif !important;
+          }
 
-  const handleSendMessage = () => {
-    if (!chatInput.trim()) return
-    
-    setChatMessages([...chatMessages, { text: chatInput, sender: 'user' }])
-    setChatInput('')
-    
-    setTimeout(() => {
-      setChatMessages(prev => [...prev, { 
-        text: 'I can help you with reporting incidents, viewing the map, or finding emergency contacts. What would you like to do?', 
-        sender: 'bot' 
-      }])
-    }, 500)
-  }
+          /* Starter prompts into a horizontal floating carousel */
+          .starter-prompts-container {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            gap: 8px !important;
+            padding: 12px 16px !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+            margin-top: auto !important;
+            background: rgba(255, 255, 255, 0.9) !important;
+            backdrop-filter: blur(4px) !important;
+            border-top: 1px solid #f1f5f9 !important;
+            z-index: 10 !important;
+          }
 
-  if (!isOpen) return null
+          .starter-prompts-container::-webkit-scrollbar {
+            display: none !important;
+          }
 
-  return (
-    <div className="fixed bottom-24 right-4 w-80 h-96 bg-white rounded-lg shadow-xl border flex flex-col z-[1001]">
-      <div className="p-4 border-b flex items-center justify-between bg-green-600 rounded-t-lg">
-        <h3 className="font-semibold text-white">SafeMap Assistant</h3>
-        <Button variant="ghost" size="sm" className="text-white hover:bg-green-700" onClick={onClose}>
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {chatMessages.map((msg, i) => (
-          <div key={i} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[80%] rounded-lg p-3 ${msg.sender === 'user' ? 'bg-green-600 text-white' : 'bg-gray-100'}`}>
-              {msg.text}
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="p-4 border-t">
-        <div className="flex gap-2">
-          <input 
-            type="text" 
-            value={chatInput}
-            onChange={(e) => setChatInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder="Type a message..." 
-            className="flex-1 border rounded-full px-4 py-2 outline-none focus:border-green-500"
-          />
-          <Button onClick={handleSendMessage} className="rounded-full px-4">
-            Send
-          </Button>
-        </div>
-      </div>
-    </div>
-  )
+          .starter-prompt-button {
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+            border: 1.5px solid #e2e8f0 !important;
+            border-radius: 9999px !important;
+            background: #ffffff !important;
+            color: #1e3a5f !important;
+            font-weight: 500 !important;
+            font-size: 13px !important;
+            padding: 8px 16px !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+          }
+
+          .starter-prompt-button:hover {
+            background: #eff6ff !important;
+            border-color: #3b82f6 !important;
+            color: #3b82f6 !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.08) !important;
+          }
+
+          /* Chat header styling */
+          .chat-header {
+            background: #1e3a5f !important;
+            border-radius: 12px 12px 0 0 !important;
+          }
+        `,
+            }}
+        />
+    )
 }
 
 export default ChatWidget

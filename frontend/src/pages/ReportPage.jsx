@@ -72,7 +72,7 @@ export default function ReportPage() {
       {/* Info Cards */}
       <div className="w-full max-w-md mx-auto mt-8 px-4 flex flex-col gap-4">
         {/* Emergency Protocol */}
-        <div className="w-full h-auto bg-white rounded-2xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-offset-[-1px] outline-gray-200 px-5 py-4 flex items-start gap-3.5">
+        <div className="w-full h-auto bg-white rounded-2xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] outline-solid outline-1 -outline-offset-1 outline-gray-200 px-5 py-4 flex items-start gap-3.5">
           <Checkbox 
             id="emergency" 
             checked={emergencyChecked} 
@@ -86,7 +86,7 @@ export default function ReportPage() {
         </div>
         
         {/* Privacy Rule */}
-        <div className="w-full h-auto bg-white rounded-2xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-offset-[-1px] outline-gray-200 px-5 py-4 flex items-start gap-3.5">
+        <div className="w-full h-auto bg-white rounded-2xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] outline-solid outline-1 -outline-offset-1 outline-gray-200 px-5 py-4 flex items-start gap-3.5">
           <Checkbox 
             id="privacy" 
             checked={privacyChecked} 

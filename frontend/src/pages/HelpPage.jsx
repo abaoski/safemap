@@ -63,9 +63,9 @@ export default function HelpPage() {
 
       {/* Women and Children Protection Center Card */}
       <div className="w-full max-w-md mx-auto mt-6 px-4">
-        <div className="w-full h-48 bg-blue-50 rounded-2xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] outline outline-[0.50px] outline-offset-[-0.50px] outline-blue-600 overflow-hidden p-4">
+        <div className="w-full h-48 bg-blue-50 rounded-2xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] outline-solid outline-[0.50px] outline-offset-[-0.50px] outline-blue-600 overflow-hidden p-4">
           <div className="flex items-start gap-4">
-            <div className="w-20 h-20 p-5 bg-white rounded-[20px] flex items-center justify-center flex-shrink-0">
+            <div className="w-20 h-20 p-5 bg-white rounded-[20px] flex items-center justify-center shrink-0">
               <img src={wacCenterImg} alt="WCPD" className="w-10 h-10" />
             </div>
             <div className="flex flex-col gap-2">
@@ -84,7 +84,7 @@ export default function HelpPage() {
           <div className="text-gray-400 text-sm">Loading contacts...</div>
         ) : emergencyContacts.length > 0 ? (
           emergencyContacts.slice(0, 3).map((contact, index) => (
-            <div key={index} className="w-full h-16 bg-white rounded-lg shadow-[0px_0px_0px_0px_rgba(0,0,0,0.00)] outline outline-1 outline-offset-[-1px] outline-gray-200 overflow-hidden mb-3">
+            <div key={index} className="w-full h-16 bg-white rounded-lg shadow-[0px_0px_0px_0px_rgba(0,0,0,0.00)] outline-solid outline-1 -outline-offset-1 outline-gray-200 overflow-hidden mb-3">
               <div className="flex items-center gap-3.5 px-5 py-3">
                 <div className="w-10 h-10 p-2.5 bg-blue-100 rounded-md flex items-center justify-center">
                   <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -106,7 +106,7 @@ export default function HelpPage() {
 
       {/* What to expect when you call */}
       <div className="w-full max-w-md mx-auto px-4 mt-8">
-        <div className="w-full h-64 bg-blue-50 rounded-[10px] shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] outline outline-[0.50px] outline-offset-[-0.50px] outline-blue-600 overflow-hidden p-5">
+        <div className="w-full h-64 bg-blue-50 rounded-[10px] shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] outline-solid outline-[0.50px] outline-offset-[-0.50px] outline-blue-600 overflow-hidden p-5">
           <div className="flex items-end gap-3 mb-4">
             <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5">
               <path d="M10 2L2 6V10C2 15 6.5 18.5 10 19.5C13.5 18.5 18 15 18 10V6L10 2Z" fill="#1A3A8F"/>
@@ -117,7 +117,7 @@ export default function HelpPage() {
           <div className="flex flex-col gap-3">
             {/* Point 1 */}
             <div className="flex items-start gap-4">
-              <div className="w-6 h-6 px-2 pt-[3px] pb-1 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-6 h-6 px-2 pt-[3px] pb-1 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
                 <div className="text-white text-xs font-bold font-['DM_Sans']">1</div>
               </div>
               <p className="text-justify text-gray-400 text-xs font-normal font-['DM_Sans']">You will be connected to a trained female officer or social worker who specializes in VAWC cases.</p>
@@ -125,7 +125,7 @@ export default function HelpPage() {
             
             {/* Point 2 */}
             <div className="flex items-start gap-4">
-              <div className="w-6 h-6 px-2 pt-[3px] pb-1 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-6 h-6 px-2 pt-[3px] pb-1 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
                 <div className="text-white text-xs font-bold font-['DM_Sans']">2</div>
               </div>
               <p className="text-justify text-gray-400 text-xs font-normal font-['DM_Sans']">Your conversation is strictly confidential and your identity will be protected.</p>
@@ -133,7 +133,7 @@ export default function HelpPage() {
             
             {/* Point 3 */}
             <div className="flex items-start gap-4">
-              <div className="w-6 h-6 px-2 pt-[3px] pb-1 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-6 h-6 px-2 pt-[3px] pb-1 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
                 <div className="text-white text-xs font-bold font-['DM_Sans']">3</div>
               </div>
               <p className="text-justify text-gray-400 text-xs font-normal font-['DM_Sans']">They will provide immediate safety guidance, legal advice, or dispatch help if needed.</p>

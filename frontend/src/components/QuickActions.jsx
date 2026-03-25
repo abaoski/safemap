@@ -53,7 +53,7 @@ function QuickActions({
   if (!showQuickActions) {
     return (
       <button
-        className="fixed z-[1001] flex flex-col items-center gap-1 bg-white px-4 py-2 rounded-full shadow-lg"
+        className="fixed z-1001 flex flex-col items-center gap-1 bg-white px-4 py-2 rounded-full shadow-lg"
         style={{ left: '50%', bottom: '90px', transform: 'translateX(-50%)' }}
         onClick={() => { setShowQuickActions(true); setQaPosition({ x: 0, y: 0 }); }}
       >
@@ -64,7 +64,7 @@ function QuickActions({
 
   return (
     <div 
-      className="fixed z-[1000] w-[90%] max-w-sm touch-none cursor-grab active:cursor-grabbing quick-actions-mobile"
+      className="fixed z-1000 w-[90%] max-w-sm touch-none cursor-grab active:cursor-grabbing quick-actions-mobile"
       tabIndex={-1}
       onKeyDown={(e) => e.preventDefault()}
       style={{ 

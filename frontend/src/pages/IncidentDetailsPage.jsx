@@ -100,8 +100,8 @@ export default function IncidentDetailsPage() {
         {/* Anonymity Info Box */}
         <div className="w-full h-20 bg-blue-50 rounded-[10px] border border-blue-600 p-3 mb-6">
           <div className="flex items-start gap-3">
-            <div className="w-5 h-5 mt-0.5 flex-shrink-0">
-              <img src={rptImpReminderImg} alt="Info" className="w-5 h-5 mt-0.5 flex-shrink-0" />
+            <div className="w-5 h-5 mt-0.5 shrink-0">
+              <img src={rptImpReminderImg} alt="Info" className="w-5 h-5 mt-0.5 shrink-0" />
             </div>
             <p className="text-justify text-zinc-800 text-xs font-medium font-['DM_Sans'] tracking-tight">
               Your safety is our priority. Please provide details without including personal names or ID numbers to maintain anonymity.
@@ -184,8 +184,8 @@ export default function IncidentDetailsPage() {
           </div>
           {/* Privacy Note */}
           <div className="flex items-center gap-2 mt-2">
-            <div className="w-4 h-4 flex-shrink-0">
-              <img src={rptImpReminderImg} alt="Lock" className="w-4 h-4 flex-shrink-0" />
+            <div className="w-4 h-4 shrink-0">
+              <img src={rptImpReminderImg} alt="Lock" className="w-4 h-4 shrink-0" />
             </div>
             <span className="text-gray-500 text-[10px] font-medium font-['DM_Sans'] tracking-tight">
               This data is encrypted and cannot be traced back to you.
