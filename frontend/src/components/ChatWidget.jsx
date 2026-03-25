@@ -51,7 +51,6 @@ function ChatWidget() {
                     backgroundColor: "#ffffff",
                     height: 620,
                     width: 400,
-                    zIndex: 999,
                     fontSize: 15,
                     zIndex: 1001,
                     starterPrompts: [

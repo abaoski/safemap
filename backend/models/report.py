@@ -63,7 +63,7 @@ class Report(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Categories
+    # Categories (including GBV categories)
     CATEGORIES = [
         'theft',           # Theft/Robbery
         'assault',         # Physical assault
@@ -75,6 +75,13 @@ class Report(db.Model):
         'flood',           # Flooding
         'suspicious',      # Suspicious activity
         'violence',        # Violence
+        # GBV Categories
+        'sexual_assault',  # Sexual Assault
+        'physical_abuse',  # Physical Abuse
+        'domestic_violence', # Domestic Violence
+        'stalking',        # Stalking
+        'verbal_abuse',    # Verbal Abuse
+        'emotional_abuse', # Emotional Abuse
         'other'            # Other
     ]
     
@@ -175,7 +182,7 @@ class Report(db.Model):
     
     def verify_pnp(self, reviewed_by, case_number=None, notes=''):
         """Mark report as verified"""
-        self.status = 'verified'
+        self.status = 'verified_pnp'
         self.is_pnp_verified = True
         self.pnp_case_number = case_number
         self.reviewed_by = reviewed_by

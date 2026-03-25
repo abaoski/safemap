@@ -8,6 +8,8 @@ import ReportSuccessPage from './pages/ReportSuccessPage'
 import TrackReportPage from './pages/TrackReportPage'
 import HelpPage from './pages/HelpPage'
 import EmergencyPage from './pages/EmergencyPage'
+import AdminLoginPage from './pages/AdminLoginPage'
+import AdminDashboardPage from './pages/AdminDashboardPage'
 
 // Import modular components
 import Header from './components/Header'
@@ -181,6 +183,8 @@ function App() {
       <Route path="/track" element={<TrackReportPage />} />
       <Route path="/help" element={<HelpPage />} />
       <Route path="/emergency" element={<EmergencyPage />} />
+      <Route path="/admin" element={<AdminLoginPage />} />
+      <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
     </Routes>
   )
 }

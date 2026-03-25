@@ -3,8 +3,8 @@ SafeMap-PH Models Package
 Database models using SQLAlchemy
 """
 
-# Import db from app - this avoids the multiple instance issue
-from app import db
+# Import db from extensions - this avoids the multiple instance issue
+from extensions import db
 
 # Import models
 from models.user import User

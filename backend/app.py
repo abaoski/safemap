@@ -5,10 +5,7 @@ Main application entry point
 
 from flask import Flask, jsonify
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
-
-# Initialize SQLAlchemy
-db = SQLAlchemy()
+from extensions import db
 
 def create_app(config_class=None):
     """Application factory for creating Flask app instances"""
@@ -22,7 +19,7 @@ def create_app(config_class=None):
     
     # Initialize extensions
     db.init_app(app)
-    CORS(app)
+    CORS(app, origins=['*'], methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], allow_headers=['Content-Type', 'Authorization'])
     
     # Register blueprints
     from routes import api_bp

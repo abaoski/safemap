@@ -55,9 +55,9 @@ function BottomNav({ onHelpClick, onChatClick }) {
 
         <button 
           className={`flex flex-col items-center gap-1 ${activeTab === 'admin' ? 'text-blue-600' : 'text-gray-400'}`}
-          onClick={() => handleTabClick('admin', onChatClick)}
+          onClick={() => handleTabClick('admin', () => navigate('/admin'))}
         >
-          <img src={adminImg} alt="Chat" className={`w-6 h-6 ${activeTab === 'admin' ? '' : 'opacity-60'}`} />
+          <img src={adminImg} alt="Admin" className={`w-6 h-6 ${activeTab === 'admin' ? '' : 'opacity-60'}`} />
           <div className="text-xs">Admin</div>
         </button>
       </div>
