@@ -20,7 +20,7 @@ def get_public_reports():
     city = request.args.get('city')
     
     query = Report.query.filter(
-        Report.status.in_(['approved_awareness', 'verified'])
+        Report.status.in_(['approved_awareness', 'verified_pnp'])
     )
     
     if category:
@@ -291,6 +291,7 @@ def remove_personal_details(report_id):
 
 
 @api_bp.route('/reports/stats', methods=['GET'])
+@require_auth
 def get_report_stats():
     """Get report statistics"""
     from sqlalchemy import func
@@ -317,9 +318,9 @@ def get_report_stats():
     # Total
     total = Report.query.count()
     public_count = Report.query.filter(
-        Report.status.in_(['approved_awareness', 'verified'])
+        Report.status.in_(['approved_awareness', 'verified_pnp'])
     ).count()
-    verified_count = Report.query.filter_by(status='verified').count()
+    verified_count = Report.query.filter_by(status='verified_pnp').count()
     
     return jsonify({
         'total': total,

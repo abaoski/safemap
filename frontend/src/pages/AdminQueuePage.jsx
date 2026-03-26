@@ -20,6 +20,7 @@ function AdminQueuePage() {
     const [reports, setReports] = useState([])
     const [allReports, setAllReports] = useState([])
     const [loading, setLoading] = useState(true)
+    const [notification, setNotification] = useState(null)
     const [searchQuery, setSearchQuery] = useState("")
     const [statusFilter, setStatusFilter] = useState("pending_review")
     const [categoryFilter, setCategoryFilter] = useState("")
@@ -30,6 +31,12 @@ function AdminQueuePage() {
         dismissed: 0,
         total: 0,
     })
+
+    // Show notification helper
+    const showNotification = (message, type = "success") => {
+        setNotification({ message, type })
+        setTimeout(() => setNotification(null), 3000)
+    }
 
     useEffect(() => {
         const token = localStorage.getItem("token")
@@ -62,6 +69,7 @@ function AdminQueuePage() {
             // Fetch stats
             const statsRes = await fetch(
                 "http://localhost:5000/api/reports/stats",
+                { headers: getAuthHeaders() }
             )
             if (statsRes.ok) {
                 const data = await statsRes.json()
@@ -72,28 +80,76 @@ function AdminQueuePage() {
                         data.by_status?.dismissed || 0,
                     total: data.total || 0,
                 })
+            } else if (statsRes.status === 401) {
+                console.error("Unauthorized stats fetch")
+                // Don't redirect here to avoid loop if reports fetch succeeded
             }
         } catch (err) {
             console.error("Error fetching data:", err)
+            showNotification("Failed to refresh data", "error")
         } finally {
             setLoading(false)
         }
     }
 
     const handleApprove = async (reportId) => {
+        if (reportId === undefined || reportId === null) {
+            console.error("Invalid report ID")
+            showNotification("Invalid report ID", "error")
+            return
+        }
+        const token = localStorage.getItem("token")
+        if (!token) {
+            showNotification("Session expired. Please login again.", "error")
+            navigate("/admin")
+            return
+        }
         try {
+            console.log("Approving report:", reportId)
             const response = await fetch(
                 `http://localhost:5000/api/reports/${reportId}/approve`,
-                { method: "POST", headers: getAuthHeaders() },
+                { 
+                    method: "POST", 
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ notes: "Approved for public awareness" }),
+                },
             )
-            if (response.ok) fetchData()
+            
+            let data = {}
+            try {
+                data = await response.json()
+            } catch (e) {
+                console.error("Failed to parse response JSON")
+            }
+
+            console.log("Approve response:", response.status, data)
+            if (response.ok) {
+                showNotification("Report approved successfully!")
+                fetchData()
+            } else {
+                showNotification(data.error || `Failed to approve (${response.status})`, "error")
+            }
         } catch (err) {
             console.error("Error approving report:", err)
+            showNotification("Network error. Please try again.", "error")
         }
     }
 
     const handleDismiss = async (reportId) => {
+        if (reportId === undefined || reportId === null) {
+            console.error("Invalid report ID")
+            showNotification("Invalid report ID", "error")
+            return
+        }
+        if (!confirm("Are you sure you want to dismiss this report?")) return
+        const token = localStorage.getItem("token")
+        if (!token) {
+            showNotification("Session expired. Please login again.", "error")
+            navigate("/admin")
+            return
+        }
         try {
+            console.log("Dismissing report:", reportId)
             const response = await fetch(
                 `http://localhost:5000/api/reports/${reportId}/dismiss`,
                 {
@@ -102,9 +158,24 @@ function AdminQueuePage() {
                     body: JSON.stringify({ reason: "Dismissed by admin" }),
                 },
             )
-            if (response.ok) fetchData()
+
+            let data = {}
+            try {
+                data = await response.json()
+            } catch (e) {
+                console.error("Failed to parse response JSON")
+            }
+
+            console.log("Dismiss response:", response.status, data)
+            if (response.ok) {
+                showNotification("Report dismissed successfully!")
+                fetchData()
+            } else {
+                showNotification(data.error || `Failed to dismiss (${response.status})`, "error")
+            }
         } catch (err) {
             console.error("Error dismissing report:", err)
+            showNotification("Network error. Please try again.", "error")
         }
     }
 
@@ -202,6 +273,22 @@ function AdminQueuePage() {
 
     return (
         <div className="w-full min-h-screen bg-slate-50 overflow-x-hidden flex flex-col items-center">
+            {/* Notification Toast */}
+            {notification && (
+                <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 ${
+                    notification.type === "error" 
+                        ? "bg-red-500 text-white" 
+                        : "bg-green-500 text-white"
+                }`}>
+                    {notification.type === "error" ? (
+                        <XCircle className="w-4 h-4" />
+                    ) : (
+                        <CheckCircle className="w-4 h-4" />
+                    )}
+                    <span className="text-sm font-medium font-['DM_Sans']">{notification.message}</span>
+                </div>
+            )}
+
             {/* Header */}
             <div className="w-full max-w-sm px-4 pt-8 pb-2">
                 <div className="relative flex items-center justify-center mb-5">

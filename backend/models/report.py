@@ -92,7 +92,7 @@ class Report(db.Model):
     STATUS_VALUES = [
         'pending_review',      # Unverified & Pending Review
         'approved_awareness', # Approved for Awareness
-        'verified',           # Verified
+        'verified_pnp',       # Verified by PNP
         'dismissed'           # Spam/Duplicates
     ]
     
