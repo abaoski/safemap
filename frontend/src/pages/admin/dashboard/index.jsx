@@ -1,146 +1,144 @@
-import { useState, useEffect } from "react"
-import { AlertCircle, Clock, ShieldAlert, CheckCircle2 } from "lucide-react"
+import { useState } from "react"
 import AdminLayout from "../../../components/admin/AdminLayout"
+import DashboardStats from "./DashboardStats"
+import NeedReviewSection from "./NeedReviewSection"
+import AuditFeedPreview from "./AuditFeedPreview"
+import StaffManagement from "./StaffManagement"
+import SystemAnnouncement from "./SystemAnnouncement"
+import { AlertTriangle, User, AlertCircle, LogIn, Edit2, Shield } from "lucide-react"
+
+// Mock Data to match Figma
+const MOCK_STATS = {
+    total: 1284,
+    pending: 42,
+}
+
+const MOCK_REPORTS = [
+    {
+        id: "SF-8294",
+        code: "SF-8294",
+        category: "HARASSMENT",
+        categoryBg: "bg-red-100",
+        categoryColor: "text-red-500",
+        title: "Lagao Public Market Incident",
+        location: "General Santos City",
+        time: "14 mins ago",
+        borderColor: "border-red-500",
+        icon: AlertTriangle,
+        iconBg: "bg-red-100",
+        iconColor: "text-red-500",
+    },
+    {
+        id: "SF-8291",
+        code: "SF-8291",
+        category: "PHYSICAL ASSAULT",
+        categoryBg: "bg-red-100",
+        categoryColor: "text-red-500",
+        title: "GSC Bulaong Terminal",
+        location: "Bulaong Ave, General Santos City",
+        time: "28 mins ago",
+        borderColor: "border-red-500",
+        icon: User,
+        iconBg: "bg-red-100",
+        iconColor: "text-red-500",
+    },
+    {
+        id: "SF-8288",
+        code: "SF-8288",
+        category: "STALKING",
+        categoryBg: "bg-amber-100",
+        categoryColor: "text-amber-500",
+        title: "Mindanao State University",
+        location: "Dadiangas, General Santos City",
+        time: "1 hour ago",
+        borderColor: "border-amber-400",
+        icon: User,
+        iconBg: "bg-amber-100",
+        iconColor: "text-amber-500",
+    },
+]
+
+const MOCK_AUDIT = [
+    {
+        icon: Shield,
+        iconBg: "bg-blue-50",
+        iconColor: "text-blue-600",
+        description: "Admin-04 approved Case #SF-8291",
+        time: "12:42 PM",
+        tag: "SECURITY_ACTION"
+    },
+    {
+        icon: Edit2,
+        iconBg: "bg-gray-100",
+        iconColor: "text-gray-500",
+        description: "Staff-21 updated description for #SF-8110",
+        time: "11:15 AM",
+        tag: "META_UPDATE"
+    },
+    {
+        icon: AlertCircle,
+        iconBg: "bg-red-50",
+        iconColor: "text-red-500",
+        description: "System flagged #SF-8299 as duplicate",
+        time: "10:02 AM",
+        tag: "AUTO_MOD"
+    },
+    {
+        icon: LogIn,
+        iconBg: "bg-indigo-50",
+        iconColor: "text-indigo-500",
+        description: "Admin-01 signed into HQ Terminal",
+        time: "08:00 AM",
+        tag: "AUTH_EVENT"
+    },
+]
+
+const MOCK_STAFF = [
+    {
+        empId: "EMP-ID: 8829 - X",
+        status: "ACTIVE",
+        name: "Linda Walker",
+        role: "Administrator",
+        email: "walkerlinda_safemapph@gmail.com"
+    },
+    {
+        empId: "EMP-ID: 4412 - X",
+        status: "ACTIVE",
+        name: "Kristaffa Abaok",
+        role: "Senior Developer",
+        email: "kristaffa_safemaphph@gmail.com"
+    },
+    {
+        empId: "EMP-ID: 9901 - X",
+        status: "OFFLINE",
+        name: "Elias Thorne",
+        role: "Network Admin",
+        email: "eliasthorne_safemaphph@gmail.com"
+    }
+]
 
 function AdminDashboardPage() {
-    const [stats, setStats] = useState({
-        pending: 0,
-        approved: 0,
-        total: 0,
-    })
-    const [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        fetchStats()
-    }, [])
-
-    const fetchStats = async () => {
-        try {
-            const response = await fetch("http://localhost:5000/api/reports/stats")
-            if (response.ok) {
-                const data = await response.json()
-                setStats({
-                    pending: data.pending_review || 0,
-                    approved: data.public_visible || 0,
-                    total: data.total || 0,
-                })
-            }
-        } catch (error) {
-            console.error("Error fetching stats:", error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
     return (
         <AdminLayout activeTab="dashboard">
+            {/* Header Area */}
             <div className="w-full max-w-sm px-4">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-zinc-800 text-2xl font-extrabold font-['DM_Sans']">Dashboard</h1>
-                    <div className="px-3 py-1.5 bg-green-50 rounded-full border border-emerald-100 flex items-center">
-                        <span className="text-green-500 text-[11px] font-semibold font-['DM_Sans']">All Systems Operational</span>
+                    <h1 className="text-zinc-800 text-lg font-extrabold font-['DM_Sans']">Dashboard</h1>
+                    <div className="px-3 py-1 bg-green-50 rounded-full border border-green-200">
+                        <span className="text-green-500 text-[9px] font-bold font-['DM_Sans']">All Systems Operational</span>
                     </div>
                 </div>
             </div>
 
-            {/* Quick Stats Grid */}
-            <div className="w-full max-w-sm px-4 mt-6 grid grid-cols-2 gap-3">
-                {/* Pending Review Card */}
-                <div className="bg-white rounded-[20px] p-5 shadow-[0px_8px_24px_rgba(149,157,165,0.1)] border border-slate-100 flex flex-col justify-between h-[130px]">
-                    <div className="flex justify-between items-start">
-                        <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center">
-                            <Clock className="w-5 h-5 text-amber-500" strokeWidth={2.5} />
-                        </div>
-                        <span className="text-amber-500 text-xs font-bold font-['DM_Sans'] bg-amber-50 px-2 py-1 rounded-md">
-                            Action Req
-                        </span>
-                    </div>
-                    <div>
-                        <div className="text-3xl font-black font-['DM_Sans'] text-slate-800">
-                            {loading ? "..." : stats.pending}
-                        </div>
-                        <div className="text-slate-400 text-xs font-medium font-['DM_Sans'] mt-0.5">
-                            Pending Review
-                        </div>
-                    </div>
-                </div>
+            <DashboardStats stats={MOCK_STATS} />
+            <NeedReviewSection reports={MOCK_REPORTS} />
+            <AuditFeedPreview events={MOCK_AUDIT} />
+            <StaffManagement staffList={MOCK_STAFF} />
+            <SystemAnnouncement 
+                title="Internal Announcement" 
+                message="System-wide maintenance scheduled for Saturday 02:00 UTC. Audit logs will remain active." 
+            />
 
-                {/* Approved/Active Card */}
-                <div className="bg-white rounded-[20px] p-5 shadow-[0px_8px_24px_rgba(149,157,165,0.1)] border border-slate-100 flex flex-col justify-between h-[130px]">
-                    <div className="flex justify-between items-start">
-                        <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
-                            <CheckCircle2 className="w-5 h-5 text-emerald-500" strokeWidth={2.5} />
-                        </div>
-                    </div>
-                    <div>
-                        <div className="text-3xl font-black font-['DM_Sans'] text-slate-800">
-                            {loading ? "..." : stats.approved}
-                        </div>
-                        <div className="text-slate-400 text-xs font-medium font-['DM_Sans'] mt-0.5">
-                            Active Reports
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Recent Alerts Section */}
-            <div className="w-full max-w-sm px-4 mt-8">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-slate-800 text-lg font-bold font-['DM_Sans']">Priority Alerts</h2>
-                    <button className="text-[#1e3a8a] text-xs font-bold font-['DM_Sans']">View All</button>
-                </div>
-
-                <div className="space-y-3">
-                    {/* Alert Card 1 */}
-                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-red-100 flex gap-4 items-start relative overflow-hidden">
-                        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-red-500 rounded-l-2xl"></div>
-                        <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center shrink-0">
-                            <ShieldAlert className="w-5 h-5 text-red-500" />
-                        </div>
-                        <div className="flex-1 pt-0.5">
-                            <div className="flex justify-between items-start">
-                                <h3 className="text-slate-800 text-sm font-bold font-['DM_Sans']">High Severity Report</h3>
-                                <span className="text-slate-400 text-[10px] font-medium">10m ago</span>
-                            </div>
-                            <p className="text-slate-500 text-xs font-normal mt-1 leading-snug">
-                                Multiple reports of physical harassment in Quezon Blvd area.
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Alert Card 2 */}
-                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-amber-100 flex gap-4 items-start relative overflow-hidden">
-                        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-400 rounded-l-2xl"></div>
-                        <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
-                            <AlertCircle className="w-5 h-5 text-amber-500" />
-                        </div>
-                        <div className="flex-1 pt-0.5">
-                            <div className="flex justify-between items-start">
-                                <h3 className="text-slate-800 text-sm font-bold font-['DM_Sans']">Unverified Cluster</h3>
-                                <span className="text-slate-400 text-[10px] font-medium">1h ago</span>
-                            </div>
-                            <p className="text-slate-500 text-xs font-normal mt-1 leading-snug">
-                                4 new reports flagged for investigation in same vicinity.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="w-full max-w-sm px-4 mt-8 pb-8">
-                <h2 className="text-slate-800 text-lg font-bold font-['DM_Sans'] mb-4">Quick Links</h2>
-                <div className="grid grid-cols-2 gap-3">
-                    <button className="bg-[#1f295b] text-white p-4 rounded-xl flex flex-col items-center justify-center gap-2 shadow-sm hover:bg-[#151c3d] transition-colors">
-                        <span className="text-sm font-bold font-['DM_Sans']">Export Data</span>
-                        <span className="text-[10px] text-blue-200 font-medium">CSV/PDF formats</span>
-                    </button>
-                    <button className="bg-white border border-slate-200 text-slate-700 p-4 rounded-xl flex flex-col items-center justify-center gap-2 shadow-sm hover:bg-slate-50 transition-colors">
-                        <span className="text-sm font-bold font-['DM_Sans']">System Logs</span>
-                        <span className="text-[10px] text-slate-400 font-medium">View audit trail</span>
-                    </button>
-                </div>
-            </div>
         </AdminLayout>
     )
 }
