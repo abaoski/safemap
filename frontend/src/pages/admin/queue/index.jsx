@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react"
+import { useLocation } from "react-router-dom"
 import { Search, Filter, Clock, ChevronDown } from "lucide-react"
 import AdminLayout from "../../../components/admin/AdminLayout"
 import QueueStatsBar from "./QueueStatsBar"
 import QueueReportCard from "./QueueReportCard"
 
 function AdminQueuePage() {
+    const location = useLocation()
     const [allReports, setAllReports] = useState([])
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState("")
@@ -12,6 +14,15 @@ function AdminQueuePage() {
     const [categoryFilter, setCategoryFilter] = useState("")
     const [showFilters, setShowFilters] = useState(false)
     const [stats, setStats] = useState({ pending: 0, approved: 0, dismissed: 0, total: 0 })
+
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search)
+        const reportId = queryParams.get("id")
+        if (reportId) {
+            setSearchQuery(reportId)
+            setStatusFilter("") // Show all statuses if searching for specific ID
+        }
+    }, [location.search])
 
     useEffect(() => {
         fetchData()
@@ -23,6 +34,9 @@ function AdminQueuePage() {
     })
 
     const fetchData = async () => {
+        const token = localStorage.getItem("token")
+        if (!token) return
+
         setLoading(true)
         try {
             let url = "http://localhost:5000/api/reports?per_page=50"
@@ -30,9 +44,19 @@ function AdminQueuePage() {
             if (categoryFilter) url += `&category=${categoryFilter}`
 
             const response = await fetch(url, { headers: getAuthHeaders() })
+            if (response.status === 401) {
+                localStorage.removeItem("token")
+                window.location.href = "/admin"
+                return
+            }
             if (response.ok) setAllReports((await response.json()).reports || [])
 
-            const statsRes = await fetch("http://localhost:5000/api/reports/stats")
+            const statsRes = await fetch("http://localhost:5000/api/reports/stats", { headers: getAuthHeaders() })
+            if (statsRes.status === 401) {
+                localStorage.removeItem("token")
+                window.location.href = "/admin"
+                return
+            }
             if (statsRes.ok) {
                 const data = await statsRes.json()
                 setStats({
@@ -78,7 +102,7 @@ function AdminQueuePage() {
                (r.location?.barangay || "").toLowerCase().includes(q)
     })
 
-    const CATEGORIES = ["", "harassment", "physical_abuse", "sexual_assault", "domestic_violence", "stalking", "verbal_abuse", "theft", "assault"]
+    const CATEGORIES = ["", "sexual_assault", "physical_abuse", "domestic_violence", "stalking", "verbal_abuse", "emotional_abuse", "other"]
 
     return (
         <AdminLayout activeTab="queue">

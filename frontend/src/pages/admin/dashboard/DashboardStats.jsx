@@ -1,41 +1,32 @@
 function DashboardStats({ stats }) {
     return (
         <div className="w-full max-w-sm px-4 mt-6 space-y-3">
-            {/* Active Cases */}
+            {/* Total Reports */}
             <div className="w-full h-20 bg-white rounded-xl shadow-[0px_0px_10px_rgba(0,0,0,0.03)] border-l-[4px] border-[#00c853] flex flex-col justify-center px-5">
-                <div className="text-gray-400 text-[10px] font-bold font-['DM_Sans'] mb-0.5">Active Cases</div>
+                <div className="text-gray-400 text-[10px] font-bold font-['DM_Sans'] mb-0.5 uppercase">Total Reports</div>
                 <div className="flex items-baseline gap-2">
                     <span className="text-[#1e3a8a] text-[28px] font-black font-['DM_Sans'] leading-none">
-                        {stats?.total?.toLocaleString() || "1,284"}
-                    </span>
-                    <span className="text-[#00c853] text-[10px] font-bold font-['DM_Sans']">
-                        General Santos
+                        {stats?.total || 0}
                     </span>
                 </div>
             </div>
 
             {/* Pending Review */}
-            <div className="w-full h-20 bg-white rounded-xl shadow-[0px_0px_10px_rgba(0,0,0,0.03)] border-l-[4px] border-[#f44336] flex flex-col justify-center px-5">
-                <div className="text-gray-400 text-[10px] font-bold font-['DM_Sans'] mb-0.5">Pending Review</div>
+            <div className="w-full h-20 bg-white rounded-xl shadow-[0px_0px_10px_rgba(0,0,0,0.03)] border-l-[4px] border-amber-500 flex flex-col justify-center px-5">
+                <div className="text-gray-400 text-[10px] font-bold font-['DM_Sans'] mb-0.5 uppercase">Pending Review</div>
                 <div className="flex items-baseline gap-2">
                     <span className="text-[#1e3a8a] text-[28px] font-black font-['DM_Sans'] leading-none">
-                        {stats?.pending || "42"}
-                    </span>
-                    <span className="text-[#f44336] text-[10px] font-bold font-['DM_Sans']">
-                        High Urgency
+                        {stats?.pending_review || 0}
                     </span>
                 </div>
             </div>
 
-            {/* Today's Report */}
-            <div className="w-full h-20 bg-white rounded-xl shadow-[0px_0px_10px_rgba(0,0,0,0.03)] border-l-[4px] border-[#1e3a8a] flex flex-col justify-center px-5">
-                <div className="text-gray-400 text-[10px] font-bold font-['DM_Sans'] mb-0.5">Today's Report</div>
+            {/* Resolved Reports */}
+            <div className="w-full h-20 bg-white rounded-xl shadow-[0px_0px_10px_rgba(0,0,0,0.03)] border-l-[4px] border-green-500 flex flex-col justify-center px-5">
+                <div className="text-gray-400 text-[10px] font-bold font-['DM_Sans'] mb-0.5 uppercase">Resolved Reports</div>
                 <div className="flex items-baseline gap-2">
                     <span className="text-[#1e3a8a] text-[28px] font-black font-['DM_Sans'] leading-none">
-                        +12%
-                    </span>
-                    <span className="text-gray-500 text-[10px] font-bold font-['DM_Sans']">
-                        vs Yesterday
+                        {stats?.pnp_verified || 0}
                     </span>
                 </div>
             </div>

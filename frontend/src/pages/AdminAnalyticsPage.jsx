@@ -30,7 +30,13 @@ function AdminAnalyticsPage() {
             // Fetch stats
             const statsRes = await fetch(
                 "http://localhost:5000/api/reports/stats",
+                { headers }
             )
+            if (statsRes.status === 401) {
+                localStorage.removeItem("token")
+                navigate("/admin")
+                return
+            }
             if (statsRes.ok) {
                 const data = await statsRes.json()
                 setStats(data)
@@ -41,6 +47,11 @@ function AdminAnalyticsPage() {
                 "http://localhost:5000/api/reports/heatmap",
                 { headers },
             )
+            if (heatRes.status === 401) {
+                localStorage.removeItem("token")
+                navigate("/admin")
+                return
+            }
             if (heatRes.ok) {
                 const data = await heatRes.json()
                 setHeatPoints(data.points || [])
@@ -111,67 +122,43 @@ function AdminAnalyticsPage() {
             </div>
             {/* Stats Cards */}
             <div className="w-full max-w-sm px-4 mt-4 space-y-3">
-                {/* Total Active Cases */}
+                {/* Total Reports */}
+                <div className="w-full h-[88px] bg-white rounded-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-blue-500 px-5 relative flex flex-col justify-center">
+                    <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase">
+                        Total Reports
+                    </div>
+                    <div className="text-[#1e3a8a] text-[28px] font-extrabold font-['DM_Sans'] leading-none mt-1 mb-1">
+                        {stats?.total || 0}
+                    </div>
+                </div>
+
+                {/* Pending Review */}
+                <div className="w-full h-[88px] bg-white rounded-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-orange-500 px-5 relative flex flex-col justify-center">
+                    <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase">
+                        Pending Review
+                    </div>
+                    <div className="text-[#1e3a8a] text-[28px] font-extrabold font-['DM_Sans'] leading-none mt-1 mb-1">
+                        {stats?.pending_review || 0}
+                    </div>
+                </div>
+
+                {/* Approved */}
                 <div className="w-full h-[88px] bg-white rounded-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-green-500 px-5 relative flex flex-col justify-center">
-                    <div className="absolute top-4 right-4 px-2 py-0.5 bg-green-100 rounded text-green-500 text-[10px] font-bold font-['DM_Sans']">
-                        +12%
-                    </div>
                     <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase">
-                        Total Active Cases
+                        Approved
                     </div>
                     <div className="text-[#1e3a8a] text-[28px] font-extrabold font-['DM_Sans'] leading-none mt-1 mb-1">
-                        {stats?.total || "1,284"}
-                    </div>
-                    <div className="text-gray-400 text-[10px] font-medium font-['DM_Sans']">
-                        Across all regional centers
+                        {stats?.public_visible || 0}
                     </div>
                 </div>
 
-                {/* High Urgency */}
-                <div className="w-full h-[88px] bg-white rounded-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-green-500 px-5 relative flex flex-col justify-center">
-                    <div className="absolute top-4 right-4 px-2 py-0.5 bg-green-100 rounded text-green-500 text-[10px] font-bold font-['DM_Sans']">
-                        +5.2%
-                    </div>
+                {/* Dismissed */}
+                <div className="w-full h-[88px] bg-white rounded-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-gray-400 px-5 relative flex flex-col justify-center">
                     <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase">
-                        High Urgency
+                        Dismissed
                     </div>
                     <div className="text-[#1e3a8a] text-[28px] font-extrabold font-['DM_Sans'] leading-none mt-1 mb-1">
-                        {stats?.pending_review || "42"}
-                    </div>
-                    <div className="text-gray-400 text-[10px] font-medium font-['DM_Sans']">
-                        Requires immediate response
-                    </div>
-                </div>
-
-                {/* Avg. Response Time */}
-                <div className="w-full h-[88px] bg-white rounded-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-red-500 px-5 relative flex flex-col justify-center">
-                    <div className="absolute top-4 right-4 px-2 py-0.5 bg-red-100 rounded text-red-500 text-[10px] font-bold font-['DM_Sans']">
-                        -18m
-                    </div>
-                    <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase">
-                        Avg. Response Time
-                    </div>
-                    <div className="text-[#1e3a8a] text-[28px] font-extrabold font-['DM_Sans'] leading-none mt-1 mb-1">
-                        2.4 hrs
-                    </div>
-                    <div className="text-gray-400 text-[10px] font-medium font-['DM_Sans']">
-                        First contact achievement
-                    </div>
-                </div>
-
-                {/* Resolution Rate */}
-                <div className="w-full h-[88px] bg-white rounded-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-[#1e3a8a] px-5 relative flex flex-col justify-center">
-                    <div className="absolute top-4 right-4 px-2 py-0.5 bg-gray-200 rounded text-gray-500 text-[10px] font-bold font-['DM_Sans']">
-                        94%
-                    </div>
-                    <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase">
-                        Resolution Rate
-                    </div>
-                    <div className="text-[#1e3a8a] text-[28px] font-extrabold font-['DM_Sans'] leading-none mt-1 mb-1">
-                        88.5%
-                    </div>
-                    <div className="text-gray-400 text-[10px] font-medium font-['DM_Sans']">
-                        Completed case workflows
+                        {stats?.by_status?.dismissed || 0}
                     </div>
                 </div>
             </div>
@@ -219,44 +206,35 @@ function AdminAnalyticsPage() {
                     </div>
 
                     <div className="space-y-5">
-                        <div className="border-l-[3px] border-red-500 pl-4 py-1 relative">
-                            <div className="flex justify-between items-start mb-1">
-                                <div>
-                                    <div className="text-zinc-800 text-xs font-bold font-['DM_Sans']">
-                                        District 4 - Metro North
-                                    </div>
-                                    <div className="text-gray-400 text-[10px] font-normal font-['DM_Sans']">
-                                        Significant spike in repetitive abuse
-                                        reports.
-                                    </div>
-                                </div>
-                                <div className="px-2 py-0.5 bg-red-100 rounded text-red-500 text-[9px] font-bold font-['DM_Sans']">
-                                    High Risk
-                                </div>
-                            </div>
-                            <div className="w-full h-1.5 bg-gray-100 rounded-full mt-2">
-                                <div className="w-[85%] h-full bg-red-500 rounded-full" />
-                            </div>
-                        </div>
+                        {(() => {
+                            const locations = {}
+                            heatPoints.forEach(p => {
+                                const key = p.barangay || p.city || "Unknown"
+                                if (!locations[key]) locations[key] = { count: 0, severity: p.severity, name: key }
+                                locations[key].count++
+                                if (p.severity === 'critical') locations[key].severity = 'critical'
+                            })
 
-                        <div className="border-l-[3px] border-orange-400 pl-4 py-1 relative">
-                            <div className="flex justify-between items-start mb-1">
-                                <div>
-                                    <div className="text-zinc-800 text-xs font-bold font-['DM_Sans']">
-                                        Coastal Zone B
-                                    </div>
-                                    <div className="text-gray-400 text-[10px] font-normal font-['DM_Sans']">
-                                        30% increase in child labor incidents.
+                            const hotspots = Object.values(locations).filter(l => l.count >= 2)
+                            
+                            if (hotspots.length === 0) {
+                                return <div className="text-center py-4 text-gray-400 text-xs italic">No recurring hotspots detected (minimum 2 reports required)</div>
+                            }
+
+                            return hotspots.map((spot, i) => (
+                                <div key={i} className={`border-l-[3px] ${spot.severity === 'critical' ? 'border-red-500' : 'border-orange-400'} pl-4 py-1 relative`}>
+                                    <div className="flex justify-between items-start mb-1">
+                                        <div>
+                                            <div className="text-zinc-800 text-xs font-bold font-['DM_Sans']">{spot.name}</div>
+                                            <div className="text-gray-400 text-[10px] font-normal font-['DM_Sans']">{spot.count} reports in this area.</div>
+                                        </div>
+                                        <div className={`px-2 py-0.5 ${spot.severity === 'critical' ? 'bg-red-100 text-red-500' : 'bg-orange-100 text-orange-500'} rounded text-[9px] font-bold font-['DM_Sans']`}>
+                                            {spot.severity === 'critical' ? 'High Risk' : 'Developing'}
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="px-2 py-0.5 bg-orange-100 rounded text-orange-500 text-[9px] font-bold font-['DM_Sans']">
-                                    Developing
-                                </div>
-                            </div>
-                            <div className="w-full h-1.5 bg-gray-100 rounded-full mt-2">
-                                <div className="w-[60%] h-full bg-orange-400 rounded-full" />
-                            </div>
-                        </div>
+                            ))
+                        })()}
                     </div>
                 </div>
 
@@ -266,61 +244,31 @@ function AdminAnalyticsPage() {
                         Case Composition
                     </h2>
                     <div className="space-y-4">
-                        <div>
-                            <div className="flex justify-between items-center mb-1">
-                                <span className="text-zinc-800 text-[10px] font-bold font-['DM_Sans'] uppercase">
-                                    PHYSICAL ABUSE
-                                </span>
-                                <span className="text-[#1e3a8a] text-[11px] font-extrabold font-['DM_Sans']">
-                                    34%
-                                </span>
-                            </div>
-                            <div className="w-full h-1.5 bg-gray-100 rounded-full">
-                                <div className="w-[34%] h-full bg-[#1e3a8a] rounded-full" />
-                            </div>
-                        </div>
-
-                        <div>
-                            <div className="flex justify-between items-center mb-1">
-                                <span className="text-zinc-800 text-[10px] font-bold font-['DM_Sans'] uppercase">
-                                    NEGLECT / ABANDONMENT
-                                </span>
-                                <span className="text-[#1e3a8a] text-[11px] font-extrabold font-['DM_Sans']">
-                                    28%
-                                </span>
-                            </div>
-                            <div className="w-full h-1.5 bg-gray-100 rounded-full">
-                                <div className="w-[28%] h-full bg-[#9ca3af] rounded-full" />
-                            </div>
-                        </div>
-
-                        <div>
-                            <div className="flex justify-between items-center mb-1">
-                                <span className="text-zinc-800 text-[10px] font-bold font-['DM_Sans'] uppercase">
-                                    ECONOMIC EXPLOITATION
-                                </span>
-                                <span className="text-[#1e3a8a] text-[11px] font-extrabold font-['DM_Sans']">
-                                    22%
-                                </span>
-                            </div>
-                            <div className="w-full h-1.5 bg-gray-100 rounded-full">
-                                <div className="w-[22%] h-full bg-[#9ca3af] rounded-full" />
-                            </div>
-                        </div>
-
-                        <div>
-                            <div className="flex justify-between items-center mb-1">
-                                <span className="text-zinc-800 text-[10px] font-bold font-['DM_Sans'] uppercase">
-                                    PSYCHOLOGICAL
-                                </span>
-                                <span className="text-[#1e3a8a] text-[11px] font-extrabold font-['DM_Sans']">
-                                    15%
-                                </span>
-                            </div>
-                            <div className="w-full h-1.5 bg-gray-100 rounded-full">
-                                <div className="w-[15%] h-full bg-[#1e3a8a] rounded-full" />
-                            </div>
-                        </div>
+                        {stats?.by_category && Object.keys(stats.by_category).length > 0 ? (
+                            Object.entries(stats.by_category).map(([cat, count]) => {
+                                const pct = Math.round((count / stats.total) * 100)
+                                return (
+                                    <div key={cat}>
+                                        <div className="flex justify-between items-center mb-1">
+                                            <span className="text-zinc-800 text-[10px] font-bold font-['DM_Sans'] uppercase">
+                                                {cat.replace('_', ' ')}
+                                            </span>
+                                            <span className="text-[#1e3a8a] text-[11px] font-extrabold font-['DM_Sans']">
+                                                {pct}%
+                                            </span>
+                                        </div>
+                                        <div className="w-full h-1.5 bg-gray-100 rounded-full">
+                                            <div 
+                                                className="h-full bg-[#1e3a8a] rounded-full" 
+                                                style={{ width: `${pct}%` }}
+                                            />
+                                        </div>
+                                    </div>
+                                )
+                            })
+                        ) : (
+                            <div className="text-center py-4 text-gray-400 text-xs italic">No data available for case composition</div>
+                        )}
                     </div>
                 </div>
 

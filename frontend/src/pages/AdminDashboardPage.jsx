@@ -27,19 +27,34 @@ function AdminDashboardPage() {
   })
 
   const fetchData = async () => {
+    const token = localStorage.getItem('token')
+    if (!token) return
+
     setLoading(true)
     try {
       if (activeTab === 'dashboard' || activeTab === 'review') {
         const response = await fetch('http://localhost:5000/api/reports/pending', {
           headers: getAuthHeaders()
         })
+        if (response.status === 401) {
+          localStorage.removeItem('token')
+          navigate('/admin')
+          return
+        }
         if (response.ok) {
           const data = await response.json()
           setReports(data.reports || [])
         }
       }
       if (activeTab === 'dashboard' || activeTab === 'analytics') {
-        const response = await fetch('http://localhost:5000/api/reports/stats')
+        const response = await fetch('http://localhost:5000/api/reports/stats', {
+          headers: getAuthHeaders()
+        })
+        if (response.status === 401) {
+          localStorage.removeItem('token')
+          navigate('/admin')
+          return
+        }
         if (response.ok) {
           const data = await response.json()
           setStats(data)
@@ -52,20 +67,8 @@ function AdminDashboardPage() {
     }
   }
 
-  const handleApprove = async (reportId) => {
-    if (!confirm("Are you sure you want to approve this report?")) return
-    try {
-      const response = await fetch(`http://localhost:5000/api/reports/${reportId}/approve`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ notes: "Approved for public awareness" })
-      })
-      if (response.ok) {
-        fetchData()
-      }
-    } catch (err) {
-      console.error('Error approving report:', err)
-    }
+  const handleReview = (reportId) => {
+    navigate(`/admin/queue?id=${reportId}`)
   }
 
   const handleLogout = () => {
@@ -76,19 +79,45 @@ function AdminDashboardPage() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'pending_review': return 'border-red-500'
-      case 'approved_awareness': return 'border-green-500'
-      case 'verified_pnp': return 'border-blue-900'
+      case 'pending_review': return 'border-amber-500'
+      case 'approved_awareness': return 'border-blue-900'
+      case 'verified':
+      case 'verified_pnp': return 'border-green-500'
+      case 'dismissed': return 'border-red-500'
       default: return 'border-gray-300'
+    }
+  }
+
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'pending_review': return 'bg-amber-100 text-amber-600 border-amber-200'
+      case 'approved_awareness': return 'bg-blue-100 text-blue-900 border-blue-200'
+      case 'verified':
+      case 'verified_pnp': return 'bg-green-100 text-green-600 border-green-200'
+      case 'dismissed': return 'bg-red-100 text-red-500 border-red-200'
+      default: return 'bg-gray-100 text-gray-500 border-gray-200'
+    }
+  }
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'pending_review': return 'Pending Review'
+      case 'approved_awareness': return 'In Progress'
+      case 'verified':
+      case 'verified_pnp': return 'Resolved'
+      case 'dismissed': return 'Dismissed'
+      default: return status
     }
   }
 
   const getCategoryColor = (category) => {
     switch (category?.toLowerCase()) {
-      case 'harassment': return 'bg-red-100 text-red-500'
-      case 'physical_assault': return 'bg-red-100 text-red-500'
-      case 'stalking': return 'bg-amber-100 text-amber-500'
-      case 'verbal_abuse': return 'bg-yellow-100 text-yellow-500'
+      case 'sexual_assault':    return 'bg-red-100 text-red-500'
+      case 'physical_abuse':    return 'bg-red-100 text-red-500'
+      case 'domestic_violence': return 'bg-red-100 text-red-500'
+      case 'stalking':          return 'bg-amber-100 text-amber-500'
+      case 'verbal_abuse':      return 'bg-yellow-100 text-yellow-500'
+      case 'emotional_abuse':   return 'bg-yellow-100 text-yellow-500'
       default: return 'bg-gray-100 text-gray-500'
     }
   }
@@ -125,29 +154,26 @@ function AdminDashboardPage() {
       {/* Stats Cards */}
       <div className="w-full max-w-sm px-4 mt-6 space-y-3">
         {/* Active Cases */}
-        <div className="w-full h-[72px] bg-white rounded-r-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-green-500 px-5 flex flex-col justify-center gap-1">
-          <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wide">Active Cases</div>
+        <div className="w-full h-[72px] bg-white rounded-r-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-blue-500 px-5 flex flex-col justify-center gap-1">
+          <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wide">Total Reports</div>
           <div className="flex items-baseline gap-2">
-            <div className="text-[#1e3a8a] text-[26px] font-extrabold font-['DM_Sans'] leading-none">{stats?.total || '1,284'}</div>
-            <div className="text-green-500 text-xs font-semibold font-['DM_Sans']">General Santos</div>
+            <div className="text-[#1e3a8a] text-[26px] font-extrabold font-['DM_Sans'] leading-none">{stats?.total || 0}</div>
           </div>
         </div>
 
         {/* Pending Review */}
-        <div className="w-full h-[72px] bg-white rounded-r-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-red-500 px-5 flex flex-col justify-center gap-1">
+        <div className="w-full h-[72px] bg-white rounded-r-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-amber-500 px-5 flex flex-col justify-center gap-1">
           <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wide">Pending Review</div>
           <div className="flex items-baseline gap-2">
-            <div className="text-[#1e3a8a] text-[26px] font-extrabold font-['DM_Sans'] leading-none">{stats?.pending_review || '42'}</div>
-            <div className="text-red-500 text-xs font-semibold font-['DM_Sans']">High Urgency</div>
+            <div className="text-[#1e3a8a] text-[26px] font-extrabold font-['DM_Sans'] leading-none">{stats?.pending_review || 0}</div>
           </div>
         </div>
 
-        {/* Today's Report */}
-        <div className="w-full h-[72px] bg-white rounded-r-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-[#1e3a8a] px-5 flex flex-col justify-center gap-1">
-          <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wide">Today's Report</div>
+        {/* Resolved Reports */}
+        <div className="w-full h-[72px] bg-white rounded-r-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-green-500 px-5 flex flex-col justify-center gap-1">
+          <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wide">Resolved Reports</div>
           <div className="flex items-baseline gap-2">
-            <div className="text-[#1e3a8a] text-[26px] font-extrabold font-['DM_Sans'] leading-none">+12%</div>
-            <div className="text-gray-500 text-xs font-semibold font-['DM_Sans']">vs Yesterday</div>
+            <div className="text-[#1e3a8a] text-[26px] font-extrabold font-['DM_Sans'] leading-none">{stats?.pnp_verified || 0}</div>
           </div>
         </div>
       </div>
@@ -176,7 +202,10 @@ function AdminDashboardPage() {
                       <div className="text-gray-400 text-[10px] font-semibold font-['DM_Sans']">
                         {report.reference_code || `SF-${report.id}`}
                       </div>
-                      <div className="px-2 py-0.5 bg-red-100 rounded text-red-500 text-[9px] font-bold font-['DM_Sans'] uppercase">
+                      <div className={`px-2 py-0.5 rounded text-[9px] font-bold font-['DM_Sans'] uppercase ${getStatusBadge(report.status)}`}>
+                        {getStatusLabel(report.status)}
+                      </div>
+                      <div className="px-2 py-0.5 bg-gray-100 rounded text-gray-500 text-[9px] font-bold font-['DM_Sans'] uppercase">
                         {report.category?.replace('_', ' ').toUpperCase() || 'REPORT'}
                       </div>
                     </div>
@@ -195,7 +224,7 @@ function AdminDashboardPage() {
                     {new Date(report.created_at).toLocaleDateString()}
                   </div>
                   <button
-                    onClick={() => handleApprove(report.id)}
+                    onClick={() => handleReview(report.id)}
                     className="h-8 px-4 bg-[#1f295b] hover:bg-[#151c3d] transition-colors rounded-lg flex items-center justify-center cursor-pointer"
                   >
                     <span className="text-white text-xs font-bold font-['DM_Sans']">Review</span>

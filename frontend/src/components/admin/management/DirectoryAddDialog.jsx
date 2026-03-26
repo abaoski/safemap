@@ -15,25 +15,17 @@ export default function DirectoryAddDialog({ isOpen, onClose, onAdd }) {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        // Generate mock Case ID
-        const caseId = `#NEW-${Math.floor(Math.random() * 900) + 100}`
         
-        let typeColor = "bg-slate-100 text-slate-500"
-        if (formData.type === "CRITICAL") typeColor = "bg-red-100 text-red-600"
-        if (formData.type === "REGIONAL") typeColor = "bg-blue-100 text-blue-600"
-        if (formData.type === "SOCIAL CARE") typeColor = "bg-emerald-100 text-emerald-600"
-        if (formData.type === "DRAFT") typeColor = "bg-slate-100 text-slate-500"
-
         const newEntry = {
-            id: Date.now(),
-            caseId,
             name: formData.name,
             phone: formData.phone,
-            location: formData.location || "Pending Location",
-            lat: formData.lat || "-",
-            lng: formData.lng || "-",
-            type: formData.type,
-            typeColor
+            address: formData.location || "Pending Location",
+            latitude: formData.lat ? parseFloat(formData.lat) : 0,
+            longitude: formData.lng ? parseFloat(formData.lng) : 0,
+            category: formData.type.toLowerCase().replace(" ", "_"),
+            category_label: formData.type,
+            description: `Contact for ${formData.name}`,
+            is_24_7: true
         }
         
         onAdd(newEntry)

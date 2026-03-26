@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import {
     Search,
     Filter,
@@ -17,6 +17,7 @@ import AdminBottomNav from "../components/AdminBottomNav"
 
 function AdminQueuePage() {
     const navigate = useNavigate()
+    const location = useLocation()
     const [reports, setReports] = useState([])
     const [allReports, setAllReports] = useState([])
     const [loading, setLoading] = useState(true)
@@ -31,6 +32,15 @@ function AdminQueuePage() {
         dismissed: 0,
         total: 0,
     })
+
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search)
+        const reportId = queryParams.get("id")
+        if (reportId) {
+            setSearchQuery(reportId)
+            setStatusFilter("") // Show all statuses if searching for specific ID
+        }
+    }, [location.search])
 
     // Show notification helper
     const showNotification = (message, type = "success") => {
@@ -53,6 +63,9 @@ function AdminQueuePage() {
     })
 
     const fetchData = async () => {
+        const token = localStorage.getItem("token")
+        if (!token) return
+
         setLoading(true)
         try {
             // Fetch filtered reports
@@ -61,6 +74,11 @@ function AdminQueuePage() {
             if (categoryFilter) url += `&category=${categoryFilter}`
 
             const response = await fetch(url, { headers: getAuthHeaders() })
+            if (response.status === 401) {
+                localStorage.removeItem("token")
+                navigate("/admin")
+                return
+            }
             if (response.ok) {
                 const data = await response.json()
                 setAllReports(data.reports || [])
@@ -71,6 +89,11 @@ function AdminQueuePage() {
                 "http://localhost:5000/api/reports/stats",
                 { headers: getAuthHeaders() }
             )
+            if (statsRes.status === 401) {
+                localStorage.removeItem("token")
+                navigate("/admin")
+                return
+            }
             if (statsRes.ok) {
                 const data = await statsRes.json()
                 setStats({
@@ -206,28 +229,28 @@ function AdminQueuePage() {
                 return {
                     bg: "bg-amber-100",
                     text: "text-amber-600",
-                    label: "PENDING",
+                    label: "Pending Review",
                     border: "border-amber-400",
                 }
             case "approved_awareness":
                 return {
-                    bg: "bg-green-100",
-                    text: "text-green-600",
-                    label: "APPROVED",
-                    border: "border-green-500",
+                    bg: "bg-blue-100",
+                    text: "text-blue-900",
+                    label: "In Progress",
+                    border: "border-blue-900",
                 }
             case "verified_pnp":
                 return {
-                    bg: "bg-blue-100",
-                    text: "text-blue-800",
-                    label: "VERIFIED",
-                    border: "border-blue-900",
+                    bg: "bg-green-100",
+                    text: "text-green-600",
+                    label: "Resolved",
+                    border: "border-green-500",
                 }
             case "dismissed":
                 return {
                     bg: "bg-red-100",
                     text: "text-red-500",
-                    label: "DISMISSED",
+                    label: "Dismissed",
                     border: "border-red-400",
                 }
             default:
@@ -413,14 +436,13 @@ function AdminQueuePage() {
                     <div className="flex flex-wrap gap-2">
                         {[
                             "",
-                            "harassment",
-                            "physical_abuse",
                             "sexual_assault",
+                            "physical_abuse",
                             "domestic_violence",
                             "stalking",
                             "verbal_abuse",
-                            "theft",
-                            "assault",
+                            "emotional_abuse",
+                            "other",
                         ].map((cat) => (
                             <button
                                 key={cat}
@@ -440,17 +462,15 @@ function AdminQueuePage() {
             </div>
 
             {/* Report Cards */}
-            <div className="w-full max-w-sm px-4 mt-5 space-y-3">
+            <div className="w-full max-w-sm px-4 mt-6 mb-20 space-y-4">
                 {loading ? (
-                    <div className="text-center py-12 text-gray-400 text-sm font-['DM_Sans']">
+                    <div className="text-center py-12 text-gray-400 font-['DM_Sans']">
                         Loading reports...
                     </div>
                 ) : filteredReports.length === 0 ? (
-                    <div className="text-center py-12">
-                        <div className="text-gray-300 text-4xl mb-3">📋</div>
-                        <div className="text-gray-400 text-sm font-['DM_Sans']">
-                            No reports found
-                        </div>
+                    <div className="text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
+                        <div className="text-gray-400 font-bold text-sm font-['DM_Sans'] uppercase tracking-tight">No reports found</div>
+                        <div className="text-gray-400 text-xs font-['DM_Sans'] mt-1">There are no reports matching your current filters.</div>
                     </div>
                 ) : (
                     filteredReports.map((report) => {
@@ -458,7 +478,7 @@ function AdminQueuePage() {
                         return (
                             <div
                                 key={report.id}
-                                className={`w-full bg-white rounded-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] border-l-[5px] ${badge.border} p-4 relative`}>
+                                className={`w-full bg-white rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border-l-[5px] ${badge.border} p-4 flex flex-col gap-3 relative`}>
                                 {/* Top row: ref code + severity badge + status */}
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-2">

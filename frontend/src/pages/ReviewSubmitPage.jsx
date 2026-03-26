@@ -37,13 +37,12 @@ export default function ReviewSubmitPage() {
   // Map frontend incident types to backend categories (GBV only)
   const mapCategory = (incidentType) => {
     const mapping = {
-      'Sexual Assault': 'sexual_assault',
-      'Physical Abuse': 'physical_abuse',
+      'Sexual Assault':    'sexual_assault',
+      'Physical Abuse':    'physical_abuse',
       'Domestic Violence': 'domestic_violence',
-      'Harassment': 'harassment',
-      'Stalking': 'stalking',
-      'Verbal Abuse': 'verbal_abuse',
-      'Emotional Abuse': 'emotional_abuse'
+      'Stalking':          'stalking',
+      'Verbal Abuse':      'verbal_abuse',
+      'Emotional Abuse':   'emotional_abuse',
     }
     return mapping[incidentType] || 'other'
   }

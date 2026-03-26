@@ -52,10 +52,9 @@ export default function IncidentDetailsPage() {
     'Sexual Assault',
     'Physical Abuse',
     'Domestic Violence',
-    'Harassment',
     'Stalking',
     'Verbal Abuse',
-    'Emotional Abuse'
+    'Emotional Abuse',
   ]
 
   return (

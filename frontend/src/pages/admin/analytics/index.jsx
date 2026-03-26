@@ -17,14 +17,26 @@ function AdminAnalyticsPage() {
     }, [])
 
     const fetchData = async () => {
-        try {
-            const token = localStorage.getItem("token")
-            const headers = token ? { Authorization: `Bearer ${token}` } : {}
+        const token = localStorage.getItem("token")
+        if (!token) return
 
-            const statsRes = await fetch("http://localhost:5000/api/reports/stats")
+        try {
+            const headers = { Authorization: `Bearer ${token}` }
+
+            const statsRes = await fetch("http://localhost:5000/api/reports/stats", { headers })
+            if (statsRes.status === 401) {
+                localStorage.removeItem("token")
+                window.location.href = "/admin"
+                return
+            }
             if (statsRes.ok) setStats(await statsRes.json())
 
             const heatRes = await fetch("http://localhost:5000/api/reports/heatmap", { headers })
+            if (heatRes.status === 401) {
+                localStorage.removeItem("token")
+                window.location.href = "/admin"
+                return
+            }
             if (heatRes.ok) {
                 const data = await heatRes.json()
                 setHeatPoints(data.points || [])

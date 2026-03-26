@@ -51,11 +51,6 @@ class Report(db.Model):
     # Created by user
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     
-    # Personal details (to be removed by admin)
-    reporter_name = db.Column(db.String(100))
-    reporter_contact = db.Column(db.String(100))
-    has_personal_details = db.Column(db.Boolean, default=False)
-    
     # Attachments
     image_url = db.Column(db.String(256))
     
@@ -63,26 +58,15 @@ class Report(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Categories (including GBV categories)
+    # GBV Categories only
     CATEGORIES = [
-        'theft',           # Theft/Robbery
-        'assault',         # Physical assault
-        'fraud',           # Scam/Fraud
-        'harassment',      # Harassment
-        'vandalism',       # Vandalism
-        'accident',        # Traffic/Accident
-        'fire',            # Fire incident
-        'flood',           # Flooding
-        'suspicious',      # Suspicious activity
-        'violence',        # Violence
-        # GBV Categories
-        'sexual_assault',  # Sexual Assault
-        'physical_abuse',  # Physical Abuse
+        'sexual_assault',    # Sexual Assault
+        'physical_abuse',    # Physical Abuse
         'domestic_violence', # Domestic Violence
-        'stalking',        # Stalking
-        'verbal_abuse',    # Verbal Abuse
-        'emotional_abuse', # Emotional Abuse
-        'other'            # Other
+        'stalking',          # Stalking
+        'verbal_abuse',      # Verbal Abuse
+        'emotional_abuse',   # Emotional Abuse
+        'other'              # Other
     ]
     
     # Severity levels
@@ -98,12 +82,12 @@ class Report(db.Model):
     
     def __repr__(self):
         return f'<Report {self.id}: {self.title}>'
-    
+
     def generate_reference_code(self):
         """Generate unique reference code for anonymous submission"""
         self.reference_code = f'SMPH-{secrets.token_hex(3).upper()}'
         return self.reference_code
-    
+
     def to_dict(self, include_personal=False, include_private=False):
         """Convert report to dictionary"""
         data = {
@@ -129,11 +113,8 @@ class Report(db.Model):
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
         
-        # Include personal details only for admin review
+        # Include admin review details only for admin view
         if include_private:
-            data['reporter_name'] = self.reporter_name
-            data['reporter_contact'] = self.reporter_contact
-            data['has_personal_details'] = self.has_personal_details
             data['reviewed_by'] = self.reviewed_by
             data['review_notes'] = self.review_notes
             data['review_date'] = self.review_date.isoformat() if self.review_date else None
@@ -143,7 +124,7 @@ class Report(db.Model):
             data['show_on_heatmap'] = self.status in ['approved_awareness', 'verified_pnp']
         
         return data
-    
+
     def to_public_dict(self):
         """Public view - only approved reports visible"""
         if self.status not in ['approved_awareness', 'verified_pnp']:
@@ -165,13 +146,11 @@ class Report(db.Model):
             },
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
-    
+
     def remove_personal_details(self):
-        """Remove personal details for privacy"""
-        self.reporter_name = None
-        self.reporter_contact = None
-        self.has_personal_details = False
-    
+        """No-op — all reports are anonymous"""
+        pass
+
     def approve_for_awareness(self, reviewed_by, notes=''):
         """Approve report for public awareness"""
         self.status = 'approved_awareness'
@@ -179,7 +158,7 @@ class Report(db.Model):
         self.review_notes = notes
         self.review_date = datetime.utcnow()
         self.remove_personal_details()
-    
+
     def verify_pnp(self, reviewed_by, case_number=None, notes=''):
         """Mark report as verified"""
         self.status = 'verified_pnp'
@@ -190,7 +169,7 @@ class Report(db.Model):
         self.review_date = datetime.utcnow()
         self.verified_date = datetime.utcnow()
         self.remove_personal_details()
-    
+
     def dismiss_report(self, reviewed_by, reason=''):
         """Dismiss report as spam/duplicate"""
         self.status = 'dismissed'
@@ -198,37 +177,72 @@ class Report(db.Model):
         self.review_notes = reason
         self.review_date = datetime.utcnow()
         self.remove_personal_details()
-    
+
     def save(self):
         """Save report to database"""
         db.session.add(self)
         db.session.commit()
-    
+
     def delete(self):
         """Delete report from database"""
         db.session.delete(self)
         db.session.commit()
-    
+
     @staticmethod
     def get_pending():
         """Get all pending review reports"""
         return Report.query.filter_by(status='pending_review')\
             .order_by(Report.created_at.desc()).all()
-    
+
     @staticmethod
     def get_public():
         """Get approved reports for public heatmap"""
         return Report.query.filter(
             Report.status.in_(['approved_awareness', 'verified_pnp'])
         ).order_by(Report.created_at.desc()).all()
-    
+
     @staticmethod
     def get_verified():
         """Get PNP verified reports"""
         return Report.query.filter_by(status='verified_pnp')\
             .order_by(Report.created_at.desc()).all()
-    
+
     @staticmethod
     def get_by_reference(code):
         """Get report by reference code"""
         return Report.query.filter_by(reference_code=code).first()
+
+class ReportCategory(db.Model):
+    """Category for incident reports"""
+    
+    __tablename__ = 'report_categories'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False, unique=True)
+    label = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(256))
+    priority = db.Column(db.String(20), default='medium')
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        report_count = Report.query.filter_by(category=self.name).count()
+        return {
+            'id': self.id,
+            'name': self.name,
+            'label': self.label,
+            'description': self.description,
+            'priority': self.priority,
+            'is_active': self.is_active,
+            'report_count': report_count
+        }
+    
+    def save(self):
+        """Save category to database"""
+        db.session.add(self)
+        db.session.commit()
+    
+    def delete(self):
+        """Delete category from database"""
+        db.session.delete(self)
+        db.session.commit()

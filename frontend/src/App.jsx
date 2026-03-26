@@ -14,6 +14,7 @@ import AdminAnalyticsPage from './pages/admin/analytics'
 import AdminQueuePage from './pages/admin/queue'
 import AdminAuditPage from './pages/admin/audit'
 import AdminSettingsPage from './pages/admin/settings'
+import MapPage from './pages/MapPage'
 import AdminManagementPage from './pages/admin/management'
 
 // Import modular components
@@ -145,7 +146,7 @@ function App() {
           )}
 
           {/* Main Content - Map */}
-          <main className="flex-1 relative">
+          <main className="flex-1 relative pb-[72px]">
             <MapView activeFilter={activeFilter} searchQuery={selectedLocation ? selectedLocation.name : ''} />
             <RiskLegend onFilterChange={setActiveFilter} activeFilter={activeFilter} />
 
@@ -180,6 +181,7 @@ function App() {
         </div>
       }
       />
+      <Route path="/map" element={<MapPage />} />
       <Route path="/report" element={<ReportPage />} />
       <Route path="/incident-details" element={<IncidentDetailsPage />} />
       <Route path="/location-details" element={<LocationDetailsPage />} />

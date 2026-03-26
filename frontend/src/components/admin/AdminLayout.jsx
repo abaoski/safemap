@@ -79,9 +79,9 @@ function AdminLayout({ activeTab, children }) {
     const initials = getInitials(user?.name || user?.username)
 
     return (
-        <div className="w-full min-h-screen bg-slate-50 overflow-x-hidden flex flex-col items-center">
+        <div className="w-full min-h-screen bg-slate-50 overflow-x-hidden flex flex-col items-center pt-0">
             {/* Header */}
-            <div className="w-full max-w-sm px-4 pt-8 pb-2">
+            <div className="w-full max-w-sm px-4 pt-4 pb-2">
                 <div className="relative flex items-center justify-center mb-5">
                     <img className="h-12 w-auto" src={logoImg} alt="SafeMap" />
                     <div className="absolute right-0 flex items-center gap-2">
@@ -236,10 +236,9 @@ function AdminLayout({ activeTab, children }) {
             </div>
 
             {/* Page body */}
-            {children}
-
-            {/* Bottom spacer */}
-            <div className="h-28" />
+            <div className="w-full pb-28">
+                {children}
+            </div>
 
             {/* Bottom Navigation */}
             <AdminBottomNav activeTab={activeTab} />

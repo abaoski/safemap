@@ -12,7 +12,9 @@ function BottomNav({ onHelpClick, onChatClick }) {
         const path = location.pathname
         // Since Map and Home both use '/', we let the internal state handle it if it's '/'.
         // Otherwise, we match specific routes.
-        if (path === "/help") {
+        if (path === "/map") {
+            setActiveTab("map")
+        } else if (path === "/help") {
             setActiveTab("help")
         } else if (path === "/admin") {
             setActiveTab("admin")
@@ -62,12 +64,12 @@ function BottomNav({ onHelpClick, onChatClick }) {
     )
 
     return (
-        <div className="fixed bottom-0 left-0 w-full h-[72px] bg-white rounded-t-[24px] flex justify-between items-center px-2 sm:px-6 z-[1002] shadow-[0_-8px_24px_rgba(0,0,0,0.06)] pb-2">
+        <div className="fixed bottom-0 left-0 w-full h-[72px] bg-white rounded-t-[24px] flex justify-between items-center px-2 sm:px-6 z-[2000] shadow-[0_-8px_24px_rgba(0,0,0,0.06)] pb-2">
             {renderTab(Home, "Home", "home", activeTab === "home", () =>
                 navigate("/"),
             )}
             {renderTab(Map, "Map", "map", activeTab === "map", () =>
-                navigate("/"),
+                navigate("/map"),
             )}
 
             {/* CTA Button: Always highlighted & prominent */}

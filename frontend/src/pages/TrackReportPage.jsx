@@ -76,6 +76,7 @@ export default function TrackReportPage() {
       case 'approved_awareness':
         return 'bg-blue-900'
       case 'verified':
+      case 'verified_pnp':
         return 'bg-green-500'
       case 'dismissed':
         return 'bg-red-500'
@@ -92,6 +93,7 @@ export default function TrackReportPage() {
       case 'approved_awareness':
         return 'In Progress'
       case 'verified':
+      case 'verified_pnp':
         return 'Resolved'
       case 'dismissed':
         return 'Dismissed'

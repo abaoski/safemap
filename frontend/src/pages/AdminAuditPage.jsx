@@ -196,27 +196,6 @@ function AdminAuditPage() {
             }
         })
 
-        // Add some static system events as samples
-        const now = new Date()
-        entries.push({
-            id: "sys-login-1",
-            type: "login",
-            reviewedBy: "Admin-01",
-            timestamp: new Date(
-                now.getTime() - 2 * 60 * 60 * 1000,
-            ).toISOString(),
-            description: "Admin-01 signed into HQ Terminal",
-        })
-        entries.push({
-            id: "sys-login-2",
-            type: "login",
-            reviewedBy: "Admin-04",
-            timestamp: new Date(
-                now.getTime() - 5 * 60 * 60 * 1000,
-            ).toISOString(),
-            description: "Admin-04 signed into Field Terminal",
-        })
-
         // Sort by timestamp (newest first)
         entries.sort(
             (a, b) => new Date(b.timestamp) - new Date(a.timestamp),

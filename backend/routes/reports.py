@@ -5,12 +5,12 @@ Handle safety report workflow - Public submission, Admin review
 
 from flask import request, jsonify
 from routes import api_bp
-from models import Report
+from models import Report, ReportCategory
 from utils import validate_json, paginate_query, require_auth, get_current_user
 
 # Required fields for report submission
 REPORT_REQUIRED_FIELDS = ['title', 'description', 'latitude', 'longitude', 'category']
-REPORT_OPTIONAL_FIELDS = ['severity', 'barangay', 'address', 'reporter_name', 'reporter_contact', 'image_url']
+REPORT_OPTIONAL_FIELDS = ['severity', 'barangay', 'address', 'image_url']
 
 
 @api_bp.route('/reports/public', methods=['GET'])
@@ -43,9 +43,10 @@ def get_pending_reports():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
     
-    query = Report.query.filter_by(status='pending_review')
+    # "Need Review" should show pending_review and approved_awareness (In Progress) reports
+    query = Report.query.filter(Report.status.in_(['pending_review', 'approved_awareness']))
     
-    pagination = paginate_query(query, page, per_page)
+    pagination = paginate_query(query.order_by(Report.created_at.desc()), page, per_page)
     
     return jsonify({
         'reports': [r.to_dict(include_private=True) for r in pagination.items],
@@ -139,8 +140,8 @@ def submit_anonymous_report():
             'valid_categories': Report.CATEGORIES
         }), 400
     
-    # Check for personal details
-    has_personal = bool(data.get('reporter_name') or data.get('reporter_contact'))
+    # All reports are anonymous
+    has_personal = False
     
     # Create report
     report = Report(
@@ -154,11 +155,9 @@ def submit_anonymous_report():
         barangay=data.get('barangay'),
         address=data.get('address'),
         image_url=data.get('image_url'),
-        reporter_name=data.get('reporter_name'),
-        reporter_contact=data.get('reporter_contact'),
-        has_personal_details=has_personal,
+        has_personal_details=False,
         is_anonymous=True,
-        status='pending_review'  # Default: Unverified & Pending Review
+        status='pending_review'
     )
     
     # Generate reference code
@@ -271,6 +270,25 @@ def dismiss_report(report_id):
     }), 200
 
 
+@api_bp.route('/reports/<int:report_id>/spam', methods=['POST'])
+@require_auth
+def mark_report_spam(report_id):
+    """Mark report as spam"""
+    current_user = get_current_user()
+    
+    if current_user.role not in ['admin', 'moderator']:
+        return jsonify({'error': 'Unauthorized - Admin access required'}), 403
+    
+    report = Report.query.get_or_404(report_id)
+    report.dismiss_report(current_user.id, 'Marked as spam')
+    report.save()
+    
+    return jsonify({
+        'message': 'Report marked as spam',
+        'report': report.to_dict()
+    }), 200
+
+
 @api_bp.route('/reports/<int:report_id>/remove-personal', methods=['POST'])
 @require_auth
 def remove_personal_details(report_id):
@@ -361,6 +379,8 @@ def get_heatmap_data():
             'severity':  r.severity,
             'category':  r.category,
             'status':    r.status,
+            'barangay':  r.barangay,
+            'city':      r.city
         })
 
     return jsonify({'points': points, 'total': len(points)}), 200
@@ -369,9 +389,79 @@ def get_heatmap_data():
 @api_bp.route('/reports/categories', methods=['GET'])
 def get_categories():
     """Get available report categories"""
+    categories = ReportCategory.query.filter_by(is_active=True).all()
+    if not categories:
+        # Fallback to static list if DB is empty
+        priority_map = {
+            'sexual_assault':    'critical',
+            'physical_abuse':    'critical',
+            'domestic_violence': 'critical',
+            'stalking':          'high',
+            'verbal_abuse':      'medium',
+            'emotional_abuse':   'medium',
+            'other':             'low',
+        }
+        return jsonify({
+            'categories': [
+                {
+                    'value': c,
+                    'name': c,
+                    'label': c.replace('_', ' ').title(),
+                    'priority': priority_map.get(c, 'medium'),
+                    'report_count': Report.query.filter_by(category=c).count()
+                }
+                for c in Report.CATEGORIES
+            ]
+        }), 200
+        
     return jsonify({
-        'categories': [
-            {'value': c, 'label': c.replace('_', ' ').title()}
-            for c in Report.CATEGORIES
-        ]
+        'categories': [c.to_dict() for c in categories]
     }), 200
+
+@api_bp.route('/reports/categories', methods=['POST'])
+@require_auth
+def create_report_category():
+    """Create new report category (admin only)"""
+    current_user = get_current_user()
+    if current_user.role not in ['admin', 'moderator']:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    data = request.get_json()
+    category = ReportCategory(
+        name=data['name'],
+        label=data['label'],
+        description=data.get('description'),
+        priority=data.get('priority', 'medium')
+    )
+    category.save()
+    return jsonify(category.to_dict()), 201
+
+@api_bp.route('/reports/categories/<int:cat_id>', methods=['PUT'])
+@require_auth
+def update_report_category(cat_id):
+    """Update report category (admin only)"""
+    current_user = get_current_user()
+    if current_user.role not in ['admin', 'moderator']:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    category = ReportCategory.query.get_or_404(cat_id)
+    data = request.get_json()
+    
+    for field in ['name', 'label', 'description', 'priority', 'is_active']:
+        if field in data:
+            setattr(category, field, data[field])
+            
+    category.save()
+    return jsonify(category.to_dict()), 200
+
+@api_bp.route('/reports/categories/<int:cat_id>', methods=['DELETE'])
+@require_auth
+def delete_report_category(cat_id):
+    """Delete report category (admin only)"""
+    current_user = get_current_user()
+    if current_user.role not in ['admin', 'moderator']:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    category = ReportCategory.query.get_or_404(cat_id)
+    category.delete()
+    return jsonify({'message': 'Category deleted'}), 200
