@@ -1,68 +1,87 @@
-import { useNavigate, useLocation } from 'react-router-dom'
-import { useState } from 'react'
-import homeImg from '/src/assets/images/ft_home.svg'
-import mapImg from '/src/assets/images/ft_map.svg'
-import helpImg from '/src/assets/images/ft_help.svg'
-import adminImg from '/src/assets/images/ft_admin-panel.svg'
-import reportImg from '/src/assets/images/ft_report.svg'
+import { useNavigate, useLocation } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { Home, Map, AlertTriangle, HelpCircle, Shield } from "lucide-react"
 
 function BottomNav({ onHelpClick, onChatClick }) {
-  const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState('home')
+    const navigate = useNavigate()
+    const location = useLocation()
+    const [activeTab, setActiveTab] = useState("home")
 
-  const handleTabClick = (tab, action) => {
-    setActiveTab(tab)
-    if (action) action()
-  }
+    useEffect(() => {
+        // Sync active tab with current path if needed
+        const path = location.pathname
+        // Since Map and Home both use '/', we let the internal state handle it if it's '/'.
+        // Otherwise, we match specific routes.
+        if (path === "/help") {
+            setActiveTab("help")
+        } else if (path === "/admin") {
+            setActiveTab("admin")
+        }
+        // We intentionally ignore '/report' because it acts as a floating CTA.
+    }, [location.pathname])
 
-  return (
-    <nav className="bg-white shadow-[0_-4px_20px_0px_rgba(0,0,0,0.08)] z-50">
-      <div className="flex items-center justify-around h-16">
-        <button 
-          className={`flex flex-col items-center gap-1 ${activeTab === 'home' ? 'text-blue-600' : 'text-gray-400'}`}
-          onClick={() => handleTabClick('home', () => navigate('/'))}
-        >
-          <img src={homeImg} alt="Home" className={`w-6 h-6 ${activeTab === 'home' ? '' : 'opacity-60'}`} />
-          <div className="text-xs">Home</div>
+    const handleTabClick = (tab, action) => {
+        setActiveTab(tab)
+        if (action) action()
+    }
+
+    // Regular Tab - Only changes color and font-weight when active
+    const renderTab = (Icon, label, tabId, isActive, action) => (
+        <button
+            onClick={() => handleTabClick(tabId, action)}
+            className={`flex flex-col items-center justify-center w-[60px] bg-transparent border-none cursor-pointer transition-colors duration-200 mt-2 ${
+                isActive
+                    ? "text-blue-700"
+                    : "text-slate-400 hover:text-slate-500"
+            }`}>
+            <div
+                className={`p-1.5 rounded-xl mb-1 transition-all duration-200 ${isActive ? "bg-blue-50" : "bg-transparent"}`}>
+                <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 2} />
+            </div>
+            <span
+                className={`text-[11px] font-['DM_Sans'] leading-none ${
+                    isActive ? "font-semibold" : "font-medium"
+                }`}>
+                {label}
+            </span>
         </button>
+    )
 
-        <button 
-          className={`flex flex-col items-center gap-1 ${activeTab === 'map' ? 'text-blue-600' : 'text-gray-400'}`}
-          onClick={() => handleTabClick('map', () => navigate('/'))}
-        >
-          <img src={mapImg} alt="Map" className={`w-6 h-6 ${activeTab === 'map' ? '' : 'opacity-60'}`} />
-          <div className="text-xs">Map</div>
-        </button>
+    // Floating Action CTA (Reports) - Always protruding
+    const renderCTA = (Icon, label, action) => (
+        <div
+            className="relative -top-[20px] flex flex-col items-center gap-1.5 cursor-pointer min-w-[64px]"
+            onClick={action}>
+            <div className="w-[56px] h-[56px] bg-[#1f295b] hover:bg-[#151c3d] transition-colors rounded-full shadow-[0px_6px_16px_rgba(31,41,91,0.4)] flex items-center justify-center border-[4px] border-white">
+                <Icon className="w-6 h-6 text-white" strokeWidth={2.5} />
+            </div>
+            <span className="text-[#1f295b] text-[11px] font-bold font-['DM_Sans'] leading-none">
+                {label}
+            </span>
+        </div>
+    )
 
-        {/* Reports Button - Center */}
-        <button 
-          className="flex flex-col items-center -mt-8"
-          onClick={() => navigate('/report')}
-        >
-          <div className="h-12 p-3 bg-blue-950 rounded-3xl shadow-[0px_4px_16px_0px_rgba(26,42,108,0.40)] outline-solid outline-[3px] outline-offset-[-3px] outline-white inline-flex justify-start items-start gap-2.5">
-            <img src={reportImg} alt="Reports" className="w-6 h-6" />
-          </div>
-          <span className="text-xs text-blue-950 font-medium bg-white px-2 py-0.5 rounded mt-1">Reports</span>
-        </button>
+    return (
+        <div className="fixed bottom-0 left-0 w-full h-[72px] bg-white rounded-t-[24px] flex justify-between items-center px-2 sm:px-6 z-[1002] shadow-[0_-8px_24px_rgba(0,0,0,0.06)] pb-2">
+            {renderTab(Home, "Home", "home", activeTab === "home", () =>
+                navigate("/"),
+            )}
+            {renderTab(Map, "Map", "map", activeTab === "map", () =>
+                navigate("/"),
+            )}
 
-        <button 
-          className={`flex flex-col items-center gap-1 ${activeTab === 'help' ? 'text-blue-600' : 'text-gray-400'}`}
-          onClick={() => handleTabClick('help', () => navigate('/help'))}
-        >
-          <img src={helpImg} alt="Help" className={`w-6 h-6 ${activeTab === 'help' ? '' : 'opacity-60'}`} />
-          <div className="text-xs">Help</div>
-        </button>
+            {/* CTA Button: Always highlighted & prominent */}
+            {renderCTA(AlertTriangle, "Report", () => navigate("/report"))}
 
-        <button 
-          className={`flex flex-col items-center gap-1 ${activeTab === 'admin' ? 'text-blue-600' : 'text-gray-400'}`}
-          onClick={() => handleTabClick('admin', () => navigate('/admin'))}
-        >
-          <img src={adminImg} alt="Admin" className={`w-6 h-6 ${activeTab === 'admin' ? '' : 'opacity-60'}`} />
-          <div className="text-xs">Admin</div>
-        </button>
-      </div>
-    </nav>
-  )
+            {renderTab(HelpCircle, "Help", "help", activeTab === "help", () => {
+                navigate("/help")
+                if (onHelpClick) onHelpClick()
+            })}
+            {renderTab(Shield, "Admin", "admin", activeTab === "admin", () =>
+                navigate("/admin"),
+            )}
+        </div>
+    )
 }
 
 export default BottomNav
