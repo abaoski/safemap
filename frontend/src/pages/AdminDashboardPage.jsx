@@ -53,10 +53,12 @@ function AdminDashboardPage() {
   }
 
   const handleApprove = async (reportId) => {
+    if (!confirm("Are you sure you want to approve this report?")) return
     try {
       const response = await fetch(`http://localhost:5000/api/reports/${reportId}/approve`, {
         method: 'POST',
-        headers: getAuthHeaders()
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ notes: "Approved for public awareness" })
       })
       if (response.ok) {
         fetchData()

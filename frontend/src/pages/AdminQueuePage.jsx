@@ -94,7 +94,6 @@ function AdminQueuePage() {
 
     const handleApprove = async (reportId) => {
         if (reportId === undefined || reportId === null) {
-            console.error("Invalid report ID")
             showNotification("Invalid report ID", "error")
             return
         }
@@ -111,28 +110,22 @@ function AdminQueuePage() {
             return
         }
         try {
-            console.log("Approving report:", reportId);
-            const body = JSON.stringify({ notes });
-            console.log("Request body:", body);
             const response = await fetch(
                 `http://localhost:5000/api/reports/${reportId}/approve`,
                 {
                     method: "POST",
                     headers: getAuthHeaders(),
-                    body,
+                    body: JSON.stringify({ notes }),
                 },
             )
 
-            let data = {};
+            let data = {}
             try {
-                const text = await response.text();
-                console.log("Raw response:", text);
-                data = JSON.parse(text);
+                data = await response.json()
             } catch (e) {
-                console.error("Failed to parse response JSON")
+                // Handle empty or non-JSON response
             }
 
-            console.log("Approve response:", response.status, data)
             if (response.ok) {
                 showNotification("Report approved successfully!")
                 fetchData()
@@ -147,7 +140,6 @@ function AdminQueuePage() {
 
     const handleDismiss = async (reportId) => {
         if (reportId === undefined || reportId === null) {
-            console.error("Invalid report ID")
             showNotification("Invalid report ID", "error")
             return
         }
@@ -162,7 +154,6 @@ function AdminQueuePage() {
             return
         }
         try {
-            console.log("Dismissing report:", reportId)
             const response = await fetch(
                 `http://localhost:5000/api/reports/${reportId}/dismiss`,
                 {
@@ -176,10 +167,9 @@ function AdminQueuePage() {
             try {
                 data = await response.json()
             } catch (e) {
-                console.error("Failed to parse response JSON")
+                // Handle empty or non-JSON response
             }
 
-            console.log("Dismiss response:", response.status, data)
             if (response.ok) {
                 showNotification("Report dismissed successfully!")
                 fetchData()

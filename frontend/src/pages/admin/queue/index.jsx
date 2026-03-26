@@ -51,7 +51,11 @@ function AdminQueuePage() {
 
     const handleApprove = async (id) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/reports/${id}/approve`, { method: "POST", headers: getAuthHeaders() })
+            const res = await fetch(`http://localhost:5000/api/reports/${id}/approve`, {
+                method: "POST",
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ notes: "Approved for public awareness" }),
+            })
             if (res.ok) fetchData()
         } catch (err) { console.error(err) }
     }
