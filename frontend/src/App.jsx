@@ -10,6 +10,7 @@ import HelpPage from './pages/HelpPage'
 import EmergencyPage from './pages/EmergencyPage'
 import AdminLoginPage from './pages/AdminLoginPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
+import AdminAnalyticsPage from './pages/AdminAnalyticsPage'
 
 // Import modular components
 import Header from './components/Header'
@@ -185,6 +186,7 @@ function App() {
       <Route path="/emergency" element={<EmergencyPage />} />
       <Route path="/admin" element={<AdminLoginPage />} />
       <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
+      <Route path="/admin-analytics" element={<AdminAnalyticsPage />} />
     </Routes>
   )
 }

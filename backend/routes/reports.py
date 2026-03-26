@@ -332,6 +332,39 @@ def get_report_stats():
     }), 200
 
 
+@api_bp.route('/reports/heatmap', methods=['GET'])
+@require_auth
+def get_heatmap_data():
+    """Get lat/lng/intensity for all non-dismissed reports (admin heatmap)"""
+    # Severity → intensity weight mapping
+    intensity_map = {
+        'critical': 1.0,
+        'high':     0.8,
+        'medium':   0.5,
+        'low':      0.3
+    }
+
+    reports = Report.query.filter(
+        Report.status != 'dismissed',
+        Report.latitude.isnot(None),
+        Report.longitude.isnot(None)
+    ).all()
+
+    points = []
+    for r in reports:
+        intensity = intensity_map.get(r.severity, 0.5)
+        points.append({
+            'lat':       r.latitude,
+            'lng':       r.longitude,
+            'intensity': intensity,
+            'severity':  r.severity,
+            'category':  r.category,
+            'status':    r.status,
+        })
+
+    return jsonify({'points': points, 'total': len(points)}), 200
+
+
 @api_bp.route('/reports/categories', methods=['GET'])
 def get_categories():
     """Get available report categories"""

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Check, Edit2, Ban, LogIn, Search, Shield, Mail } from 'lucide-react'
 import logoImg from '/src/assets/images/Logo.svg'
 import backImg from '/src/assets/images/rpt_back.svg'
+import AdminBottomNav from '../components/AdminBottomNav'
 
 function AdminDashboardPage() {
   const navigate = useNavigate()
@@ -90,65 +92,69 @@ function AdminDashboardPage() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 overflow-hidden flex flex-col items-center">
+    <div className="w-full min-h-screen bg-slate-50 overflow-x-hidden flex flex-col items-center">
       {/* Header */}
-      <div className="w-96 max-w-[95vw] relative h-[120px] mt-8">
-        <img 
-          className="w-24 h-11 mx-auto" 
-          src={logoImg} 
-          alt="SafeMap" 
-        />
-        <div className="mt-4 text-zinc-800 text-lg font-extrabold font-['DM_Sans']">
-          Dashboard
-        </div>
-        {/* Status Badge */}
-        <div className="w-40 h-7 px-1.5 py-1 mt-2 mx-auto bg-green-50 rounded-[20px] outline outline-1 outline-offset-[-1px] outline-emerald-100 flex items-center justify-center">
-          <span className="text-green-500 text-xs font-semibold font-['DM_Sans']">All Systems Operational</span>
-        </div>
-        {/* User Menu */}
-        <div className="absolute top-8 right-0 flex items-center gap-2">
-          <div className="w-4 h-4 relative overflow-hidden">
-            <div className="w-3 h-3.5 left-[2px] top-[1.33px] absolute bg-blue-900" />
+      <div className="w-full max-w-sm px-4 pt-8 pb-2">
+        {/* Top row: logo centered, icons right */}
+        <div className="relative flex items-center justify-center mb-5">
+          <img
+            className="h-12 w-auto"
+            src={logoImg}
+            alt="SafeMap"
+          />
+          {/* Bell + Avatar */}
+          <div className="absolute right-0 flex items-center gap-2">
+            <div className="w-8 h-8 bg-[#1f295b] rounded-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </div>
+            <img className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm" src="https://placehold.co/32x32" alt="User" />
           </div>
-          <img className="w-4 h-4 rounded-full" src="https://placehold.co/16x16" alt="User" />
+        </div>
+
+        {/* Dashboard title row + status badge */}
+        <div className="flex items-center justify-between">
+          <h1 className="text-zinc-800 text-2xl font-extrabold font-['DM_Sans']">Dashboard</h1>
+          <div className="px-3 py-1.5 bg-green-50 rounded-full border border-emerald-100 flex items-center">
+            <span className="text-green-500 text-[11px] font-semibold font-['DM_Sans']">All Systems Operational</span>
+          </div>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="w-96 max-w-[95vw] px-4 space-y-4">
+      <div className="w-full max-w-sm px-4 mt-6 space-y-3">
         {/* Active Cases */}
-        <div className="w-96 h-20 bg-white rounded-tl-xl rounded-bl-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-green-500 overflow-hidden">
-          <div className="w-32 h-14 left-[31px] top-[15px] absolute">
-            <div className="left-0 top-0 absolute text-gray-400 text-xs font-bold font-['DM_Sans']">Active Cases</div>
-            <div className="left-[0.18px] top-[18px] absolute text-blue-900 text-3xl font-extrabold font-['DM_Sans']">{stats?.total || '1,284'}</div>
-            <div className="left-[79px] top-[34px] absolute text-green-500 text-sm font-semibold font-['DM_Sans']">General Santos</div>
+        <div className="w-full h-[72px] bg-white rounded-r-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-green-500 px-5 flex flex-col justify-center gap-1">
+          <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wide">Active Cases</div>
+          <div className="flex items-baseline gap-2">
+            <div className="text-[#1e3a8a] text-[26px] font-extrabold font-['DM_Sans'] leading-none">{stats?.total || '1,284'}</div>
+            <div className="text-green-500 text-xs font-semibold font-['DM_Sans']">General Santos</div>
           </div>
         </div>
 
         {/* Pending Review */}
-        <div className="w-96 h-20 bg-white rounded-tl-xl rounded-bl-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-red-500 overflow-hidden">
-          <div className="w-32 h-14 left-[31px] top-[15px] absolute">
-            <div className="left-0 top-0 absolute text-gray-400 text-xs font-bold font-['DM_Sans']">Pending Review</div>
-            <div className="left-[0.18px] top-[18px] absolute text-blue-900 text-3xl font-extrabold font-['DM_Sans']">{stats?.pending_review || '42'}</div>
-            <div className="left-[42px] top-[34px] absolute text-red-500 text-sm font-semibold font-['DM_Sans']">High Urgency</div>
+        <div className="w-full h-[72px] bg-white rounded-r-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-red-500 px-5 flex flex-col justify-center gap-1">
+          <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wide">Pending Review</div>
+          <div className="flex items-baseline gap-2">
+            <div className="text-[#1e3a8a] text-[26px] font-extrabold font-['DM_Sans'] leading-none">{stats?.pending_review || '42'}</div>
+            <div className="text-red-500 text-xs font-semibold font-['DM_Sans']">High Urgency</div>
           </div>
         </div>
 
         {/* Today's Report */}
-        <div className="w-96 h-20 bg-white rounded-tl-xl rounded-bl-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-blue-900 overflow-hidden">
-          <div className="w-40 h-14 left-[31px] top-[15px] absolute">
-            <div className="left-0 top-0 absolute text-gray-400 text-xs font-bold font-['DM_Sans']">Today's Report</div>
-            <div className="left-[0.18px] top-[18px] absolute text-blue-900 text-3xl font-extrabold font-['DM_Sans']">+12%</div>
-            <div className="left-[75px] top-[34px] absolute text-gray-500 text-sm font-semibold font-['DM_Sans']">vs Yesterday</div>
+        <div className="w-full h-[72px] bg-white rounded-r-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-[#1e3a8a] px-5 flex flex-col justify-center gap-1">
+          <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wide">Today's Report</div>
+          <div className="flex items-baseline gap-2">
+            <div className="text-[#1e3a8a] text-[26px] font-extrabold font-['DM_Sans'] leading-none">+12%</div>
+            <div className="text-gray-500 text-xs font-semibold font-['DM_Sans']">vs Yesterday</div>
           </div>
         </div>
       </div>
 
       {/* Need Review Section */}
-      <div className="mt-8 px-4">
-        <div className="flex justify-between items-center">
+      <div className="mt-8 px-4 w-full max-w-sm">
+        <div className="flex justify-between items-center mb-4">
           <div className="text-zinc-800 text-lg font-extrabold font-['DM_Sans']">Need Review</div>
-          <div className="text-blue-900 text-xs font-bold font-['DM_Sans']">View Queue</div>
+          <div className="text-blue-900 text-xs font-bold font-['DM_Sans'] cursor-pointer">View Queue</div>
         </div>
 
         {loading ? (
@@ -156,44 +162,43 @@ function AdminDashboardPage() {
         ) : reports.length === 0 ? (
           <div className="text-center py-8 text-gray-500">No pending reports</div>
         ) : (
-          <div className="space-y-4 mt-4">
+          <div className="space-y-4">
             {reports.slice(0, 3).map((report) => (
-              <div key={report.id} className={`w-96 h-36 bg-white rounded-tl-xl rounded-bl-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] border-l-[5px] ${getStatusColor(report.status)} overflow-hidden`}>
-                <div className="left-[31px] top-[24px] absolute flex items-start gap-3.5">
-                  <div className="w-9 h-9 p-2 bg-red-100 rounded-[10px] flex items-center justify-center">
-                    <div className="w-4 h-3.5 bg-red-500" />
+              <div key={report.id} className={`w-full bg-white rounded-xl shadow-sm border-l-[5px] ${getStatusColor(report.status)} p-4 flex flex-col gap-3 relative`}>
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center shrink-0">
+                    <div className="w-4 h-3.5 bg-red-500 rounded-sm" />
                   </div>
-                  <div className="w-52 h-20 relative">
-                    <div className="left-[0.38px] top-[2.62px] absolute text-gray-400 text-xs font-semibold font-['DM_Sans']">
-                      {report.reference_code || `SF-${report.id}`}
-                    </div>
-                    <div className="h-5 px-2.5 left-[56px] top-0 absolute bg-red-100 rounded flex items-center">
-                      <span className="text-red-500 text-xs font-bold font-['DM_Sans']">
+                  <div className="flex-1 flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <div className="text-gray-400 text-[10px] font-semibold font-['DM_Sans']">
+                        {report.reference_code || `SF-${report.id}`}
+                      </div>
+                      <div className="px-2 py-0.5 bg-red-100 rounded text-red-500 text-[9px] font-bold font-['DM_Sans'] uppercase">
                         {report.category?.replace('_', ' ').toUpperCase() || 'REPORT'}
-                      </span>
+                      </div>
                     </div>
-                    <div className="left-0 top-[31px] absolute text-zinc-800 text-base font-bold font-['DM_Sans']">
+                    <div className="text-zinc-800 text-sm font-bold font-['DM_Sans'] leading-tight">
                       {report.title || 'Untitled Report'}
                     </div>
-                    <div className="left-0 top-[59px] absolute flex items-center gap-1.5">
-                      <div className="w-3.5 h-3.5 relative overflow-hidden">
-                        <div className="w-2 h-3 left-[2.92px] top-[1.17px] absolute bg-gray-500" />
-                      </div>
-                      <span className="text-gray-500 text-xs font-normal font-['DM_Sans']">
-                        {report.barangay || report.city || 'General Santos City'}
-                      </span>
+                    <div className="text-gray-500 text-xs font-normal font-['DM_Sans'] flex items-center gap-1.5 pt-0.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+                      {report.barangay || report.city || 'General Santos City'}
                     </div>
                   </div>
                 </div>
-                <div className="left-[31px] top-[113px] absolute text-gray-400 text-xs font-normal font-['DM_Sans']">
-                  {new Date(report.created_at).toLocaleDateString()}
+                
+                <div className="flex items-center justify-between mt-1 pt-3 border-t border-gray-100">
+                  <div className="text-gray-400 text-xs font-normal font-['DM_Sans']">
+                    {new Date(report.created_at).toLocaleDateString()}
+                  </div>
+                  <button
+                    onClick={() => handleApprove(report.id)}
+                    className="h-8 px-4 bg-[#1f295b] hover:bg-[#151c3d] transition-colors rounded-lg flex items-center justify-center cursor-pointer"
+                  >
+                    <span className="text-white text-xs font-bold font-['DM_Sans']">Review</span>
+                  </button>
                 </div>
-                <button
-                  onClick={() => handleApprove(report.id)}
-                  className="w-20 h-8 px-2.5 left-[273px] top-[105px] absolute bg-blue-950 rounded-lg flex items-center justify-center"
-                >
-                  <span className="text-white text-xs font-bold font-['DM_Sans']">Review</span>
-                </button>
               </div>
             ))}
           </div>
@@ -201,39 +206,60 @@ function AdminDashboardPage() {
       </div>
 
       {/* Audit Feed */}
-      <div className="mt-8 px-4">
-        <div className="text-zinc-800 text-lg font-extrabold font-['DM_Sans']">Audit Feed</div>
-        <div className="w-96 h-80 mt-4 bg-white rounded-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-offset-[-1px] outline-gray-100 overflow-hidden">
-          <div className="w-80 h-72 left-[26px] top-[21px] absolute">
+      <div className="mt-8 px-4 w-full max-w-sm">
+        <div className="text-zinc-800 text-lg font-extrabold font-['DM_Sans'] mb-4">Audit Feed</div>
+        <div className="w-full bg-white rounded-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-offset-[-1px] outline-gray-100 p-6 flex justify-center">
+          <div className="relative pl-6 border-l-[1.5px] border-gray-200 space-y-8 w-full max-w-[280px]">
             {/* Audit items */}
-            <div className="left-0 top-0 absolute flex items-start gap-3.5">
-              <div className="w-9 h-9 p-2 bg-indigo-50 rounded-2xl flex items-center justify-center">
-                <div className="w-4 h-4 bg-blue-600" />
+            <div className="relative">
+              <div className="w-8 h-8 bg-indigo-50 rounded-full flex items-center justify-center absolute -left-[41px] -top-1 border-[4px] border-white">
+                <Check className="w-3.5 h-3.5 text-blue-600" />
               </div>
-              <div className="w-60 flex items-end gap-[3px] flex-wrap content-end">
-                <div className="text-zinc-800 text-sm font-semibold font-['DM_Sans']">Admin approved Case #{reports[0]?.reference_code || 'SF-8294'}</div>
-                <div className="text-gray-400 text-xs font-normal font-['DM_Sans']">12:42 PM</div>
-                <div className="text-gray-500 text-[10px] font-bold font-['DM_Sans']">SECURITY_ACTION</div>
-              </div>
-            </div>
-            <div className="left-0 top-[85px] absolute flex items-start gap-3.5">
-              <div className="w-9 h-9 p-2 bg-slate-100 rounded-2xl flex items-center justify-center">
-                <div className="w-4 h-3 bg-gray-500" />
-              </div>
-              <div className="w-72 flex items-end gap-[3px] flex-wrap content-end">
-                <div className="text-zinc-800 text-sm font-semibold font-['DM_Sans']">Staff updated description for #SF-8110</div>
-                <div className="text-gray-400 text-xs font-normal font-['DM_Sans']">11:15 AM</div>
-                <div className="text-gray-500 text-[10px] font-bold font-['DM_Sans']">META_UPDATE</div>
+              <div className="flex flex-col -mt-1">
+                <div className="text-zinc-800 text-sm font-semibold font-['DM_Sans'] leading-tight">Admin-04 approved Case #{reports[0]?.reference_code || 'SF-8291'}</div>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-gray-400 text-xs font-normal font-['DM_Sans']">12:42 PM</span>
+                  <span className="text-gray-500 text-[10px] font-bold font-['DM_Sans'] uppercase">SECURITY_ACTION</span>
+                </div>
               </div>
             </div>
-            <div className="left-0 top-[171px] absolute flex items-start gap-3.5">
-              <div className="w-9 h-9 p-2 bg-red-100 rounded-2xl flex items-center justify-center">
-                <div className="w-4 h-4 bg-red-500" />
+
+            <div className="relative">
+              <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center absolute -left-[41px] -top-1 border-[4px] border-white">
+                <Edit2 className="w-3.5 h-3.5 text-gray-500" />
               </div>
-              <div className="w-64 flex items-end gap-[3px] flex-wrap content-end">
-                <div className="text-zinc-800 text-sm font-semibold font-['DM_Sans']">System flagged #SF-8299 as duplicate</div>
-                <div className="text-gray-400 text-xs font-normal font-['DM_Sans']">10:02 AM</div>
-                <div className="text-gray-500 text-[10px] font-bold font-['DM_Sans']">AUTO_MOD</div>
+              <div className="flex flex-col -mt-1">
+                <div className="text-zinc-800 text-sm font-semibold font-['DM_Sans'] leading-tight">Staff-21 updated description for #SF-8110</div>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-gray-400 text-xs font-normal font-['DM_Sans']">11:15 AM</span>
+                  <span className="text-gray-500 text-[10px] font-bold font-['DM_Sans'] uppercase">META_UPDATE</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center absolute -left-[41px] -top-1 border-[4px] border-white">
+                <Ban className="w-3.5 h-3.5 text-red-500" />
+              </div>
+              <div className="flex flex-col -mt-1">
+                <div className="text-zinc-800 text-sm font-semibold font-['DM_Sans'] leading-tight">System flagged #SF-8299 as duplicate</div>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-gray-400 text-xs font-normal font-['DM_Sans']">10:02 AM</span>
+                  <span className="text-gray-500 text-[10px] font-bold font-['DM_Sans'] uppercase">AUTO_MOD</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center absolute -left-[41px] -top-1 border-[4px] border-white">
+                <LogIn className="w-3.5 h-3.5 text-blue-500" />
+              </div>
+              <div className="flex flex-col -mt-1">
+                <div className="text-zinc-800 text-sm font-semibold font-['DM_Sans'] leading-tight">Admin-01 signed into HQ Terminal</div>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-gray-400 text-xs font-normal font-['DM_Sans']">08:00 AM</span>
+                  <span className="text-gray-500 text-[10px] font-bold font-['DM_Sans'] uppercase">AUTH_EVENT</span>
+                </div>
               </div>
             </div>
           </div>
@@ -241,108 +267,141 @@ function AdminDashboardPage() {
       </div>
 
       {/* Staff Management */}
-      <div className="mt-8 px-4">
-        <div className="text-zinc-800 text-lg font-extrabold font-['DM_Sans']">Staff Management</div>
-        
+      <div className="mt-8 px-4 w-full max-w-sm">
         {/* Search */}
-        <div className="w-96 mt-4 shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] flex flex-col items-center">
-          <div className="self-stretch h-14 pl-5 pr-52 py-5 bg-white rounded-[10px] outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col items-start gap-2.5">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 relative overflow-hidden">
-                <div className="w-3 h-3 left-[2px] top-[2px] absolute bg-gray-400" />
-              </div>
-              <span className="text-gray-400 text-xs font-normal font-['DM_Sans']">Search staff members....</span>
-            </div>
+        <div className="mt-4 mb-8">
+          <div className="w-full h-12 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center px-4 gap-3 shadow-sm">
+            <Search className="w-4 h-4 text-gray-400" />
+            <input type="text" placeholder="Search staff members..." className="flex-1 bg-transparent outline-none text-sm font-normal text-zinc-800 font-['DM_Sans'] placeholder-gray-400" />
           </div>
         </div>
 
-        {/* Add New Staff Button */}
-        <button className="w-28 h-8 px-2.5 mt-[-40px] ml-[230px] bg-blue-950 rounded-lg flex items-center justify-center">
-          <span className="text-white text-xs font-bold font-['DM_Sans']">+ Add New Staff</span>
-        </button>
+        <div className="flex justify-between items-center mb-5">
+          <div className="text-zinc-800 text-lg font-extrabold font-['DM_Sans']">Staff Management</div>
+          {/* Add New Staff Button */}
+          <button className="h-8 px-4 bg-[#1f295b] rounded-lg flex items-center justify-center">
+            <span className="text-white text-xs font-bold font-['DM_Sans']">+ Add New Staff</span>
+          </button>
+        </div>
 
         {/* Staff List */}
-        <div className="w-96 mt-5 flex flex-col items-start gap-5">
-          {/* Staff 1 */}
-          <div className="self-stretch h-52 relative bg-white rounded-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-blue-900 overflow-hidden">
-            <div className="w-24 left-[31px] top-[21px] absolute flex flex-col items-start gap-1">
-              <div className="text-gray-400 text-xs font-bold font-['DM_Sans']">EMP-ID: 8829</div>
+        <div className="flex flex-col gap-5">
+          {/* Staff 1: Linda Walker */}
+          <div className="w-full bg-white rounded-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-[#1e3a8a] py-5 px-6 relative">
+            <div className="flex justify-between items-start mb-4">
+              <span className="text-gray-400 text-[10px] font-bold font-['DM_Sans'] tracking-wider">EMP-ID: 8829 - X</span>
+              <div className="px-2.5 py-1 bg-[#eff6ff] rounded text-[#1e40af] text-[9px] font-bold font-['DM_Sans'] tracking-wider">
+                ACTIVE
+              </div>
             </div>
-            <div className="h-5 px-2.5 left-[301px] top-[18px] absolute bg-blue-50 rounded-md flex items-center">
-              <span className="text-blue-900 text-[10px] font-bold font-['DM_Sans']">ACTIVE</span>
-            </div>
-            <div className="w-64 left-[31px] top-[47px] absolute flex flex-col items-start gap-6">
-              <div className="text-blue-900 text-base font-bold font-['DM_Sans']">Linda Walker</div>
-              <div className="flex flex-col items-start gap-2">
-                <div className="flex items-end gap-3">
-                  <div className="w-4 h-4 relative overflow-hidden">
-                    <div className="w-2.5 h-3.5 left-[2.67px] top-[1.33px] absolute bg-gray-600" />
-                  </div>
-                  <span className="text-gray-500 text-xs font-medium font-['DM_Sans']">Administrator</span>
+            
+            <div className="mb-5">
+              <div className="text-[#1e3a8a] text-lg font-bold font-['DM_Sans'] mb-2.5">Linda Walker</div>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-3.5 h-3.5 text-gray-500" />
+                  <span className="text-gray-500 text-xs font-medium font-['DM_Sans'] text-left">Administrator</span>
                 </div>
-                <div className="flex items-end gap-3">
-                  <div className="w-4 h-4 relative overflow-hidden">
-                    <div className="w-3.5 h-2.5 left-[1.33px] top-[2.67px] absolute bg-gray-600" />
-                  </div>
-                  <span className="text-gray-500 text-xs font-medium font-['DM_Sans']">walkerlinda_safemapph@gmail.com</span>
+                <div className="flex items-center gap-3">
+                  <Mail className="w-3.5 h-3.5 text-gray-500" />
+                  <span className="text-gray-500 text-xs font-medium font-['DM_Sans'] text-left">walkerlinda_safemapph@gmail.com</span>
                 </div>
               </div>
             </div>
-            <div className="left-[31px] top-[159px] absolute flex items-center gap-3">
-              <div className="w-28 h-6 px-2.5 bg-blue-50 rounded-md flex flex-col items-end gap-2.5">
-                <div className="flex items-center gap-2">
-                  <div className="w-3.5 h-3.5 relative overflow-hidden">
-                    <div className="w-2.5 h-2.5 left-[1.75px] top-[1.75px] absolute bg-blue-900" />
-                  </div>
-                  <span className="text-blue-900 text-xs font-bold font-['DM_Sans']">Edit</span>
-                </div>
-              </div>
-              <div className="w-28 h-6 px-2.5 bg-red-100 rounded-md flex items-center justify-center">
-                <span className="text-red-500 text-xs font-bold font-['DM_Sans']">Deactivate</span>
+
+            <div className="flex items-center gap-3">
+              <button className="flex-1 h-8 bg-[#eff6ff] rounded flex items-center justify-center gap-2">
+                <Edit2 className="w-3 h-3 text-[#1e3a8a]" />
+                <span className="text-[#1e3a8a] text-xs font-bold font-['DM_Sans']">Edit</span>
+              </button>
+              <button className="flex-1 h-8 bg-[#ffe4e6] rounded flex items-center justify-center">
+                <span className="text-[#ef4444] text-xs font-bold font-['DM_Sans']">Deactivate</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Staff 2: Kritaffa Abaok */}
+          <div className="w-full bg-white rounded-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-[#1e3a8a] py-5 px-6 relative">
+            <div className="flex justify-between items-start mb-4">
+              <span className="text-gray-400 text-[10px] font-bold font-['DM_Sans'] tracking-wider">EMP-ID: 4412 - X</span>
+              <div className="px-2.5 py-1 bg-[#eff6ff] rounded text-[#1e40af] text-[9px] font-bold font-['DM_Sans'] tracking-wider">
+                ACTIVE
               </div>
             </div>
+            
+            <div className="mb-5">
+              <div className="text-[#1e3a8a] text-lg font-bold font-['DM_Sans'] mb-2.5">Kritaffa Abaok</div>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-3.5 h-3.5 text-gray-500" />
+                  <span className="text-gray-500 text-xs font-medium font-['DM_Sans'] text-left">Senior Developer</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Mail className="w-3.5 h-3.5 text-gray-500" />
+                  <span className="text-gray-500 text-xs font-medium font-['DM_Sans'] text-left">kristaffa_safemaphph@gmail.com</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button className="flex-1 h-8 bg-[#eff6ff] rounded flex items-center justify-center gap-2">
+                <Edit2 className="w-3 h-3 text-[#1e3a8a]" />
+                <span className="text-[#1e3a8a] text-xs font-bold font-['DM_Sans']">Edit</span>
+              </button>
+              <button className="flex-1 h-8 bg-[#ffe4e6] rounded flex items-center justify-center">
+                <span className="text-[#ef4444] text-xs font-bold font-['DM_Sans']">Deactivate</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Staff 3: Elias Thorne */}
+          <div className="w-full bg-[#fafafa] rounded-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-[#e5e7eb] py-5 px-6 relative">
+            <div className="flex justify-between items-start mb-4">
+              <span className="text-gray-400 text-[10px] font-bold font-['DM_Sans'] tracking-wider">EMP-ID: 9901 - X</span>
+              <div className="px-2.5 py-1 bg-[#e5e7eb] rounded text-gray-500 text-[9px] font-bold font-['DM_Sans'] tracking-wider">
+                OFFLINE
+              </div>
+            </div>
+            
+            <div className="mb-5">
+              <div className="text-gray-500 text-lg font-bold font-['DM_Sans'] mb-2.5">Elias Thorne</div>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-3.5 h-3.5 text-gray-500" />
+                  <span className="text-gray-500 text-xs font-medium font-['DM_Sans'] text-left">Network Admin</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Mail className="w-3.5 h-3.5 text-gray-500" />
+                  <span className="text-gray-500 text-xs font-medium font-['DM_Sans'] text-left">eliasthorne_safemaphph@gmail.com</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button className="flex-1 h-8 bg-[#eff6ff] rounded flex items-center justify-center gap-2">
+                <Edit2 className="w-3 h-3 text-[#1e3a8a]" />
+                <span className="text-[#1e3a8a] text-xs font-bold font-['DM_Sans']">Edit</span>
+              </button>
+              <button className="flex-1 h-8 bg-[#ffe4e6] rounded flex items-center justify-center">
+                <span className="text-[#ef4444] text-xs font-bold font-['DM_Sans']">Deactivate</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Internal Announcement */}
+          <div className="w-full bg-[#3b53cc] rounded-xl p-5 mt-2">
+            <h3 className="text-white text-sm font-bold font-['DM_Sans'] mb-2">Internal Announcement</h3>
+            <p className="text-blue-100 text-[12px] font-normal font-['DM_Sans'] leading-relaxed pr-8">
+              System-wide maintenance scheduled for Saturday 02:00 UTC. Audit logs will remain active.
+            </p>
           </div>
         </div>
       </div>
 
+      <div className="h-28"></div> {/* Spacer for bottom nav */}
+
       {/* Bottom Navigation */}
-      <div className="mt-8 w-96 h-20 relative">
-        <div className="w-96 h-16 left-0 top-[16px] absolute bg-white rounded-tl-[30px] rounded-tr-[30px] overflow-hidden flex justify-around items-center">
-          <div className="w-14 flex flex-col items-center gap-1">
-            <div className="w-6 h-6 relative overflow-hidden">
-              <div className="w-4 h-2.5 left-[3px] top-[7px] absolute bg-gray-400" />
-            </div>
-            <span className="text-gray-400 text-base font-medium font-['DM_Sans']">Queue</span>
-          </div>
-          <div className="w-16 flex flex-col items-center gap-1">
-            <div className="w-6 h-6 relative overflow-hidden">
-              <div className="w-4 h-4 left-[3px] top-[3px] absolute bg-gray-400" />
-            </div>
-            <span className="text-gray-400 text-base font-medium font-['DM_Sans']">Analytics</span>
-          </div>
-          <div className="w-10 flex flex-col items-center gap-1">
-            <div className="w-6 h-6 relative overflow-hidden">
-              <div className="w-4 h-4 left-[4px] top-[2.50px] absolute bg-gray-400 outline outline-[1.33px] outline-offset-[-0.67px] outline-gray-400" />
-            </div>
-            <span className="text-gray-400 text-base font-medium font-['DM_Sans']">Audit</span>
-          </div>
-          <div className="w-14 flex flex-col items-center gap-1">
-            <div className="w-6 h-6 relative overflow-hidden">
-              <div className="w-5 h-5 left-[2.48px] top-[2px] absolute bg-gray-400" />
-            </div>
-            <span className="text-gray-400 text-base font-medium font-['DM_Sans']">Settings</span>
-          </div>
-        </div>
-        {/* Dashboard Button (Center) */}
-        <div className="w-12 left-[194px] top-0 absolute flex flex-col items-center gap-1">
-          <div className="h-12 p-3 bg-blue-950 rounded-3xl shadow-[0px_4px_16px_0px_rgba(26,42,108,0.40)] outline outline-[3px] outline-offset-[-3px] outline-white flex items-start justify-center">
-            <div className="w-6 h-6 relative overflow-hidden">
-              <div className="w-5 h-5 left-[3.25px] top-[3.25px] absolute bg-white" />
-            </div>
-          </div>
-          <span className="text-blue-950 text-base font-bold font-['DM_Sans']">Dashboard</span>
-        </div>
-      </div>
+      <AdminBottomNav activeTab="dashboard" />
 
       {/* Back Button */}
       <button
