@@ -98,16 +98,18 @@ function AdminQueuePage() {
             showNotification("Invalid report ID", "error")
             return
         }
+
+        const notes = prompt("Enter approval notes (optional):", "Approved for public awareness")
+        if (notes === null) return // User cancelled
+
+        if (!confirm("Are you sure you want to approve this report?")) return
+
         const token = localStorage.getItem("token")
         if (!token) {
             showNotification("Session expired. Please login again.", "error")
             navigate("/admin")
             return
         }
-
-        const notes = prompt("Enter approval notes (optional):", "Approved for public awareness")
-        if (notes === null) return // User cancelled
-
         try {
             console.log("Approving report:", reportId)
             const response = await fetch(
@@ -145,7 +147,7 @@ function AdminQueuePage() {
             showNotification("Invalid report ID", "error")
             return
         }
-
+  //FIX ERROR
         const reason = prompt("Enter dismissal reason (optional):", "Dismissed by admin")
         if (reason === null) return // User cancelled
 
