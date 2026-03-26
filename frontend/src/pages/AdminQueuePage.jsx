@@ -147,7 +147,6 @@ function AdminQueuePage() {
             showNotification("Invalid report ID", "error")
             return
         }
-  //FIX ERROR
         const reason = prompt("Enter dismissal reason (optional):", "Dismissed by admin")
         if (reason === null) return // User cancelled
 
