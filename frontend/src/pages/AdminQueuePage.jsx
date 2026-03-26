@@ -111,19 +111,23 @@ function AdminQueuePage() {
             return
         }
         try {
-            console.log("Approving report:", reportId)
+            console.log("Approving report:", reportId);
+            const body = JSON.stringify({ notes });
+            console.log("Request body:", body);
             const response = await fetch(
                 `http://localhost:5000/api/reports/${reportId}/approve`,
                 {
                     method: "POST",
                     headers: getAuthHeaders(),
-                    body: JSON.stringify({ notes }),
+                    body,
                 },
             )
 
-            let data = {}
+            let data = {};
             try {
-                data = await response.json()
+                const text = await response.text();
+                console.log("Raw response:", text);
+                data = JSON.parse(text);
             } catch (e) {
                 console.error("Failed to parse response JSON")
             }
