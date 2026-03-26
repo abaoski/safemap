@@ -9,8 +9,10 @@ import TrackReportPage from './pages/TrackReportPage'
 import HelpPage from './pages/HelpPage'
 import EmergencyPage from './pages/EmergencyPage'
 import AdminLoginPage from './pages/AdminLoginPage'
-import AdminDashboardPage from './pages/AdminDashboardPage'
-import AdminAnalyticsPage from './pages/AdminAnalyticsPage'
+import AdminDashboardPage from './pages/admin/dashboard'
+import AdminAnalyticsPage from './pages/admin/analytics'
+import AdminQueuePage from './pages/admin/queue'
+import AdminAuditPage from './pages/admin/audit'
 
 // Import modular components
 import Header from './components/Header'
@@ -187,6 +189,8 @@ function App() {
       <Route path="/admin" element={<AdminLoginPage />} />
       <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
       <Route path="/admin-analytics" element={<AdminAnalyticsPage />} />
+      <Route path="/admin-queue" element={<AdminQueuePage />} />
+      <Route path="/admin-audit" element={<AdminAuditPage />} />
     </Routes>
   )
 }
