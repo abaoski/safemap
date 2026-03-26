@@ -104,17 +104,21 @@ function AdminQueuePage() {
             navigate("/admin")
             return
         }
+
+        const notes = prompt("Enter approval notes (optional):", "Approved for public awareness")
+        if (notes === null) return // User cancelled
+
         try {
             console.log("Approving report:", reportId)
             const response = await fetch(
                 `http://localhost:5000/api/reports/${reportId}/approve`,
-                { 
-                    method: "POST", 
+                {
+                    method: "POST",
                     headers: getAuthHeaders(),
-                    body: JSON.stringify({ notes: "Approved for public awareness" }),
+                    body: JSON.stringify({ notes }),
                 },
             )
-            
+
             let data = {}
             try {
                 data = await response.json()
@@ -141,6 +145,10 @@ function AdminQueuePage() {
             showNotification("Invalid report ID", "error")
             return
         }
+
+        const reason = prompt("Enter dismissal reason (optional):", "Dismissed by admin")
+        if (reason === null) return // User cancelled
+
         if (!confirm("Are you sure you want to dismiss this report?")) return
         const token = localStorage.getItem("token")
         if (!token) {
@@ -155,7 +163,7 @@ function AdminQueuePage() {
                 {
                     method: "POST",
                     headers: getAuthHeaders(),
-                    body: JSON.stringify({ reason: "Dismissed by admin" }),
+                    body: JSON.stringify({ reason }),
                 },
             )
 
