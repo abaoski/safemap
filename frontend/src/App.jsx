@@ -13,6 +13,7 @@ import AdminDashboardPage from './pages/admin/dashboard'
 import AdminAnalyticsPage from './pages/admin/analytics'
 import AdminQueuePage from './pages/admin/queue'
 import AdminAuditPage from './pages/admin/audit'
+import AdminSettingsPage from './pages/admin/settings'
 
 // Import modular components
 import Header from './components/Header'
@@ -191,6 +192,7 @@ function App() {
       <Route path="/admin-analytics" element={<AdminAnalyticsPage />} />
       <Route path="/admin-queue" element={<AdminQueuePage />} />
       <Route path="/admin-audit" element={<AdminAuditPage />} />
+      <Route path="/admin-settings" element={<AdminSettingsPage />} />
     </Routes>
   )
 }

@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import logoImg from "/src/assets/images/Logo.svg"
-import backImg from "/src/assets/images/rpt_back.svg"
-import { BellIcon } from "lucide-react"
+import { BellIcon, Settings, LogOut, User } from "lucide-react"
 import AdminBottomNav from "./AdminBottomNav"
 
 /**
@@ -29,6 +28,7 @@ function AdminLayout({ activeTab, children }) {
     const navigate = useNavigate()
     const [user, setUser] = useState(null)
     const [isNotifOpen, setIsNotifOpen] = useState(false)
+    const [isProfileOpen, setIsProfileOpen] = useState(false)
 
     // Sample notifications
     const notifications = [
@@ -88,7 +88,10 @@ function AdminLayout({ activeTab, children }) {
                         {/* Bell with Dropdown */}
                         <div className="relative">
                             <button
-                                onClick={() => setIsNotifOpen(!isNotifOpen)}
+                                onClick={() => {
+                                    setIsNotifOpen(!isNotifOpen)
+                                    if (isProfileOpen) setIsProfileOpen(false)
+                                }}
                                 className="w-8 h-8 hover:bg-[#1f295b]/10 transition-colors rounded-lg flex items-center justify-center relative cursor-pointer border-none outline-none">
                                 <BellIcon className="w-4 h-4 text-[#1f295b]" />
                                 {/* Unread indicator dot */}
@@ -137,20 +140,95 @@ function AdminLayout({ activeTab, children }) {
                             )}
                         </div>
 
-                        {/* Avatar or Initials */}
-                        {avatarUrl ? (
-                            <img
-                                className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm"
-                                src={avatarUrl}
-                                alt="User"
-                            />
-                        ) : (
-                            <div className="w-8 h-8 rounded-full bg-[#1e3a8a] border-2 border-white shadow-sm flex items-center justify-center">
-                                <span className="text-white text-[10px] font-bold font-['DM_Sans'] leading-none">
-                                    {initials}
-                                </span>
-                            </div>
-                        )}
+                        {/* Avatar Profile Dropdown */}
+                        <div className="relative">
+                            <button
+                                onClick={() => {
+                                    setIsProfileOpen(!isProfileOpen)
+                                    if (isNotifOpen) setIsNotifOpen(false)
+                                }}
+                                className="focus:outline-none flex items-center justify-center border-none"
+                            >
+                                {avatarUrl ? (
+                                    <img
+                                        className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm transition-transform hover:scale-105"
+                                        src={avatarUrl}
+                                        alt="User"
+                                    />
+                                ) : (
+                                    <div className="w-8 h-8 rounded-full bg-[#1e3a8a] border-2 border-white shadow-sm flex items-center justify-center transition-transform hover:scale-105">
+                                        <span className="text-white text-[10px] font-bold font-['DM_Sans'] leading-none">
+                                            {initials}
+                                        </span>
+                                    </div>
+                                )}
+                            </button>
+
+                            {/* Dropdown Menu */}
+                            {isProfileOpen && (
+                                <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-[0px_8px_24px_rgba(149,157,165,0.2)] border border-slate-100 overflow-hidden z-[9999]">
+                                    <div className="px-4 py-3 border-b border-slate-50 flex items-center gap-3">
+                                        <div className="flex-shrink-0">
+                                            {avatarUrl ? (
+                                                <img
+                                                    className="w-9 h-9 rounded-full object-cover border border-slate-100 shadow-sm"
+                                                    src={avatarUrl}
+                                                    alt="User"
+                                                />
+                                            ) : (
+                                                <div className="w-9 h-9 rounded-full bg-[#1e3a8a] flex items-center justify-center shadow-sm">
+                                                    <span className="text-white text-xs font-bold font-['DM_Sans'] leading-none">
+                                                        {initials}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col min-w-0">
+                                            <p className="text-slate-800 text-sm font-bold font-['DM_Sans'] truncate">
+                                                {user?.name || user?.username || "Admin User"}
+                                            </p>
+                                            <p className="text-slate-500 text-[10px] truncate leading-snug font-['DM_Sans']">
+                                                {user?.email || "admin@safemap.com"}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="py-2 flex flex-col items-start w-full">
+                                        <button
+                                            onClick={() => {
+                                                setIsProfileOpen(false)
+                                                navigate("/admin-settings")
+                                            }}
+                                            className="w-full text-left px-4 py-2.5 text-xs text-slate-700 font-medium font-['DM_Sans'] hover:bg-slate-50 transition-colors flex items-center gap-3 border-none outline-none"
+                                        >
+                                            <User className="w-4 h-4 text-slate-400" />
+                                            Profile
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setIsProfileOpen(false)
+                                                navigate("/admin-settings")
+                                            }}
+                                            className="w-full text-left px-4 py-2.5 text-xs text-slate-700 font-medium font-['DM_Sans'] hover:bg-slate-50 transition-colors flex items-center gap-3 border-none outline-none"
+                                        >
+                                            <Settings className="w-4 h-4 text-slate-400" />
+                                            Settings
+                                        </button>
+                                    </div>
+                                    <div className="py-2 border-t border-slate-50">
+                                        <button
+                                            onClick={() => {
+                                                setIsProfileOpen(false)
+                                                handleLogout()
+                                            }}
+                                            className="w-full text-left px-4 py-2.5 text-xs text-red-600 font-medium font-['DM_Sans'] hover:bg-red-50 transition-colors flex items-center gap-3 border-none outline-none"
+                                        >
+                                            <LogOut className="w-4 h-4 text-red-500" />
+                                            Logout
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -166,12 +244,7 @@ function AdminLayout({ activeTab, children }) {
             {/* Bottom Navigation */}
             <AdminBottomNav activeTab={activeTab} />
 
-            {/* Back / Logout Button */}
-            <button
-                onClick={handleLogout}
-                className="absolute top-4 left-4 p-2 flex items-center gap-2 text-gray-600 hover:text-blue-900">
-                <img src={backImg} alt="Back" className="w-5 h-5" />
-            </button>
+            {/* Removed Back / Logout Button to use Avatar Dropdown Instead */}
         </div>
     )
 }
