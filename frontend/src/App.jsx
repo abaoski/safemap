@@ -9,7 +9,12 @@ import TrackReportPage from './pages/TrackReportPage'
 import HelpPage from './pages/HelpPage'
 import EmergencyPage from './pages/EmergencyPage'
 import AdminLoginPage from './pages/AdminLoginPage'
-import AdminDashboardPage from './pages/AdminDashboardPage'
+import AdminDashboardPage from './pages/admin/dashboard'
+import AdminAnalyticsPage from './pages/admin/analytics'
+import AdminQueuePage from './pages/admin/queue'
+import AdminAuditPage from './pages/admin/audit'
+import AdminSettingsPage from './pages/admin/settings'
+import AdminManagementPage from './pages/admin/management'
 
 // Import modular components
 import Header from './components/Header'
@@ -185,6 +190,11 @@ function App() {
       <Route path="/emergency" element={<EmergencyPage />} />
       <Route path="/admin" element={<AdminLoginPage />} />
       <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
+      <Route path="/admin-analytics" element={<AdminAnalyticsPage />} />
+      <Route path="/admin-queue" element={<AdminQueuePage />} />
+      <Route path="/admin-audit" element={<AdminAuditPage />} />
+      <Route path="/admin-management" element={<AdminManagementPage />} />
+      <Route path="/admin-settings" element={<AdminSettingsPage />} />
     </Routes>
   )
 }
