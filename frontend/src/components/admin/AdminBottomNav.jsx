@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import { List, BarChart2, LayoutGrid, User, Settings } from "lucide-react"
+import { List, BarChart2, LayoutGrid, User, Folder } from "lucide-react"
 
 function AdminBottomNav({ activeTab }) {
     const navigate = useNavigate()
@@ -45,20 +45,50 @@ function AdminBottomNav({ activeTab }) {
                 : renderInactiveTab(List, "Queue", "queue", "/admin-queue")}
 
             {activeTab === "analytics"
-                ? renderActiveTab(BarChart2, "Analytics", "analytics", "/admin-analytics")
-                : renderInactiveTab(BarChart2, "Analytics", "analytics", "/admin-analytics")}
+                ? renderActiveTab(
+                      BarChart2,
+                      "Analytics",
+                      "analytics",
+                      "/admin-analytics",
+                  )
+                : renderInactiveTab(
+                      BarChart2,
+                      "Analytics",
+                      "analytics",
+                      "/admin-analytics",
+                  )}
 
             {activeTab === "dashboard"
-                ? renderActiveTab(LayoutGrid, "Dashboard", "dashboard", "/admin-dashboard")
-                : renderInactiveTab(LayoutGrid, "Dashboard", "dashboard", "/admin-dashboard")}
+                ? renderActiveTab(
+                      LayoutGrid,
+                      "Dashboard",
+                      "dashboard",
+                      "/admin-dashboard",
+                  )
+                : renderInactiveTab(
+                      LayoutGrid,
+                      "Dashboard",
+                      "dashboard",
+                      "/admin-dashboard",
+                  )}
 
             {activeTab === "audit"
                 ? renderActiveTab(User, "Audit", "audit", "/admin-audit")
                 : renderInactiveTab(User, "Audit", "audit", "/admin-audit")}
 
-            {activeTab === "settings"
-                ? renderActiveTab(Settings, "Settings", "settings", "/admin-settings")
-                : renderInactiveTab(Settings, "Settings", "settings", "/admin-settings")}
+            {activeTab === "management"
+                ? renderActiveTab(
+                      Folder,
+                      "Management",
+                      "management",
+                      "/admin-management",
+                  )
+                : renderInactiveTab(
+                      Folder,
+                      "Management",
+                      "management",
+                      "/admin-management",
+                  )}
         </div>
     )
 }

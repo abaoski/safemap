@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import { List, BarChart2, LayoutGrid, User, Settings } from "lucide-react"
+import { List, BarChart2, LayoutGrid, User, Folders } from "lucide-react"
 
 function AdminBottomNav({ activeTab }) {
     const navigate = useNavigate()
@@ -79,18 +79,18 @@ function AdminBottomNav({ activeTab }) {
                 ? renderActiveTab(User, "Audit", "audit", "/admin-audit")
                 : renderInactiveTab(User, "Audit", "audit", "/admin-audit")}
 
-            {activeTab === "settings"
+            {activeTab === "management"
                 ? renderActiveTab(
-                      Settings,
-                      "Settings",
-                      "settings",
-                      "/admin-settings",
+                      Folders,
+                      "Management",
+                      "management",
+                      "/admin-management",
                   )
                 : renderInactiveTab(
-                      Settings,
-                      "Settings",
-                      "settings",
-                      "/admin-settings",
+                      Folders,
+                      "Management",
+                      "management",
+                      "/admin-management",
                   )}
         </div>
     )
