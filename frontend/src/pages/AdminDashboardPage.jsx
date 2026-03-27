@@ -67,8 +67,49 @@ function AdminDashboardPage() {
     }
   }
 
-  const handleReview = (reportId) => {
-    navigate(`/admin/queue?id=${reportId}`)
+  const handleApprove = async (reportId) => {
+     if (!confirm("Are you sure you want to resolve this report?")) return
+ 
+     try {
+       const response = await fetch(`http://localhost:5000/api/reports/${reportId}/verify`, {
+         method: 'POST',
+         headers: getAuthHeaders(),
+         body: JSON.stringify({ notes: 'Verified by administrator', case_number: 'ADMIN-RESOLVED' })
+       })
+       if (response.ok) {
+         fetchData()
+       } else {
+         const data = await response.json()
+         alert(data.error || 'Failed to resolve report')
+       }
+     } catch (err) {
+       console.error('Error resolving report:', err)
+       alert('Network error. Please try again.')
+     }
+   }
+
+  const handleDismiss = async (reportId) => {
+    const reason = prompt("Enter dismissal reason (optional):", "Dismissed by admin")
+    if (reason === null) return
+
+    if (!confirm("Are you sure you want to dismiss this report?")) return
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/reports/${reportId}/dismiss`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ reason })
+      })
+      if (response.ok) {
+        fetchData()
+      } else {
+        const data = await response.json()
+        alert(data.error || 'Failed to dismiss report')
+      }
+    } catch (err) {
+      console.error('Error dismissing report:', err)
+      alert('Network error. Please try again.')
+    }
   }
 
   const handleLogout = () => {
@@ -182,7 +223,12 @@ function AdminDashboardPage() {
       <div className="mt-8 px-4 w-full max-w-sm">
         <div className="flex justify-between items-center mb-4">
           <div className="text-zinc-800 text-lg font-extrabold font-['DM_Sans']">Need Review</div>
-          <div className="text-blue-900 text-xs font-bold font-['DM_Sans'] cursor-pointer">View Queue</div>
+          <div 
+            onClick={() => navigate('/admin-queue')}
+            className="text-blue-900 text-xs font-bold font-['DM_Sans'] cursor-pointer hover:underline"
+          >
+            View Queue
+          </div>
         </div>
 
         {loading ? (
@@ -223,12 +269,20 @@ function AdminDashboardPage() {
                   <div className="text-gray-400 text-xs font-normal font-['DM_Sans']">
                     {new Date(report.created_at).toLocaleDateString()}
                   </div>
-                  <button
-                    onClick={() => handleReview(report.id)}
-                    className="h-8 px-4 bg-[#1f295b] hover:bg-[#151c3d] transition-colors rounded-lg flex items-center justify-center cursor-pointer"
-                  >
-                    <span className="text-white text-xs font-bold font-['DM_Sans']">Review</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleDismiss(report.id)}
+                      className="h-8 px-3 bg-red-50 hover:bg-red-100 transition-colors rounded-lg flex items-center justify-center cursor-pointer"
+                    >
+                      <span className="text-red-500 text-xs font-bold font-['DM_Sans']">Dismiss</span>
+                    </button>
+                    <button
+                      onClick={() => handleApprove(report.id)}
+                      className="h-8 px-3 bg-[#1f295b] hover:bg-[#151c3d] transition-colors rounded-lg flex items-center justify-center cursor-pointer"
+                    >
+                      <span className="text-white text-xs font-bold font-['DM_Sans']">Resolve</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

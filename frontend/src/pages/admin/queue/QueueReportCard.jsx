@@ -24,7 +24,7 @@ function formatTime(dateStr) {
     return new Date(dateStr).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
 }
 
-function QueueReportCard({ report, onApprove, onDismiss }) {
+function QueueReportCard({ report, onApprove, onDismiss, onView }) {
     const badge = STATUS_BADGES[report.status] || { bg: "bg-gray-100", text: "text-gray-500", label: report.status, border: "border-gray-300" }
     const sevColor = SEVERITY_COLORS[report.severity] || "bg-gray-400"
 
@@ -89,7 +89,9 @@ function QueueReportCard({ report, onApprove, onDismiss }) {
                         </>
                     )}
                     {report.status !== "pending_review" && (
-                        <button className="h-7 px-3 bg-[#eff6ff] hover:bg-blue-100 transition-colors rounded-lg flex items-center gap-1.5">
+                        <button 
+                            onClick={() => onView && onView(report)}
+                            className="h-7 px-3 bg-[#eff6ff] hover:bg-blue-100 transition-colors rounded-lg flex items-center gap-1.5">
                             <Eye className="w-3 h-3 text-[#1e3a8a]" />
                             <span className="text-[#1e3a8a] text-[10px] font-bold font-['DM_Sans']">View</span>
                         </button>

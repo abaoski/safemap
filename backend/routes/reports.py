@@ -140,9 +140,6 @@ def submit_anonymous_report():
             'valid_categories': Report.CATEGORIES
         }), 400
     
-    # All reports are anonymous
-    has_personal = False
-    
     # Create report
     report = Report(
         title=data['title'],
@@ -155,7 +152,6 @@ def submit_anonymous_report():
         barangay=data.get('barangay'),
         address=data.get('address'),
         image_url=data.get('image_url'),
-        has_personal_details=False,
         is_anonymous=True,
         status='pending_review'
     )
