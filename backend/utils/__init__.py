@@ -8,7 +8,7 @@ from flask import request, jsonify, g
 import jwt
 from datetime import datetime, timedelta
 
-from models import User
+from models import SysUser as User
 from config import Config
 
 

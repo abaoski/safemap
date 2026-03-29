@@ -5,8 +5,10 @@ Handle safety report workflow - Public submission, Admin review
 
 from flask import request, jsonify
 from routes import api_bp
-from models import Report, ReportCategory
+from models import TransReportHeader as Report, SysReportCategory as ReportCategory, TransReportLedger as ReportLedger, SysAuditLog, db
 from utils import validate_json, paginate_query, require_auth, get_current_user
+from flask import request, jsonify
+from datetime import datetime
 
 # Required fields for report submission
 REPORT_REQUIRED_FIELDS = ['title', 'description', 'latitude', 'longitude', 'category']
@@ -140,7 +142,14 @@ def submit_anonymous_report():
             'valid_categories': Report.CATEGORIES
         }), 400
     
-    # Create report
+    # Check for logged in user (optional tracking)
+    try:
+        current_user = get_current_user()
+        created_by = current_user.id if current_user else None
+    except:
+        created_by = None
+
+    # Create report header
     report = Report(
         title=data['title'],
         description=data['description'],
@@ -153,12 +162,27 @@ def submit_anonymous_report():
         address=data.get('address'),
         image_url=data.get('image_url'),
         is_anonymous=True,
-        status='pending_review'
+        status='pending_review',
+        created_by=created_by,
+        user_ip=request.remote_addr,
+        user_agent=request.headers.get('User-Agent')
     )
     
     # Generate reference code
     report.generate_reference_code()
-    report.save()
+    
+    # Save header first to get ID
+    from models import db
+    db.session.add(report)
+    db.session.commit()
+    
+    # Add initial ledger entry
+    report.add_ledger_entry(
+        action='submit',
+        status='pending_review',
+        notes='Initial submission'
+    )
+    db.session.commit()
     
     # Run basic safety check (placeholder - can be enhanced)
     safety_check_passed = run_safety_check(report)
@@ -212,8 +236,26 @@ def approve_report(report_id):
     data = request.get_json() or {}
     notes = data.get('notes', '')
     
-    report.approve_for_awareness(current_user.id, notes)
-    report.save()
+    # Add ledger entry for approval
+    report.add_ledger_entry(
+        action='approve',
+        status='approved_awareness',
+        actor_id=current_user.id,
+        notes=notes
+    )
+    
+    # Log the system audit
+    SysAuditLog.log(
+        category='report_management',
+        action='approve_report',
+        target_table='trans_report_header',
+        target_id=report.id,
+        actor_id=current_user.id,
+        actor_ip=request.remote_addr,
+        details={'reference_code': report.reference_code}
+    )
+    
+    db.session.commit()
     
     return jsonify({
         'message': 'Report approved for awareness',
@@ -235,8 +277,30 @@ def verify_report_pnp(report_id):
     case_number = data.get('case_number')
     notes = data.get('notes', '')
     
-    report.verify_pnp(current_user.id, case_number, notes)
-    report.save()
+    # Update header
+    report.is_pnp_verified = True
+    report.pnp_case_number = case_number
+    
+    # Add ledger entry for verification
+    report.add_ledger_entry(
+        action='verify',
+        status='verified_pnp',
+        actor_id=current_user.id,
+        notes=notes
+    )
+    
+    # Log the system audit
+    SysAuditLog.log(
+        category='report_management',
+        action='verify_report',
+        target_table='trans_report_header',
+        target_id=report.id,
+        actor_id=current_user.id,
+        actor_ip=request.remote_addr,
+        details={'reference_code': report.reference_code, 'case_number': case_number}
+    )
+    
+    db.session.commit()
     
     return jsonify({
         'message': 'Report verified as PNP confirmed',
@@ -257,11 +321,69 @@ def dismiss_report(report_id):
     data = request.get_json() or {}
     reason = data.get('reason', 'Dismissed by admin')
     
-    report.dismiss_report(current_user.id, reason)
-    report.save()
+    # Add ledger entry for dismissal
+    report.add_ledger_entry(
+        action='dismiss',
+        status='dismissed',
+        actor_id=current_user.id,
+        notes=reason
+    )
+    
+    # Log the system audit
+    SysAuditLog.log(
+        category='report_management',
+        action='dismiss_report',
+        target_table='trans_report_header',
+        target_id=report.id,
+        actor_id=current_user.id,
+        actor_ip=request.remote_addr,
+        details={'reference_code': report.reference_code}
+    )
+    
+    db.session.commit()
     
     return jsonify({
         'message': 'Report dismissed',
+        'report': report.to_dict()
+    }), 200
+
+
+@api_bp.route('/reports/<int:report_id>/false', methods=['POST'])
+@require_auth
+def mark_report_false(report_id):
+    """Mark report as false report"""
+    current_user = get_current_user()
+    
+    if current_user.role not in ['admin', 'moderator']:
+        return jsonify({'error': 'Unauthorized - Admin access required'}), 403
+    
+    report = Report.query.get_or_404(report_id)
+    data = request.get_json() or {}
+    notes = data.get('notes', 'Marked as false report')
+    
+    # Add ledger entry
+    report.add_ledger_entry(
+        action='mark_false',
+        status='false_report',
+        actor_id=current_user.id,
+        notes=notes
+    )
+    
+    # Log the system audit
+    SysAuditLog.log(
+        category='report_management',
+        action='label_false_report',
+        target_table='trans_report_header',
+        target_id=report.id,
+        actor_id=current_user.id,
+        actor_ip=request.remote_addr,
+        details={'reference_code': report.reference_code}
+    )
+    
+    db.session.commit()
+    
+    return jsonify({
+        'message': 'Report marked as false',
         'report': report.to_dict()
     }), 200
 
@@ -276,8 +398,27 @@ def mark_report_spam(report_id):
         return jsonify({'error': 'Unauthorized - Admin access required'}), 403
     
     report = Report.query.get_or_404(report_id)
-    report.dismiss_report(current_user.id, 'Marked as spam')
-    report.save()
+    
+    # Add ledger entry for spam
+    report.add_ledger_entry(
+        action='mark_spam',
+        status='spam',
+        actor_id=current_user.id,
+        notes='Marked as spam'
+    )
+    
+    # Log the system audit
+    SysAuditLog.log(
+        category='report_management',
+        action='label_spam',
+        target_table='trans_report_header',
+        target_id=report.id,
+        actor_id=current_user.id,
+        actor_ip=request.remote_addr,
+        details={'reference_code': report.reference_code}
+    )
+    
+    db.session.commit()
     
     return jsonify({
         'message': 'Report marked as spam',
@@ -288,20 +429,8 @@ def mark_report_spam(report_id):
 @api_bp.route('/reports/<int:report_id>/remove-personal', methods=['POST'])
 @require_auth
 def remove_personal_details(report_id):
-    """Remove personal details from report"""
-    current_user = get_current_user()
-    
-    if current_user.role not in ['admin', 'moderator']:
-        return jsonify({'error': 'Unauthorized - Admin access required'}), 403
-    
-    report = Report.query.get_or_404(report_id)
-    report.remove_personal_details()
-    report.save()
-    
-    return jsonify({
-        'message': 'Personal details removed',
-        'report': report.to_dict(include_private=True)
-    }), 200
+    """Placeholder - All reports are already anonymous"""
+    return jsonify({'message': 'All reports are anonymous by design'}), 200
 
 
 @api_bp.route('/reports/stats', methods=['GET'])
@@ -406,7 +535,15 @@ def get_categories():
                     'priority': priority_map.get(c, 'medium'),
                     'report_count': Report.query.filter_by(category=c).count()
                 }
-                for c in Report.CATEGORIES
+                for c in [
+                    'sexual_assault',    # Sexual Assault
+                    'physical_abuse',    # Physical Abuse
+                    'domestic_violence', # Domestic Violence
+                    'stalking',          # Stalking
+                    'verbal_abuse',      # Verbal Abuse
+                    'emotional_abuse',   # Emotional Abuse
+                    'other'              # Other
+                ]
             ]
         }), 200
         

@@ -35,6 +35,11 @@ class Config:
     RATELIMIT_ENABLED = True
     RATELIMIT_DEFAULT = "100 per hour"
     
+    # Encryption key for sensitive data
+    # In production, this should be a 32-byte base64 encoded string
+    # Generate one using: cryptography.fernet.Fernet.generate_key()
+    ENCRYPTION_KEY = os.environ.get('ENCRYPTION_KEY') or 'v3N0M-SafeMapPH-Secure-Encryption-Key-32b='
+    
     # Pagination
     ITEMS_PER_PAGE = 20
     MAX_ITEMS_PER_PAGE = 100
