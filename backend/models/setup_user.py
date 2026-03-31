@@ -1,5 +1,5 @@
 """
-SafeMap-PH System User Model
+SafeMap-PH Setup User Model
 User authentication and profile management
 """
 
@@ -8,10 +8,10 @@ from datetime import datetime
 import hashlib
 import secrets
 
-class SysUser(db.Model):
+class SetupUser(db.Model):
     """System User model for authentication and profile"""
     
-    __tablename__ = 'sys_user'
+    __tablename__ = 'setup_user'
     
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False, index=True)
@@ -35,11 +35,11 @@ class SysUser(db.Model):
     last_login = db.Column(db.DateTime)
     
     # Relationships
-    reports = db.relationship('TransReportHeader', backref='creator', lazy='dynamic', foreign_keys='TransReportHeader.created_by')
-    actions = db.relationship('TransReportLedger', backref='actor', lazy='dynamic', foreign_keys='TransReportLedger.actor_id')
+    reports = db.relationship('LedgerReportHeader', backref='creator', lazy='dynamic', foreign_keys='LedgerReportHeader.created_by')
+    actions = db.relationship('LedgerReportEntry', backref='actor', lazy='dynamic', foreign_keys='LedgerReportEntry.actor_id')
     
     def __repr__(self):
-        return f'<SysUser {self.username}>'
+        return f'<SetupUser {self.username}>'
     
     def set_password(self, password):
         """Hash and set password"""
@@ -99,9 +99,9 @@ class SysUser(db.Model):
     @staticmethod
     def get_by_username(username):
         """Get user by username"""
-        return SysUser.query.filter_by(username=username).first()
+        return SetupUser.query.filter_by(username=username).first()
     
     @staticmethod
     def get_by_email(email):
         """Get user by email"""
-        return SysUser.query.filter_by(email=email).first()
+        return SetupUser.query.filter_by(email=email).first()

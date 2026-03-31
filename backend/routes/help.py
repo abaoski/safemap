@@ -5,7 +5,7 @@ Emergency hotlines, contacts, and safety resources
 
 from flask import request, jsonify
 from routes import api_bp
-from models import SysHelpCategory as HelpCategory, SysHelpContact as HelpContact, SysAuditLog, db
+from models import RefHelpCategory as HelpCategory, RefHelpContact as HelpContact, SysAuditLog, db
 from utils import require_auth, get_current_user, validate_json
 from flask import request, jsonify
 from datetime import datetime
@@ -113,7 +113,7 @@ def create_contact():
     SysAuditLog.log(
         category='emergency_contact',
         action='add_contact',
-        target_table='sys_help_contact',
+        target_table='ref_help_contact',
         target_id=contact.id,
         actor_id=current_user.id,
         actor_ip=request.remote_addr,
@@ -156,7 +156,7 @@ def update_contact(contact_id):
     SysAuditLog.log(
         category='emergency_contact',
         action='edit_contact',
-        target_table='sys_help_contact',
+        target_table='ref_help_contact',
         target_id=contact.id,
         actor_id=current_user.id,
         actor_ip=request.remote_addr,
@@ -189,7 +189,7 @@ def delete_contact(contact_id):
     SysAuditLog.log(
         category='emergency_contact',
         action='delete_contact',
-        target_table='sys_help_contact',
+        target_table='ref_help_contact',
         target_id=contact.id,
         actor_id=current_user.id,
         actor_ip=request.remote_addr,

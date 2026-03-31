@@ -5,7 +5,7 @@ Handle safety report workflow - Public submission, Admin review
 
 from flask import request, jsonify
 from routes import api_bp
-from models import TransReportHeader as Report, SysReportCategory as ReportCategory, TransReportLedger as ReportLedger, SysAuditLog, db
+from models import LedgerReportHeader as Report, SetupReportCategory as ReportCategory, LedgerReportEntry as ReportLedger, SysAuditLog, db
 from utils import validate_json, paginate_query, require_auth, get_current_user
 from flask import request, jsonify
 from datetime import datetime
@@ -248,7 +248,7 @@ def approve_report(report_id):
     SysAuditLog.log(
         category='report_management',
         action='approve_report',
-        target_table='trans_report_header',
+        target_table='ledger_report_header',
         target_id=report.id,
         actor_id=current_user.id,
         actor_ip=request.remote_addr,
@@ -293,7 +293,7 @@ def verify_report_pnp(report_id):
     SysAuditLog.log(
         category='report_management',
         action='verify_report',
-        target_table='trans_report_header',
+        target_table='ledger_report_header',
         target_id=report.id,
         actor_id=current_user.id,
         actor_ip=request.remote_addr,
@@ -333,7 +333,7 @@ def dismiss_report(report_id):
     SysAuditLog.log(
         category='report_management',
         action='dismiss_report',
-        target_table='trans_report_header',
+        target_table='ledger_report_header',
         target_id=report.id,
         actor_id=current_user.id,
         actor_ip=request.remote_addr,
@@ -373,7 +373,7 @@ def mark_report_false(report_id):
     SysAuditLog.log(
         category='report_management',
         action='label_false_report',
-        target_table='trans_report_header',
+        target_table='ledger_report_header',
         target_id=report.id,
         actor_id=current_user.id,
         actor_ip=request.remote_addr,
@@ -411,7 +411,7 @@ def mark_report_spam(report_id):
     SysAuditLog.log(
         category='report_management',
         action='label_spam',
-        target_table='trans_report_header',
+        target_table='ledger_report_header',
         target_id=report.id,
         actor_id=current_user.id,
         actor_ip=request.remote_addr,

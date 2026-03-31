@@ -5,7 +5,7 @@ Handle location-related endpoints
 
 from flask import request, jsonify
 from routes import api_bp
-from models import SysLocation as Location, SysAuditLog, db
+from models import SetupLocation as Location, SysAuditLog, db
 from utils import paginate_query, require_auth, get_current_user
 from datetime import datetime
 
@@ -99,7 +99,7 @@ def create_location():
     SysAuditLog.log(
         category='location_management',
         action='add_location',
-        target_table='sys_location',
+        target_table='setup_location',
         target_id=location.id,
         actor_id=current_user.id,
         actor_ip=request.remote_addr,
@@ -135,7 +135,7 @@ def update_location(location_id):
     SysAuditLog.log(
         category='location_management',
         action='edit_location',
-        target_table='sys_location',
+        target_table='setup_location',
         target_id=location.id,
         actor_id=current_user.id,
         actor_ip=request.remote_addr,
@@ -167,7 +167,7 @@ def delete_location(location_id):
     SysAuditLog.log(
         category='location_management',
         action='delete_location',
-        target_table='sys_location',
+        target_table='setup_location',
         target_id=location.id,
         actor_id=current_user.id,
         actor_ip=request.remote_addr,

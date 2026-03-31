@@ -1,5 +1,5 @@
 """
-SafeMap-PH Transaction Report Models
+SafeMap-PH Ledger Report Models
 Header/Ledger architecture for safety incidents
 """
 
@@ -10,10 +10,10 @@ from cryptography.fernet import Fernet
 from flask import current_app
 import base64
 
-class TransReportHeader(db.Model):
-    """Transaction Header model for safety incidents"""
+class LedgerReportHeader(db.Model):
+    """Ledger Report Header model for safety incidents"""
     
-    __tablename__ = 'trans_report_header'
+    __tablename__ = 'ledger_report_header'
     
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
@@ -42,7 +42,7 @@ class TransReportHeader(db.Model):
     pnp_case_number = db.Column(db.String(50))
     
     # Link to user who created the report (optional, for internal tracking)
-    created_by = db.Column(db.Integer, db.ForeignKey('sys_user.id'), nullable=True)
+    created_by = db.Column(db.Integer, db.ForeignKey('setup_user.id'), nullable=True)
     image_url = db.Column(db.String(256))
     
     # Soft Delete
@@ -54,7 +54,7 @@ class TransReportHeader(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    ledger_entries = db.relationship('TransReportLedger', backref='header', lazy='dynamic', cascade='all, delete-orphan')
+    ledger_entries = db.relationship('LedgerReportEntry', backref='header', lazy='dynamic', cascade='all, delete-orphan')
     
     @property
     def description(self):
@@ -78,7 +78,7 @@ class TransReportHeader(db.Model):
             self._description = None
 
     def __repr__(self):
-        return f'<TransReportHeader {self.id}: {self.title}>'
+        return f'<LedgerReportHeader {self.id}: {self.title}>'
 
     def generate_reference_code(self):
         """Generate unique reference code"""
@@ -87,7 +87,7 @@ class TransReportHeader(db.Model):
 
     def add_ledger_entry(self, action, status, actor_id=None, notes=''):
         """Add a new entry to the transaction ledger"""
-        entry = TransReportLedger(
+        entry = LedgerReportEntry(
             report_header_id=self.id,
             action=action,
             status_to=status,
@@ -127,18 +127,18 @@ class TransReportHeader(db.Model):
         # Include admin review details only for admin view
         if include_private:
             data['created_by'] = self.created_by
-            data['ledger'] = [entry.to_dict() for entry in self.ledger_entries.order_by(TransReportLedger.created_at.asc()).all()]
+            data['ledger'] = [entry.to_dict() for entry in self.ledger_entries.order_by(LedgerReportEntry.created_at.asc()).all()]
             
         return data
 
 
-class TransReportLedger(db.Model):
-    """Transaction Ledger model for report audit trail"""
+class LedgerReportEntry(db.Model):
+    """Ledger Report Entry model for report audit trail"""
     
-    __tablename__ = 'trans_report_ledger'
+    __tablename__ = 'ledger_report_entry'
     
     id = db.Column(db.Integer, primary_key=True)
-    report_header_id = db.Column(db.Integer, db.ForeignKey('trans_report_header.id'), nullable=False)
+    report_header_id = db.Column(db.Integer, db.ForeignKey('ledger_report_header.id'), nullable=False)
     
     # Action taken (e.g., 'submit', 'approve', 'verify', 'dismiss')
     action = db.Column(db.String(50), nullable=False)
@@ -147,7 +147,7 @@ class TransReportLedger(db.Model):
     status_to = db.Column(db.String(30), nullable=False)
     
     # User who took the action
-    actor_id = db.Column(db.Integer, db.ForeignKey('sys_user.id'), nullable=True)
+    actor_id = db.Column(db.Integer, db.ForeignKey('setup_user.id'), nullable=True)
     notes = db.Column(db.Text)
     
     # Timestamps

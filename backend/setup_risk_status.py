@@ -4,7 +4,7 @@ Seed default report categories and their settings
 """
 
 from app import create_app, db
-from models import SysReportCategory
+from models import SetupReportCategory
 
 def set_up_risk_status():
     """Seed default report categories for incident classification"""
@@ -13,7 +13,7 @@ def set_up_risk_status():
     
     with app.app_context():
         # Check if categories already exist
-        if SysReportCategory.query.first():
+        if SetupReportCategory.query.first():
             print("[OK] Risk status categories already seeded")
             return
         
@@ -31,7 +31,7 @@ def set_up_risk_status():
         ]
         
         for cat_data in categories:
-            category = SysReportCategory(
+            category = SetupReportCategory(
                 name=cat_data['name'],
                 label=cat_data['label'],
                 priority=cat_data['priority'],

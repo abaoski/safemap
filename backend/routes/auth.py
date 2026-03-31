@@ -6,7 +6,7 @@ Handle login, logout, and token management
 from flask import request, jsonify
 from datetime import timedelta
 from routes import api_bp
-from models import SysUser as User, SysAuditLog
+from models import SetupUser as User, SysAuditLog
 from utils import validate_json, create_token, require_auth, get_current_user
 
 @api_bp.route('/auth/login', methods=['POST'])
@@ -37,7 +37,7 @@ def login():
     SysAuditLog.log(
         category='auth',
         action='login',
-        target_table='sys_user',
+        target_table='setup_user',
         target_id=user.id,
         actor_id=user.id,
         actor_ip=request.remote_addr,
@@ -98,7 +98,7 @@ def logout():
         SysAuditLog.log(
             category='auth',
             action='logout',
-            target_table='sys_user',
+            target_table='setup_user',
             target_id=current_user.id,
             actor_id=current_user.id,
             actor_ip=request.remote_addr

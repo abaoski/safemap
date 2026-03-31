@@ -24,7 +24,7 @@ class SysAuditLog(db.Model):
     target_id = db.Column(db.Integer)
     
     # Actor details
-    actor_id = db.Column(db.Integer, db.ForeignKey('sys_user.id'), nullable=True)
+    actor_id = db.Column(db.Integer, db.ForeignKey('setup_user.id'), nullable=True)
     actor_ip = db.Column(db.String(45))
     
     # Payload/Change details (JSON format for flexibility)

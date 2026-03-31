@@ -5,7 +5,7 @@ Handle user management endpoints
 
 from flask import request, jsonify
 from routes import api_bp
-from models import SysUser as User, SysAuditLog, db
+from models import SetupUser as User, SysAuditLog, db
 from utils import validate_json, get_current_user, require_auth
 from datetime import datetime
 
@@ -76,7 +76,7 @@ def create_user():
     SysAuditLog.log(
         category='staff_management',
         action='create_staff',
-        target_table='sys_user',
+        target_table='setup_user',
         target_id=user.id,
         actor_id=current_user.id,
         actor_ip=request.remote_addr,
@@ -129,7 +129,7 @@ def update_user(user_id):
     SysAuditLog.log(
         category='staff_management',
         action='edit_staff',
-        target_table='sys_user',
+        target_table='setup_user',
         target_id=user.id,
         actor_id=current_user.id,
         actor_ip=request.remote_addr,
@@ -163,7 +163,7 @@ def delete_user(user_id):
     SysAuditLog.log(
         category='staff_management',
         action='delete_staff',
-        target_table='sys_user',
+        target_table='setup_user',
         target_id=user.id,
         actor_id=current_user.id,
         actor_ip=request.remote_addr,
@@ -189,7 +189,7 @@ def get_user_reports():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
     
-    from models import TransReportHeader as Report
+    from models import LedgerReportHeader as Report
     pagination = Report.query.filter_by(created_by=current_user.id, is_deleted=False)\
         .order_by(Report.created_at.desc())\
         .paginate(page=page, per_page=per_page)

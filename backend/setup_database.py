@@ -17,13 +17,13 @@ def set_up_database():
         print("[OK] Tables created successfully")
         
         # Import models
-        from models import SysUser
+        from models import SetupUser
         
         # Check if admin exists
-        admin = SysUser.query.filter_by(username='admin').first()
+        admin = SetupUser.query.filter_by(username='admin').first()
         if not admin:
             print("\nCreating default admin user...")
-            admin = SysUser(
+            admin = SetupUser(
                 username='admin',
                 email='admin@safemap.ph',
                 full_name='System Administrator',
@@ -43,8 +43,8 @@ def set_up_database():
         print("="*50)
         print(f"\nDatabase: {app.config['SQLALCHEMY_DATABASE_URI']}")
         print("\nNext steps:")
-        print("1. Run 'python set_up_emergency_contacts.py' to seed emergency contacts")
-        print("2. Run 'python set_up_risk_status.py' to seed report categories")
+        print("1. Run 'python setup_emergency_contacts.py' to seed emergency contacts")
+        print("2. Run 'python setup_risk_status.py' to seed report categories")
         print("3. Run 'python run.py' to start the backend server")
 
 

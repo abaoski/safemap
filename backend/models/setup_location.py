@@ -1,15 +1,15 @@
 """
-SafeMap-PH System Location Model
+SafeMap-PH Setup Location Model
 Safe locations and points of interest
 """
 
 from models import db
 from datetime import datetime
 
-class SysLocation(db.Model):
-    """System Location model for safe places and points of interest"""
+class SetupLocation(db.Model):
+    """Setup Location model for safe places and points of interest"""
     
-    __tablename__ = 'sys_location'
+    __tablename__ = 'setup_location'
     
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
@@ -39,7 +39,7 @@ class SysLocation(db.Model):
     
     # Verification
     is_verified = db.Column(db.Boolean, default=False)
-    verified_by = db.Column(db.Integer, db.ForeignKey('sys_user.id'))
+    verified_by = db.Column(db.Integer, db.ForeignKey('setup_user.id'))
     verified_at = db.Column(db.DateTime)
     
     # Soft Delete
@@ -66,7 +66,7 @@ class SysLocation(db.Model):
     ]
     
     def __repr__(self):
-        return f'<SysLocation {self.id}: {self.name}>'
+        return f'<SetupLocation {self.id}: {self.name}>'
     
     def to_dict(self):
         """Convert location to dictionary"""

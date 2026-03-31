@@ -1,15 +1,15 @@
 """
-SafeMap-PH System Report Category Model
+SafeMap-PH Setup Report Category Model
 Incident report categories and their settings
 """
 
 from models import db
 from datetime import datetime
 
-class SysReportCategory(db.Model):
-    """System Report Category model for incident classification"""
+class SetupReportCategory(db.Model):
+    """Setup Report Category model for incident classification"""
     
-    __tablename__ = 'sys_report_category'
+    __tablename__ = 'setup_report_category'
     
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False, unique=True)
@@ -41,8 +41,8 @@ class SysReportCategory(db.Model):
         
     def get_report_count(self):
         """Get number of reports in this category"""
-        from models import TransReportHeader
-        return TransReportHeader.query.filter_by(category=self.name).count()
+        from models import LedgerReportHeader
+        return LedgerReportHeader.query.filter_by(category=self.name).count()
     
     def save(self):
         """Save category to database"""

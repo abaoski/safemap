@@ -4,7 +4,7 @@ Seed default emergency categories and contacts
 """
 
 from app import create_app, db
-from models import SysHelpCategory, SysHelpContact
+from models import RefHelpCategory, RefHelpContact
 
 def set_up_emergency_contacts():
     """Seed default emergency categories and contacts"""
@@ -13,7 +13,7 @@ def set_up_emergency_contacts():
     
     with app.app_context():
         # Check if contacts already exist
-        if SysHelpContact.query.first():
+        if RefHelpContact.query.first():
             print("[OK] Emergency contacts already seeded")
             return
         
@@ -31,7 +31,7 @@ def set_up_emergency_contacts():
         
         created_categories = {}
         for cat in categories:
-            category = SysHelpCategory(
+            category = RefHelpCategory(
                 name=cat['name'],
                 description=cat['label'],
                 icon=cat['icon']
@@ -57,7 +57,7 @@ def set_up_emergency_contacts():
         for contact_data in contacts:
             category = created_categories.get(contact_data['category'])
             if category:
-                contact = SysHelpContact(
+                contact = RefHelpContact(
                     category_id=category.id,
                     name=contact_data['name'],
                     phone=contact_data['phone'],
