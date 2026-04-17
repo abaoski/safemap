@@ -6,7 +6,7 @@ Handle safety report workflow - Public submission, Admin review
 from flask import request, jsonify
 from routes import api_bp
 from models import LedgerReportHeader as Report, SetupReportCategory as ReportCategory, LedgerReportEntry as ReportLedger, SysAuditLog, db
-from utils import validate_json, paginate_query, require_auth, get_current_user
+from utils import validate_json, paginate_query, require_auth, get_current_user, rate_limit, sanitize_input
 from flask import request, jsonify
 from datetime import datetime
 
@@ -16,13 +16,15 @@ REPORT_OPTIONAL_FIELDS = ['severity', 'barangay', 'address', 'image_url']
 
 
 @api_bp.route('/reports/public', methods=['GET'])
+@rate_limit('30 per minute')
 def get_public_reports():
-    """Get approved reports for public heatmap"""
+    """Get all reports for public heatmap - includes all statuses for transparency"""
     category = request.args.get('category')
     city = request.args.get('city')
     
+    # Include all statuses: pending, approved, verified, dismissed, false, spam
     query = Report.query.filter(
-        Report.status.in_(['approved_awareness', 'verified_pnp'])
+        Report.status.in_(['pending_review', 'approved_awareness', 'verified', 'dismissed', 'false_report', 'spam'])
     )
     
     if category:
@@ -44,6 +46,10 @@ def get_pending_reports():
     """Get pending reports for admin review"""
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
+    
+    # Enforce pagination limit (Bug 8 fix)
+    from config import Config
+    per_page = min(per_page, Config.MAX_ITEMS_PER_PAGE)
     
     # "Need Review" should show pending_review and approved_awareness (In Progress) reports
     query = Report.query.filter(Report.status.in_(['pending_review', 'approved_awareness']))
@@ -67,6 +73,10 @@ def get_all_reports():
     status = request.args.get('status')
     category = request.args.get('category')
     city = request.args.get('city')
+    
+    # Enforce pagination limit (Bug 8 fix)
+    from config import Config
+    per_page = min(per_page, Config.MAX_ITEMS_PER_PAGE)
     
     query = Report.query
     
@@ -94,7 +104,7 @@ def get_report(report_id):
     report = Report.query.get_or_404(report_id)
     
     # Public can only see approved reports
-    if report.status not in ['approved_awareness', 'verified_pnp']:
+    if report.status not in ['approved_awareness', 'verified']:
         # Check if user is authenticated admin
         try:
             current_user = get_current_user()
@@ -107,6 +117,7 @@ def get_report(report_id):
 
 
 @api_bp.route('/reports/reference/<reference_code>', methods=['GET'])
+@rate_limit('30 per minute')
 def get_report_by_reference(reference_code):
     """Get report by reference code"""
     report = Report.query.filter_by(reference_code=reference_code).first()
@@ -118,6 +129,7 @@ def get_report_by_reference(reference_code):
 
 
 @api_bp.route('/reports/submit', methods=['POST'])
+@rate_limit('10 per minute')
 @validate_json(required_fields=REPORT_REQUIRED_FIELDS)
 def submit_anonymous_report():
     """
@@ -135,11 +147,48 @@ def submit_anonymous_report():
             'message': 'Please complete all required fields'
         }), 400
     
-    # Validate category
-    if data['category'] not in Report.CATEGORIES:
+    # Validate title is not empty (Bug 12 fix)
+    if not data.get('title', '').strip():
+        return jsonify({
+            'error': 'Invalid title',
+            'message': 'Title cannot be empty'
+        }), 400
+    
+    # Validate description is not empty (Bug 12 fix)
+    if not data.get('description', '').strip():
+        return jsonify({
+            'error': 'Invalid description',
+            'message': 'Description cannot be empty'
+        }), 400
+    
+    # Validate category - query from database
+    valid_categories_query = ReportCategory.query.filter_by(is_active=True).all()
+    valid_categories = [cat.name for cat in valid_categories_query]
+    
+    # Fallback to default categories if database is empty
+    if not valid_categories:
+        valid_categories = [
+            'sexual_assault', 'physical_abuse', 'domestic_violence',
+            'stalking', 'verbal_abuse', 'emotional_abuse', 'other'
+        ]
+    
+    if data['category'] not in valid_categories:
         return jsonify({
             'error': 'Invalid category',
-            'valid_categories': Report.CATEGORIES
+            'valid_categories': valid_categories
+        }), 400
+    
+    # Validate latitude and longitude (Bug 7 fix)
+    if not isinstance(data['latitude'], (int, float)) or not (4.5 <= data['latitude'] <= 21.0):
+        return jsonify({
+            'error': 'Invalid latitude',
+            'message': 'Latitude must be a number between 4.5 and 21.0 (Philippines bounds)'
+        }), 400
+    
+    if not isinstance(data['longitude'], (int, float)) or not (116.0 <= data['longitude'] <= 127.0):
+        return jsonify({
+            'error': 'Invalid longitude',
+            'message': 'Longitude must be a number between 116.0 and 127.0 (Philippines bounds)'
         }), 400
     
     # Check for logged in user (optional tracking)
@@ -149,17 +198,22 @@ def submit_anonymous_report():
     except:
         created_by = None
 
+    # Sanitize input fields to prevent injection attacks
+    sanitized_title = sanitize_input(data['title'])
+    sanitized_description = sanitize_input(data['description'])
+    sanitized_address = sanitize_input(data.get('address', ''))
+
     # Create report header
     report = Report(
-        title=data['title'],
-        description=data['description'],
+        title=sanitized_title,
+        description=sanitized_description,
         latitude=data['latitude'],
         longitude=data['longitude'],
         category=data['category'],
         severity=data.get('severity', 'medium'),
         city=data.get('city'),
         barangay=data.get('barangay'),
-        address=data.get('address'),
+        address=sanitized_address if sanitized_address else None,
         image_url=data.get('image_url'),
         is_anonymous=True,
         status='pending_review',
@@ -284,7 +338,7 @@ def verify_report_pnp(report_id):
     # Add ledger entry for verification
     report.add_ledger_entry(
         action='verify',
-        status='verified_pnp',
+        status='verified',
         actor_id=current_user.id,
         notes=notes
     )
@@ -430,7 +484,7 @@ def mark_report_spam(report_id):
 @require_auth
 def remove_personal_details(report_id):
     """Placeholder - All reports are already anonymous"""
-    return jsonify({'message': 'All reports are anonymous by design'}), 200
+    return jsonify({'error': 'Not Implemented', 'message': 'Personal data removal not implemented - all reports are anonymous by design'}), 501
 
 
 @api_bp.route('/reports/stats', methods=['GET'])
@@ -461,9 +515,9 @@ def get_report_stats():
     # Total
     total = Report.query.count()
     public_count = Report.query.filter(
-        Report.status.in_(['approved_awareness', 'verified_pnp'])
+        Report.status.in_(['approved_awareness', 'verified'])
     ).count()
-    verified_count = Report.query.filter_by(status='verified_pnp').count()
+    verified_count = Report.query.filter_by(status='verified').count()
     
     return jsonify({
         'total': total,

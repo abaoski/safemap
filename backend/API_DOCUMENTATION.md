@@ -42,7 +42,7 @@ All system tables and files use the `sys_` prefix, while transaction-related tab
 | GET | `/reference/<ref>` | Get report by ref code | URL Param: `reference_code` | `TransReportHeader` |
 | POST | `/submit` | Submit anonymous report | Body: `title`, `description`, `latitude`, `longitude`, `category`, `severity` (opt), `city` (opt), `barangay` (opt), `address` (opt), `image_url` (opt) | `TransReportHeader`, `TransReportLedger` |
 | POST | `/<id>/approve` | Approve for awareness | URL Param: `report_id`, Body: `notes` (opt) | `TransReportHeader`, `TransReportLedger` |
-| POST | `/<id>/verify` | PNP Verification | URL Param: `report_id`, Body: `case_number` (opt), `notes` (opt) | `TransReportHeader`, `TransReportLedger` |
+| POST | `/<id>/verify` | PNP Verification (sets status to 'verified') | URL Param: `report_id`, Body: `case_number` (opt), `notes` (opt) | `TransReportHeader`, `TransReportLedger` |
 | POST | `/<id>/dismiss` | Dismiss report | URL Param: `report_id`, Body: `reason` (opt) | `TransReportHeader`, `TransReportLedger` |
 | POST | `/<id>/spam` | Mark as spam | URL Param: `report_id` | `TransReportHeader`, `TransReportLedger` |
 | GET | `/stats` | Dashboard statistics | None (Requires Auth) | `TransReportHeader` |
@@ -91,3 +91,27 @@ All system tables and files use the `sys_` prefix, while transaction-related tab
 | GET | `/suggestions` | Get workflow prompts | None | None |
 | GET | `/history` | Get chat history | None (Requires Auth) | None (Planned) |
 | DELETE | `/history` | Clear history | None (Requires Auth) | None (Planned) |
+
+
+---
+
+## Report Status Values
+
+The system uses the following status values for report lifecycle management:
+
+| Status | Description | Visibility |
+| :--- | :--- | :--- |
+| `pending_review` | Initial status when report is submitted | Admin only |
+| `approved_awareness` | Report approved for public awareness display | Public |
+| `verified` | Report verified by PNP (Philippine National Police) | Public |
+| `dismissed` | Report dismissed by admin | Admin only |
+| `spam` | Report marked as spam | Admin only |
+
+**Status Workflow:**
+```
+pending_review → approved_awareness → verified
+              ↘ dismissed
+              ↘ spam
+```
+
+**Public Visibility:** Only reports with status `approved_awareness` or `verified` are visible in public endpoints (`/api/reports/public`).

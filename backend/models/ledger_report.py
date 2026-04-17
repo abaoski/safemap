@@ -10,6 +10,11 @@ from cryptography.fernet import Fernet
 from flask import current_app
 import base64
 
+
+class DecryptionError(Exception):
+    """Custom exception raised when report description decryption fails"""
+    pass
+
 class LedgerReportHeader(db.Model):
     """Ledger Report Header model for safety incidents"""
     
@@ -65,8 +70,8 @@ class LedgerReportHeader(db.Model):
             f = Fernet(current_app.config['ENCRYPTION_KEY'].encode())
             return f.decrypt(self._description.encode()).decode()
         except Exception as e:
-            print(f"Decryption error: {e}")
-            return self._description  # Fallback to raw if decryption fails
+            current_app.logger.error(f"Decryption error: {e}")
+            raise DecryptionError(f"Failed to decrypt report description: {e}")
 
     @description.setter
     def description(self, value):
@@ -130,6 +135,28 @@ class LedgerReportHeader(db.Model):
             data['ledger'] = [entry.to_dict() for entry in self.ledger_entries.order_by(LedgerReportEntry.created_at.asc()).all()]
             
         return data
+
+    def to_public_dict(self):
+        """Convert header to public dictionary (no sensitive data, no description decryption)"""
+        try:
+            return {
+                'id': self.id,
+                'title': self.title,
+                'category': self.category,
+                'severity': self.severity,
+                'status': self.status,
+                'reference_code': self.reference_code,
+                'location': {
+                    'latitude': self.latitude,
+                    'longitude': self.longitude,
+                    'city': self.city,
+                    'barangay': self.barangay
+                },
+                'created_at': self.created_at.isoformat() if self.created_at else None
+            }
+        except Exception as e:
+            current_app.logger.error(f"Error converting report {self.id} to public dict: {e}")
+            return None
 
 
 class LedgerReportEntry(db.Model):

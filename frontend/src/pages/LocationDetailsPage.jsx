@@ -145,6 +145,55 @@ export default function LocationDetailsPage() {
     }
   }, [location])
 
+  // Load draft data on mount
+  useEffect(() => {
+    const draft = localStorage.getItem('safemap_report_draft')
+    if (draft) {
+      try {
+        const draftData = JSON.parse(draft)
+        if (draftData.locationCoords) {
+          setLocationCoords(draftData.locationCoords)
+          setSelectedLocation(draftData.locationCoords)
+        }
+        if (draftData.landmark) setLandmark(draftData.landmark)
+        if (draftData.gender) setGender(draftData.gender)
+        if (draftData.ageGroup) setAgeGroup(draftData.ageGroup)
+        if (draftData.relationship) setRelationship(draftData.relationship)
+        if (draftData.description) setDescription(draftData.description)
+      } catch (e) {
+        console.error('Error loading draft:', e)
+      }
+    }
+  }, [])
+
+  // Save to localStorage whenever data changes
+  useEffect(() => {
+    const draft = localStorage.getItem('safemap_report_draft')
+    let draftData = {}
+    
+    if (draft) {
+      try {
+        draftData = JSON.parse(draft)
+      } catch (e) {
+        console.error('Error parsing draft:', e)
+      }
+    }
+
+    // Update draft with current data
+    const updatedDraft = {
+      ...draftData,
+      locationCoords,
+      landmark,
+      gender,
+      ageGroup,
+      relationship,
+      description,
+      timestamp: Date.now()
+    }
+
+    localStorage.setItem('safemap_report_draft', JSON.stringify(updatedDraft))
+  }, [locationCoords, landmark, gender, ageGroup, relationship, description])
+
   const genderOptions = ['Male', 'Female', 'LGBTQ+', 'Prefer not to say']
   const ageGroupOptions = ['Under 18', '18-25', '26-35', '36-45', '46-55', '56-65', 'Over 65', 'Unknown']
   const relationshipOptions = ['Stranger', 'Acquaintance', 'Friend', 'Family', 'Neighbor', 'Colleague', 'Other']
@@ -349,7 +398,7 @@ export default function LocationDetailsPage() {
         </div>
 
         {/* Stay Anonymous Info Box */}
-        <div className="w-full h-24 bg-blue-50 rounded-[10px] border border-blue-600 p-3 mb-6">
+        <div className="w-full h-28 bg-blue-50 rounded-[10px] border border-blue-600 p-3 mb-6">
           <div className="flex items-start gap-3">
             <div className="w-5 h-5 mt-0.5 shrink-0">
               <img src={rptImpReminderImg} alt="Info" className="w-5 h-5" />
@@ -363,7 +412,7 @@ export default function LocationDetailsPage() {
       </div>
 
       {/* Submit Button */}
-      <div className="w-full max-w-md mx-auto px-4 mb-8">
+      <div className="w-full max-w-md mx-auto px-4 mb-24">
         <Button 
           onClick={handleProceed}
           className="w-full h-14 bg-blue-900 rounded-2xl shadow-[0px_4px_16px_0px_rgba(59,91,219,0.35)]"

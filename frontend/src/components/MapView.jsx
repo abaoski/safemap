@@ -106,7 +106,26 @@ function IncidentPin({ severity }) {
   )
 }
 
-function PopupCard({ title, subtitle, badge, badgeBg, extra }) {
+function PopupCard({ title, subtitle, badge, badgeBg, status, extra }) {
+  // Status badge colors
+  const statusColors = {
+    'pending_review': 'bg-yellow-500',
+    'approved_awareness': 'bg-green-500',
+    'verified': 'bg-blue-600',
+    'dismissed': 'bg-gray-500',
+    'false_report': 'bg-red-600',
+    'spam': 'bg-orange-600'
+  }
+  
+  const statusLabels = {
+    'pending_review': 'Pending',
+    'approved_awareness': 'Approved',
+    'verified': 'Verified',
+    'dismissed': 'Dismissed',
+    'false_report': 'False Report',
+    'spam': 'Spam'
+  }
+  
   return (
     <div className="min-w-[180px] p-1">
       <p className="font-bold text-[#1f295b] text-sm leading-tight mb-1">{title}</p>
@@ -115,6 +134,11 @@ function PopupCard({ title, subtitle, badge, badgeBg, extra }) {
         {badge && (
           <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase text-white ${badgeBg}`}>
             {badge}
+          </span>
+        )}
+        {status && (
+          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase text-white ${statusColors[status] || 'bg-gray-500'}`}>
+            {statusLabels[status] || status}
           </span>
         )}
       </div>
@@ -168,7 +192,7 @@ function MapView({ activeFilter }) {
       theme="light"
       className="h-full w-full"
       styles={{
-        light: "https://tiles.openfreemap.org/styles/bright",
+        light: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
         dark:  "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
       }}
     >
@@ -227,6 +251,7 @@ function MapView({ activeFilter }) {
                 report.severity === 'medium'   ? 'bg-amber-400'  :
                 'bg-green-500'
               }
+              status={report.status}
               extra={new Date(report.created_at).toLocaleDateString()}
             />
           </MarkerPopup>

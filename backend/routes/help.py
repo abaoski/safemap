@@ -65,6 +65,25 @@ def get_all_contacts():
     }), 200
 
 
+@api_bp.route('/help/emergency', methods=['GET'])
+def get_emergency_contacts():
+    """Get all emergency contacts (alias for /help/contacts with different response key)"""
+    category = request.args.get('category')
+    
+    if category:
+        category_obj = HelpCategory.query.filter_by(name=category, is_deleted=False).first()
+        if category_obj:
+            contacts = HelpContact.query.filter_by(category_id=category_obj.id, is_active=True, is_deleted=False).all()
+        else:
+            contacts = []
+    else:
+        contacts = HelpContact.query.filter_by(is_active=True, is_deleted=False).all()
+    
+    return jsonify({
+        'emergency_contacts': [c.to_dict() for c in contacts]
+    }), 200
+
+
 @api_bp.route('/help/contacts/<int:contact_id>', methods=['GET'])
 def get_contact(contact_id):
     """Get a single contact"""

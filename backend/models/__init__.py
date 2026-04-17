@@ -8,7 +8,7 @@ from extensions import db
 
 # Import models using new naming convention
 from models.setup_user import SetupUser
-from models.ledger_report import LedgerReportHeader, LedgerReportEntry
+from models.ledger_report import LedgerReportHeader, LedgerReportEntry, DecryptionError
 from models.setup_location import SetupLocation
 from models.ref_emergency import RefHelpCategory, RefHelpContact
 from models.setup_report_category import SetupReportCategory
@@ -19,6 +19,7 @@ __all__ = [
     'SetupUser',
     'LedgerReportHeader',
     'LedgerReportEntry',
+    'DecryptionError',
     'SetupLocation',
     'RefHelpCategory',
     'RefHelpContact',

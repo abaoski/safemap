@@ -53,28 +53,47 @@ export default function ReviewSubmitPage() {
       return
     }
 
+    // Validate required data before submitting
+    if (!data.incidentType || !data.description) {
+      alert('Please complete all required fields: incident type and description.')
+      return
+    }
+
+    if (!data.locationCoords || !data.locationCoords.lat || !data.locationCoords.lng) {
+      alert('Please select a location on the map.')
+      return
+    }
+
     try {
+      const payload = {
+        title: data.incidentType,
+        description: data.description,
+        latitude: data.locationCoords.lat,
+        longitude: data.locationCoords.lng,
+        category: mapCategory(data.incidentType),
+        city: 'General Santos',
+        barangay: data.landmark || '',
+        address: data.landmark || ''
+      }
+
+      console.log('Submitting report:', payload)
+
       // Submit report to backend
       const response = await fetch('http://localhost:5000/api/reports/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          title: data.incidentType,
-          description: data.description,
-          latitude: data.locationCoords?.lat || 6.1167,
-          longitude: data.locationCoords?.lng || 125.1667,
-          category: mapCategory(data.incidentType),
-          city: 'General Santos',
-          barangay: data.landmark,
-          address: data.landmark
-        })
+        body: JSON.stringify(payload)
       })
 
       const result = await response.json()
+      console.log('Backend response:', result)
 
       if (response.ok) {
+        // Clear localStorage draft on successful submission
+        localStorage.removeItem('safemap_report_draft')
+        
         // Navigate to success page with reference code from backend
         navigate('/report-success', { 
           state: { 
@@ -83,7 +102,10 @@ export default function ReviewSubmitPage() {
           } 
         })
       } else {
-        alert('Failed to submit report. Please try again.')
+        // Show specific error message from backend
+        const errorMsg = result.message || result.error || 'Failed to submit report. Please try again.'
+        alert(`Error: ${errorMsg}`)
+        console.error('Backend error:', result)
       }
     } catch (error) {
       console.error('Error submitting report:', error)
@@ -234,27 +256,43 @@ export default function ReviewSubmitPage() {
             )}
           </button>
           <span className="text-justify text-gray-500 text-sm font-normal font-['DM_Sans']">
-            I confirm that this report does not contain personal names or identifying information, ensuring full anonymity for all parties.
+            I confirm that this report does not contain personal names or identifying information, ensuring full anonymity for all parties. I agree to the{' '}
+            <button 
+              onClick={() => navigate('/terms', { state: { from: 'review-submit', data: reportData } })}
+              className="text-blue-700 underline hover:text-blue-900"
+            >
+              Terms of Service
+            </button>
+            {' '}and{' '}
+            <button 
+              onClick={() => navigate('/privacy', { state: { from: 'review-submit', data: reportData } })}
+              className="text-blue-700 underline hover:text-blue-900"
+            >
+              Privacy Policy
+            </button>.
           </span>
         </div>
       </div>
 
       {/* Encryption Info */}
       <div className="w-full max-w-md mx-auto px-4 mt-4">
-        <div className="w-full h-20 bg-blue-50 rounded-[10px] border border-blue-600 overflow-hidden p-4">
+        <div className="w-full bg-blue-50 rounded-[10px] border border-blue-600 overflow-hidden p-4">
           <div className="flex items-start gap-3.5">
             <div className="w-5 h-5 shrink-0 mt-0.5">
               <img src={rptImpReminderImg} alt="Lock" className="w-5 h-5" />
             </div>
-            <span className="text-justify text-blue-900 text-xs font-normal font-['DM_Sans']">
-              Your data is end-to-end encrypted. We do not track your IP address or device metadata. This report is 100% anonymous.
-            </span>
+            <div className="flex flex-col gap-1">
+              <span className="text-blue-900 text-xs font-semibold font-['DM_Sans']">Your Privacy is Protected</span>
+              <span className="text-justify text-blue-900 text-xs font-normal font-['DM_Sans']">
+                Your report description is encrypted. We collect minimal data (location, category, timestamp) for safety purposes. Your IP address is logged for security only. This report is anonymous by design.
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Submit Button */}
-      <div className="w-full max-w-md mx-auto px-4 mt-6 mb-8">
+      <div className="w-full max-w-md mx-auto px-4 mt-6 mb-24">
         <Button 
           onClick={handleSubmit}
           className="w-full h-14 bg-blue-900 rounded-2xl shadow-[0px_4px_16px_0px_rgba(59,91,219,0.35)]"

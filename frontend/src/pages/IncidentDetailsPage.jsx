@@ -1,5 +1,5 @@
-import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import logoImg from '/src/assets/images/Logo.svg'
 import rptBackImg from '/src/assets/images/rpt_back.svg'
 import rptImpReminderImg from '/src/assets/images/rpt_imp_reminder.svg'
@@ -8,6 +8,7 @@ import BottomNav from "@/components/BottomNav"
 
 export default function IncidentDetailsPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [incidentType, setIncidentType] = useState('')
   const [date, setDate] = useState(() => {
     const today = new Date()
@@ -18,6 +19,46 @@ export default function IncidentDetailsPage() {
     return now.toTimeString().slice(0, 5)
   })
   const [description, setDescription] = useState('')
+
+  // Load draft data on mount if resuming
+  useEffect(() => {
+    if (location.state?.resumeDraft) {
+      const draft = localStorage.getItem('safemap_report_draft')
+      if (draft) {
+        try {
+          const draftData = JSON.parse(draft)
+          if (draftData.incidentType) setIncidentType(draftData.incidentType)
+          if (draftData.description) setDescription(draftData.description)
+        } catch (e) {
+          console.error('Error loading draft:', e)
+        }
+      }
+    }
+  }, [location])
+
+  // Save to localStorage whenever data changes
+  useEffect(() => {
+    const draft = localStorage.getItem('safemap_report_draft')
+    let draftData = {}
+    
+    if (draft) {
+      try {
+        draftData = JSON.parse(draft)
+      } catch (e) {
+        console.error('Error parsing draft:', e)
+      }
+    }
+
+    // Update draft with current data
+    const updatedDraft = {
+      ...draftData,
+      incidentType,
+      description,
+      timestamp: Date.now()
+    }
+
+    localStorage.setItem('safemap_report_draft', JSON.stringify(updatedDraft))
+  }, [incidentType, description])
 
   // Format date for display
   const formatDate = (dateStr) => {
@@ -194,7 +235,7 @@ export default function IncidentDetailsPage() {
       </div>
 
       {/* Submit Button */}
-      <div className="w-full max-w-md mx-auto px-4">
+      <div className="w-full max-w-md mx-auto px-4 mb-24">
         <Button 
           onClick={handleProceed}
           className="w-full h-14 bg-blue-900 rounded-2xl shadow-[0px_4px_16px_0px_rgba(59,91,219,0.35)]"

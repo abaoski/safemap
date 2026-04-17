@@ -8,6 +8,8 @@ import ReportSuccessPage from './pages/ReportSuccessPage'
 import TrackReportPage from './pages/TrackReportPage'
 import HelpPage from './pages/HelpPage'
 import EmergencyPage from './pages/EmergencyPage'
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
+import TermsOfServicePage from './pages/TermsOfServicePage'
 import AdminLoginPage from './pages/AdminLoginPage'
 import AdminDashboardPage from './pages/admin/dashboard'
 import AdminAnalyticsPage from './pages/admin/analytics'
@@ -190,6 +192,8 @@ function App() {
       <Route path="/track" element={<TrackReportPage />} />
       <Route path="/help" element={<HelpPage />} />
       <Route path="/emergency" element={<EmergencyPage />} />
+      <Route path="/privacy" element={<PrivacyPolicyPage />} />
+      <Route path="/terms" element={<TermsOfServicePage />} />
       <Route path="/admin" element={<AdminLoginPage />} />
       <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
       <Route path="/admin-analytics" element={<AdminAnalyticsPage />} />

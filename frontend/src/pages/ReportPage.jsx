@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import logoImg from '/src/assets/images/Logo.svg'
 import rptBackImg from '/src/assets/images/rpt_back.svg'
 import rptSafetyImg from '/src/assets/images/rpt_safety.svg'
@@ -11,6 +11,50 @@ export default function ReportPage() {
   const navigate = useNavigate()
   const [emergencyChecked, setEmergencyChecked] = useState(false)
   const [privacyChecked, setPrivacyChecked] = useState(false)
+  const [hasDraft, setHasDraft] = useState(false)
+
+  // Check for existing draft on mount
+  useEffect(() => {
+    const draft = localStorage.getItem('safemap_report_draft')
+    if (draft) {
+      try {
+        const draftData = JSON.parse(draft)
+        // Check if draft is less than 24 hours old
+        const draftAge = Date.now() - (draftData.timestamp || 0)
+        if (draftAge < 24 * 60 * 60 * 1000) {
+          setHasDraft(true)
+        } else {
+          // Clear expired draft
+          localStorage.removeItem('safemap_report_draft')
+        }
+      } catch (e) {
+        console.error('Error parsing draft:', e)
+      }
+    }
+  }, [])
+
+  const handleStartReport = () => {
+    if (!emergencyChecked || !privacyChecked) {
+      alert('Please check both boxes to confirm you have read the guidelines.')
+      return
+    }
+    navigate('/incident-details')
+  }
+
+  const handleResumeDraft = () => {
+    if (!emergencyChecked || !privacyChecked) {
+      alert('Please check both boxes to confirm you have read the guidelines.')
+      return
+    }
+    navigate('/incident-details', { state: { resumeDraft: true } })
+  }
+
+  const handleClearDraft = () => {
+    if (confirm('Are you sure you want to clear your saved draft?')) {
+      localStorage.removeItem('safemap_report_draft')
+      setHasDraft(false)
+    }
+  }
 
   return (
     <div className="w-full h-screen bg-slate-50 overflow-y-auto">
@@ -102,18 +146,39 @@ export default function ReportPage() {
       
       {/* Submit Button */}
       <div className="w-full max-w-md mx-auto mt-8 px-4 pb-8">
+        {hasDraft && (
+          <div className="mb-4 p-4 bg-blue-50 rounded-xl border border-blue-600">
+            <div className="flex items-center gap-2 mb-2">
+              <img src={rptImpReminderImg} alt="Info" className="w-4 h-4" />
+              <span className="text-blue-900 text-sm font-semibold">Draft Found</span>
+            </div>
+            <p className="text-blue-900 text-xs mb-3">You have an unfinished report. Would you like to continue where you left off?</p>
+            <div className="flex gap-2">
+              <button 
+                onClick={handleResumeDraft}
+                disabled={!emergencyChecked || !privacyChecked}
+                className="flex-1 h-10 bg-blue-900 rounded-xl text-white text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Resume Draft
+              </button>
+              <button 
+                onClick={handleClearDraft}
+                className="h-10 px-4 bg-white border border-gray-300 rounded-xl text-gray-700 text-sm font-semibold hover:bg-gray-50"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        )}
+        
         <button 
-          onClick={() => {
-            if (!emergencyChecked || !privacyChecked) {
-              alert('Please check both boxes to confirm you have read the guidelines.')
-              return
-            }
-            navigate('/incident-details')
-          }}
+          onClick={handleStartReport}
           disabled={!emergencyChecked || !privacyChecked}
           className="w-full h-14 bg-blue-950 rounded-xl shadow-[0px_4px_16px_0px_rgba(26,42,108,0.40)] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span className="text-white text-base font-semibold font-['DM_Sans'] tracking-tight">Start Anonymous Report</span>
+          <span className="text-white text-base font-semibold font-['DM_Sans'] tracking-tight">
+            {hasDraft ? 'Start New Report' : 'Start Anonymous Report'}
+          </span>
         </button>
       </div>
     </div>
