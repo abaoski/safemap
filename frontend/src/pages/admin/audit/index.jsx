@@ -10,7 +10,7 @@ function AdminAuditPage() {
     const [typeFilter, setTypeFilter] = useState("")
     const [showFilters, setShowFilters] = useState(false)
     const [auditEntries, setAuditEntries] = useState([])
-    const [auditStats, setAuditStats] = useState({ total: 0, approvals: 0, dismissals: 0, verifications: 0 })
+    const [auditStats, setAuditStats] = useState({ total: 0, submissions: 0, pending: 0, approvals: 0, dismissals: 0, verifications: 0 })
 
     useEffect(() => {
         fetchData()
@@ -32,6 +32,8 @@ function AdminAuditPage() {
 
                 setAuditStats({
                     total: entries.length,
+                    submissions: entries.filter((e) => e.type === "submitted").length,
+                    pending: entries.filter((e) => e.type === "pending").length,
                     approvals: entries.filter((e) => e.type === "approved").length,
                     dismissals: entries.filter((e) => e.type === "dismissed").length,
                     verifications: entries.filter((e) => e.type === "verified").length,
@@ -47,6 +49,27 @@ function AdminAuditPage() {
     const buildAuditEntries = (reports) => {
         const entries = []
         reports.forEach((report) => {
+            // Pending reports (submitted but not yet reviewed)
+            if (report.status === "pending_review" && report.created_at) {
+                entries.push({
+                    id: `pending-${report.id}`, type: "pending", reportId: report.id,
+                    refCode: report.reference_code || `SF-${report.id}`, title: report.title, category: report.category,
+                    reviewedBy: "System", notes: "Awaiting admin review", timestamp: report.created_at,
+                    description: `Report ${report.reference_code || `#SF-${report.id}`} submitted — pending review`,
+                })
+            }
+
+            // Submitted (non-pending reports — show their creation as a submission event)
+            if (report.status !== "pending_review" && report.created_at) {
+                entries.push({
+                    id: `submit-${report.id}`, type: "submitted", reportId: report.id,
+                    refCode: report.reference_code || `SF-${report.id}`, title: report.title, category: report.category,
+                    reviewedBy: "Anonymous", notes: "", timestamp: report.created_at,
+                    description: `New report submitted: ${report.reference_code || `#SF-${report.id}`} — ${report.title || report.category}`,
+                })
+            }
+
+            // Approved
             if (report.status === "approved_awareness" && report.review_date) {
                 entries.push({
                     id: `approve-${report.id}`, type: "approved", reportId: report.id,
@@ -56,6 +79,8 @@ function AdminAuditPage() {
                     description: `Approved case ${report.reference_code || `#SF-${report.id}`} for public awareness`,
                 })
             }
+
+            // Dismissed
             if (report.status === "dismissed" && report.review_date) {
                 entries.push({
                     id: `dismiss-${report.id}`, type: "dismissed", reportId: report.id,
@@ -65,7 +90,9 @@ function AdminAuditPage() {
                     description: `Dismissed case ${report.reference_code || `#SF-${report.id}`}`,
                 })
             }
-            if (report.status === "verified_pnp" && report.review_date) {
+
+            // Verified
+            if ((report.status === "verified_pnp" || report.status === "verified") && report.review_date) {
                 entries.push({
                     id: `verify-${report.id}`, type: "verified", reportId: report.id,
                     refCode: report.reference_code || `SF-${report.id}`, title: report.title, category: report.category,
@@ -74,13 +101,28 @@ function AdminAuditPage() {
                     description: `PNP verified case ${report.reference_code || `#SF-${report.id}`}${report.pnp_case_number ? ` — Case #${report.pnp_case_number}` : ""}`,
                 })
             }
-        })
 
-        const now = new Date()
-        entries.push({
-            id: "sys-login-1", type: "login", reviewedBy: "Admin-01",
-            timestamp: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
-            description: "Admin-01 signed into HQ Terminal",
+            // False report
+            if (report.status === "false_report" && report.review_date) {
+                entries.push({
+                    id: `false-${report.id}`, type: "flagged", reportId: report.id,
+                    refCode: report.reference_code || `SF-${report.id}`, title: report.title, category: report.category,
+                    reviewedBy: report.reviewed_by ? `Admin-${String(report.reviewed_by).padStart(2, "0")}` : "System",
+                    notes: report.review_notes || "Marked as false report", timestamp: report.review_date,
+                    description: `Flagged case ${report.reference_code || `#SF-${report.id}`} as false report`,
+                })
+            }
+
+            // Spam
+            if (report.status === "spam" && report.review_date) {
+                entries.push({
+                    id: `spam-${report.id}`, type: "flagged", reportId: report.id,
+                    refCode: report.reference_code || `SF-${report.id}`, title: report.title, category: report.category,
+                    reviewedBy: report.reviewed_by ? `Admin-${String(report.reviewed_by).padStart(2, "0")}` : "System",
+                    notes: report.review_notes || "Marked as spam", timestamp: report.review_date,
+                    description: `Flagged case ${report.reference_code || `#SF-${report.id}`} as spam`,
+                })
+            }
         })
 
         entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
@@ -148,9 +190,13 @@ function AdminAuditPage() {
                 {showFilters && (
                     <div className="flex flex-wrap gap-2">
                         {[
-                            { key: "", label: "All" }, { key: "approved", label: "Approvals" },
-                            { key: "dismissed", label: "Dismissals" }, { key: "verified", label: "PNP Verify" },
-                            { key: "login", label: "Auth Events" }, { key: "flagged", label: "Auto Flags" },
+                            { key: "", label: "All" },
+                            { key: "submitted", label: "Submitted" },
+                            { key: "pending", label: "Pending" },
+                            { key: "approved", label: "Approvals" },
+                            { key: "dismissed", label: "Dismissals" },
+                            { key: "verified", label: "PNP Verify" },
+                            { key: "flagged", label: "Flagged" },
                         ].map((t) => (
                             <button
                                 key={t.key}

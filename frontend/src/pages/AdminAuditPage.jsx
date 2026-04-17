@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+    import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import {
     Search,
@@ -20,6 +20,22 @@ import AdminBottomNav from "../components/AdminBottomNav"
 
 // Audit event type definitions
 const AUDIT_TYPES = {
+    submitted: {
+        icon: FileText,
+        bg: "bg-purple-50",
+        iconColor: "text-purple-500",
+        label: "SUBMITTED",
+        labelBg: "bg-purple-100",
+        labelText: "text-purple-600",
+    },
+    pending: {
+        icon: Clock,
+        bg: "bg-yellow-50",
+        iconColor: "text-yellow-500",
+        label: "PENDING",
+        labelBg: "bg-yellow-100",
+        labelText: "text-yellow-600",
+    },
     approved: {
         icon: CheckCircle,
         bg: "bg-green-50",
@@ -80,6 +96,8 @@ function AdminAuditPage() {
     const [auditEntries, setAuditEntries] = useState([])
     const [auditStats, setAuditStats] = useState({
         total: 0,
+        submissions: 0,
+        pending: 0,
         approvals: 0,
         dismissals: 0,
         verifications: 0,
@@ -107,9 +125,16 @@ function AdminAuditPage() {
                 "http://localhost:5000/api/reports?per_page=100",
                 { headers: getAuthHeaders() },
             )
+            
+            console.log('Fetch response status:', response.status) // Debug
+            
             if (response.ok) {
                 const data = await response.json()
+                console.log('Fetched reports data:', data) // Debug
+                
                 const allReports = data.reports || []
+                console.log('Total reports:', allReports.length) // Debug
+                
                 setReports(allReports)
 
                 // Build audit entries from reviewed reports
@@ -119,6 +144,8 @@ function AdminAuditPage() {
                 // Stats
                 setAuditStats({
                     total: entries.length,
+                    submissions: entries.filter((e) => e.type === "submitted").length,
+                    pending: entries.filter((e) => e.type === "pending").length,
                     approvals: entries.filter((e) => e.type === "approved")
                         .length,
                     dismissals: entries.filter((e) => e.type === "dismissed")
@@ -126,6 +153,8 @@ function AdminAuditPage() {
                     verifications: entries.filter((e) => e.type === "verified")
                         .length,
                 })
+            } else {
+                console.error('Fetch failed with status:', response.status)
             }
         } catch (err) {
             console.error("Error fetching data:", err)
@@ -138,7 +167,40 @@ function AdminAuditPage() {
         const entries = []
 
         reports.forEach((report) => {
-            // Reports that have been reviewed create audit entries
+            // 1. Report submission (created_at) - only for non-pending reports
+            // For pending reports, we'll show "pending" instead of "submitted"
+            if (report.created_at && report.status !== "pending_review") {
+                entries.push({
+                    id: `submit-${report.id}`,
+                    type: "submitted",
+                    reportId: report.id,
+                    refCode: report.reference_code || `SF-${report.id}`,
+                    title: report.title,
+                    category: report.category,
+                    reviewedBy: "Anonymous User",
+                    notes: "",
+                    timestamp: report.created_at,
+                    description: `New report submitted: ${report.reference_code || `#SF-${report.id}`}`,
+                })
+            }
+
+            // 2. Pending review (if status is pending_review)
+            if (report.status === "pending_review" && report.created_at) {
+                entries.push({
+                    id: `pending-${report.id}`,
+                    type: "pending",
+                    reportId: report.id,
+                    refCode: report.reference_code || `SF-${report.id}`,
+                    title: report.title,
+                    category: report.category,
+                    reviewedBy: "System",
+                    notes: "Awaiting admin review",
+                    timestamp: report.created_at,
+                    description: `Report ${report.reference_code || `#SF-${report.id}`} pending review`,
+                })
+            }
+
+            // 3. Approved reports
             if (
                 report.status === "approved_awareness" &&
                 report.review_date
@@ -159,6 +221,7 @@ function AdminAuditPage() {
                 })
             }
 
+            // 4. Dismissed reports
             if (report.status === "dismissed" && report.review_date) {
                 entries.push({
                     id: `dismiss-${report.id}`,
@@ -177,7 +240,8 @@ function AdminAuditPage() {
                 })
             }
 
-            if (report.status === "verified_pnp" && report.review_date) {
+            // 5. Verified reports
+            if ((report.status === "verified_pnp" || report.status === "verified") && report.review_date) {
                 entries.push({
                     id: `verify-${report.id}`,
                     type: "verified",
@@ -194,12 +258,50 @@ function AdminAuditPage() {
                     description: `PNP verified case ${report.reference_code || `#SF-${report.id}`}${report.pnp_case_number ? ` — Case #${report.pnp_case_number}` : ""}`,
                 })
             }
+
+            // 6. False reports
+            if (report.status === "false_report" && report.review_date) {
+                entries.push({
+                    id: `false-${report.id}`,
+                    type: "flagged",
+                    reportId: report.id,
+                    refCode: report.reference_code || `SF-${report.id}`,
+                    title: report.title,
+                    category: report.category,
+                    reviewedBy: report.reviewed_by
+                        ? `Admin-${String(report.reviewed_by).padStart(2, "0")}`
+                        : "System",
+                    notes: report.review_notes || "Marked as false report",
+                    timestamp: report.review_date,
+                    description: `Flagged case ${report.reference_code || `#SF-${report.id}`} as false report`,
+                })
+            }
+
+            // 7. Spam reports
+            if (report.status === "spam" && report.review_date) {
+                entries.push({
+                    id: `spam-${report.id}`,
+                    type: "flagged",
+                    reportId: report.id,
+                    refCode: report.reference_code || `SF-${report.id}`,
+                    title: report.title,
+                    category: report.category,
+                    reviewedBy: report.reviewed_by
+                        ? `Admin-${String(report.reviewed_by).padStart(2, "0")}`
+                        : "System",
+                    notes: report.review_notes || "Marked as spam",
+                    timestamp: report.review_date,
+                    description: `Flagged case ${report.reference_code || `#SF-${report.id}`} as spam`,
+                })
+            }
         })
 
         // Sort by timestamp (newest first)
         entries.sort(
             (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
         )
+
+        console.log('Built audit entries:', entries) // Debug log
 
         return entries
     }
@@ -303,6 +405,24 @@ function AdminAuditPage() {
             <div className="w-full max-w-sm px-4 mt-4">
                 <div className="grid grid-cols-3 gap-2">
                     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 text-center">
+                        <FileText className="w-5 h-5 text-purple-500 mx-auto mb-1" />
+                        <div className="text-lg font-extrabold font-['DM_Sans'] text-purple-600">
+                            {auditStats.submissions}
+                        </div>
+                        <div className="text-[8px] font-bold font-['DM_Sans'] uppercase text-gray-400">
+                            Submitted
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 text-center">
+                        <Clock className="w-5 h-5 text-yellow-500 mx-auto mb-1" />
+                        <div className="text-lg font-extrabold font-['DM_Sans'] text-yellow-600">
+                            {auditStats.pending}
+                        </div>
+                        <div className="text-[8px] font-bold font-['DM_Sans'] uppercase text-gray-400">
+                            Pending
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 text-center">
                         <CheckCircle className="w-5 h-5 text-green-500 mx-auto mb-1" />
                         <div className="text-lg font-extrabold font-['DM_Sans'] text-green-600">
                             {auditStats.approvals}
@@ -311,6 +431,8 @@ function AdminAuditPage() {
                             Approved
                         </div>
                     </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 mt-2">
                     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 text-center">
                         <XCircle className="w-5 h-5 text-red-500 mx-auto mb-1" />
                         <div className="text-lg font-extrabold font-['DM_Sans'] text-red-500">
@@ -359,11 +481,12 @@ function AdminAuditPage() {
                     <div className="flex flex-wrap gap-2">
                         {[
                             { key: "", label: "All" },
+                            { key: "submitted", label: "Submissions" },
+                            { key: "pending", label: "Pending" },
                             { key: "approved", label: "Approvals" },
                             { key: "dismissed", label: "Dismissals" },
                             { key: "verified", label: "PNP Verify" },
-                            { key: "login", label: "Auth Events" },
-                            { key: "flagged", label: "Auto Flags" },
+                            { key: "flagged", label: "Flagged" },
                         ].map((t) => (
                             <button
                                 key={t.key}
