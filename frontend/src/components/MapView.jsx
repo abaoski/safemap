@@ -297,7 +297,7 @@ function ServicePin({ type }) {
 
 // Neon aura circle — used for incidents
 function IncidentPin({ severity, status }) {
-    const isResolved = status === "verified"
+    const isResolved = status === "verified" || status === "verified_pnp"
     const cfg = isResolved
         ? SEVERITY_CONFIG.low
         : SEVERITY_CONFIG[severity] || SEVERITY_CONFIG.medium
@@ -354,6 +354,7 @@ function PopupCard({ title, subtitle, badge, badgeBg, status, extra }) {
         pending_review: "bg-yellow-500",
         in_progress: "bg-green-500",
         verified: "bg-green-600",
+        verified_pnp: "bg-green-600",
         dismissed: "bg-gray-500",
         false_report: "bg-red-600",
         spam: "bg-orange-600",
@@ -363,6 +364,7 @@ function PopupCard({ title, subtitle, badge, badgeBg, status, extra }) {
         pending_review: "Pending",
         in_progress: "In Progress",
         verified: "Resolved",
+        verified_pnp: "Verified",
         dismissed: "Dismissed",
         false_report: "False Report",
         spam: "Spam",

@@ -5,7 +5,7 @@ export const AUDIT_TYPES = {
     pending: { icon: Clock, bg: "bg-yellow-50", iconColor: "text-yellow-500", label: "PENDING", labelBg: "bg-yellow-100", labelText: "text-yellow-600" },
     approved: { icon: CheckCircle, bg: "bg-green-50", iconColor: "text-green-500", label: "APPROVAL", labelBg: "bg-green-100", labelText: "text-green-600" },
     dismissed: { icon: XCircle, bg: "bg-red-50", iconColor: "text-red-500", label: "DISMISSAL", labelBg: "bg-red-100", labelText: "text-red-500" },
-    verified: { icon: Shield, bg: "bg-blue-50", iconColor: "text-blue-600", label: "PNP_VERIFY", labelBg: "bg-blue-100", labelText: "text-blue-700" },
+    verified: { icon: Shield, bg: "bg-green-50", iconColor: "text-green-600", label: "PNP_VERIFY", labelBg: "bg-green-100", labelText: "text-green-700" },
     modified: { icon: Edit2, bg: "bg-slate-100", iconColor: "text-gray-500", label: "META_UPDATE", labelBg: "bg-gray-100", labelText: "text-gray-500" },
     login: { icon: LogIn, bg: "bg-indigo-50", iconColor: "text-indigo-500", label: "AUTH_EVENT", labelBg: "bg-indigo-100", labelText: "text-indigo-600" },
     flagged: { icon: AlertTriangle, bg: "bg-amber-50", iconColor: "text-amber-500", label: "FLAGGED", labelBg: "bg-amber-100", labelText: "text-amber-600" },

@@ -54,11 +54,11 @@ const AUDIT_TYPES = {
     },
     verified: {
         icon: Shield,
-        bg: "bg-blue-50",
-        iconColor: "text-blue-600",
+        bg: "bg-green-50",
+        iconColor: "text-green-600",
         label: "PNP_VERIFY",
-        labelBg: "bg-blue-100",
-        labelText: "text-blue-700",
+        labelBg: "bg-green-100",
+        labelText: "text-green-700",
     },
     modified: {
         icon: Edit2,
@@ -442,8 +442,8 @@ function AdminAuditPage() {
                         </div>
                     </div>
                     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 text-center">
-                        <Shield className="w-5 h-5 text-[#1e3a8a] mx-auto mb-1" />
-                        <div className="text-lg font-extrabold font-['DM_Sans'] text-[#1e3a8a]">
+                        <Shield className="w-5 h-5 text-green-500 mx-auto mb-1" />
+                        <div className="text-lg font-extrabold font-['DM_Sans'] text-green-600">
                             {auditStats.verifications}
                         </div>
                         <div className="text-[8px] font-bold font-['DM_Sans'] uppercase text-gray-400">

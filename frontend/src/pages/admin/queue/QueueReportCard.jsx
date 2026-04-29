@@ -14,10 +14,10 @@ const STATUS_BADGES = {
         border: "border-green-500",
     },
     verified_pnp: {
-        bg: "bg-blue-100",
-        text: "text-blue-800",
+        bg: "bg-green-100",
+        text: "text-green-800",
         label: "VERIFIED",
-        border: "border-blue-900",
+        border: "border-green-600",
     },
     dismissed: {
         bg: "bg-red-100",
