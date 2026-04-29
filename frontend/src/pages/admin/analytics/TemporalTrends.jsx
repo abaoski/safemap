@@ -8,8 +8,10 @@ function TemporalTrends() {
                 Comparison of reported cases vs resolution velocity
             </p>
 
-            <div className="space-y-4 min-h-[100px] flex items-center justify-center">
-                <span className="text-gray-400 text-[10px] italic">Data visualization will be available in future updates.</span>
+            <div className="space-y-4 min-h-25 flex items-center justify-center">
+                <span className="text-gray-400 text-[10px] italic">
+                    Data visualization will be available in future updates.
+                </span>
             </div>
         </div>
     )

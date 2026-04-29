@@ -31,7 +31,7 @@ function BottomNav({ onHelpClick, onChatClick }) {
     const renderTab = (Icon, label, tabId, isActive, action) => (
         <button
             onClick={() => handleTabClick(tabId, action)}
-            className={`flex flex-col items-center justify-center w-[60px] bg-transparent border-none cursor-pointer transition-colors duration-200 mt-2 ${
+            className={`flex flex-col items-center justify-center w-15 bg-transparent border-none cursor-pointer transition-colors duration-200 mt-2 ${
                 isActive
                     ? "text-blue-700"
                     : "text-slate-400 hover:text-slate-500"
@@ -52,9 +52,9 @@ function BottomNav({ onHelpClick, onChatClick }) {
     // Floating Action CTA (Reports) - Always protruding
     const renderCTA = (Icon, label, action) => (
         <div
-            className="relative -top-[20px] flex flex-col items-center gap-1.5 cursor-pointer min-w-[64px]"
+            className="relative -top-5 flex flex-col items-center gap-1.5 cursor-pointer min-w-16"
             onClick={action}>
-            <div className="w-[56px] h-[56px] bg-[#1f295b] hover:bg-[#151c3d] transition-colors rounded-full shadow-[0px_6px_16px_rgba(31,41,91,0.4)] flex items-center justify-center border-[4px] border-white">
+            <div className="w-14 h-14 bg-[#1f295b] hover:bg-[#151c3d] transition-colors rounded-full shadow-[0px_6px_16px_rgba(31,41,91,0.4)] flex items-center justify-center border-4 border-white">
                 <Icon className="w-6 h-6 text-white" strokeWidth={2.5} />
             </div>
             <span className="text-[#1f295b] text-[11px] font-bold font-['DM_Sans'] leading-none">
@@ -64,7 +64,7 @@ function BottomNav({ onHelpClick, onChatClick }) {
     )
 
     return (
-        <div className="fixed bottom-0 left-0 w-full h-[72px] bg-white rounded-t-[24px] flex justify-between items-center px-2 sm:px-6 z-[2000] shadow-[0_-8px_24px_rgba(0,0,0,0.06)] pb-2">
+        <div className="fixed bottom-0 left-0 w-full h-18 bg-white rounded-t-[24px] flex justify-between items-center px-2 sm:px-6 z-2000 shadow-[0_-8px_24px_rgba(0,0,0,0.06)] pb-2">
             {renderTab(Home, "Home", "home", activeTab === "home", () =>
                 navigate("/"),
             )}

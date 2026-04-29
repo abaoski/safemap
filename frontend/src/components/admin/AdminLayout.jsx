@@ -102,7 +102,7 @@ function AdminLayout({ activeTab, children }) {
 
                             {/* Dropdown Menu */}
                             {isNotifOpen && (
-                                <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-[0px_8px_24px_rgba(149,157,165,0.2)] border border-slate-100 overflow-hidden z-[9999]">
+                                <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-[0px_8px_24px_rgba(149,157,165,0.2)] border border-slate-100 overflow-hidden z-9999">
                                     <div className="px-4 py-3 border-b border-slate-50 flex items-center justify-between">
                                         <h3 className="text-slate-800 text-sm font-bold font-['DM_Sans']">
                                             Notifications
@@ -111,7 +111,7 @@ function AdminLayout({ activeTab, children }) {
                                             Mark all read
                                         </button>
                                     </div>
-                                    <div className="max-h-[300px] overflow-y-auto">
+                                    <div className="max-h-75 overflow-y-auto">
                                         {notifications.length > 0 ? (
                                             notifications.map(notif => (
                                                 <div
@@ -147,8 +147,7 @@ function AdminLayout({ activeTab, children }) {
                                     setIsProfileOpen(!isProfileOpen)
                                     if (isNotifOpen) setIsNotifOpen(false)
                                 }}
-                                className="focus:outline-none flex items-center justify-center border-none"
-                            >
+                                className="focus:outline-none flex items-center justify-center border-none">
                                 {avatarUrl ? (
                                     <img
                                         className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm transition-transform hover:scale-105"
@@ -166,9 +165,9 @@ function AdminLayout({ activeTab, children }) {
 
                             {/* Dropdown Menu */}
                             {isProfileOpen && (
-                                <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-[0px_8px_24px_rgba(149,157,165,0.2)] border border-slate-100 overflow-hidden z-[9999]">
+                                <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-[0px_8px_24px_rgba(149,157,165,0.2)] border border-slate-100 overflow-hidden z-9999">
                                     <div className="px-4 py-3 border-b border-slate-50 flex items-center gap-3">
-                                        <div className="flex-shrink-0">
+                                        <div className="shrink-0">
                                             {avatarUrl ? (
                                                 <img
                                                     className="w-9 h-9 rounded-full object-cover border border-slate-100 shadow-sm"
@@ -185,10 +184,13 @@ function AdminLayout({ activeTab, children }) {
                                         </div>
                                         <div className="flex flex-col min-w-0">
                                             <p className="text-slate-800 text-sm font-bold font-['DM_Sans'] truncate">
-                                                {user?.name || user?.username || "Admin User"}
+                                                {user?.name ||
+                                                    user?.username ||
+                                                    "Admin User"}
                                             </p>
                                             <p className="text-slate-500 text-[10px] truncate leading-snug font-['DM_Sans']">
-                                                {user?.email || "admin@safemap.com"}
+                                                {user?.email ||
+                                                    "admin@safemap.com"}
                                             </p>
                                         </div>
                                     </div>
@@ -198,8 +200,7 @@ function AdminLayout({ activeTab, children }) {
                                                 setIsProfileOpen(false)
                                                 navigate("/admin-settings")
                                             }}
-                                            className="w-full text-left px-4 py-2.5 text-xs text-slate-700 font-medium font-['DM_Sans'] hover:bg-slate-50 transition-colors flex items-center gap-3 border-none outline-none"
-                                        >
+                                            className="w-full text-left px-4 py-2.5 text-xs text-slate-700 font-medium font-['DM_Sans'] hover:bg-slate-50 transition-colors flex items-center gap-3 border-none outline-none">
                                             <User className="w-4 h-4 text-slate-400" />
                                             Profile
                                         </button>
@@ -208,8 +209,7 @@ function AdminLayout({ activeTab, children }) {
                                                 setIsProfileOpen(false)
                                                 navigate("/admin-settings")
                                             }}
-                                            className="w-full text-left px-4 py-2.5 text-xs text-slate-700 font-medium font-['DM_Sans'] hover:bg-slate-50 transition-colors flex items-center gap-3 border-none outline-none"
-                                        >
+                                            className="w-full text-left px-4 py-2.5 text-xs text-slate-700 font-medium font-['DM_Sans'] hover:bg-slate-50 transition-colors flex items-center gap-3 border-none outline-none">
                                             <Settings className="w-4 h-4 text-slate-400" />
                                             Settings
                                         </button>
@@ -220,8 +220,7 @@ function AdminLayout({ activeTab, children }) {
                                                 setIsProfileOpen(false)
                                                 handleLogout()
                                             }}
-                                            className="w-full text-left px-4 py-2.5 text-xs text-red-600 font-medium font-['DM_Sans'] hover:bg-red-50 transition-colors flex items-center gap-3 border-none outline-none"
-                                        >
+                                            className="w-full text-left px-4 py-2.5 text-xs text-red-600 font-medium font-['DM_Sans'] hover:bg-red-50 transition-colors flex items-center gap-3 border-none outline-none">
                                             <LogOut className="w-4 h-4 text-red-500" />
                                             Logout
                                         </button>
@@ -236,9 +235,7 @@ function AdminLayout({ activeTab, children }) {
             </div>
 
             {/* Page body */}
-            <div className="w-full pb-28">
-                {children}
-            </div>
+            <div className="w-full pb-28">{children}</div>
 
             {/* Bottom Navigation */}
             <AdminBottomNav activeTab={activeTab} />

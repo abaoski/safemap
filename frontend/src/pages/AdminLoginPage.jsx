@@ -71,7 +71,7 @@ function AdminLoginPage() {
                 <svg
                     viewBox="0 0 1440 220"
                     preserveAspectRatio="none"
-                    className="w-full h-[140px] md:h-[180px] block">
+                    className="w-full h-35 md:h-45 block">
                     {/* 
             Four perfectly parallel quadratic bezier arch curves.
             Control points shifted uniformly by 30 units vertically to create stacked ribbons.
@@ -118,7 +118,7 @@ function AdminLoginPage() {
                                     value={email}
                                     onChange={e => setEmail(e.target.value)}
                                     placeholder="Enter your credentials"
-                                    className="w-full h-[48px] px-4 bg-white rounded-xl border border-gray-200 outline-none text-[14px] text-zinc-800 placeholder-gray-300 focus:border-[#233f8e] transition-colors shadow-sm"
+                                    className="w-full h-12 px-4 bg-white rounded-xl border border-gray-200 outline-none text-[14px] text-zinc-800 placeholder-gray-300 focus:border-[#233f8e] transition-colors shadow-sm"
                                     required
                                 />
                             </div>
@@ -146,7 +146,7 @@ function AdminLoginPage() {
                                             setPassword(e.target.value)
                                         }
                                         placeholder="Enter your password"
-                                        className="w-full h-[48px] px-4 pr-12 bg-white rounded-xl border border-gray-200 outline-none text-[14px] text-zinc-800 placeholder-gray-300 focus:border-[#233f8e] transition-colors shadow-sm"
+                                        className="w-full h-12 px-4 pr-12 bg-white rounded-xl border border-gray-200 outline-none text-[14px] text-zinc-800 placeholder-gray-300 focus:border-[#233f8e] transition-colors shadow-sm"
                                         required
                                     />
                                     <button
@@ -157,7 +157,7 @@ function AdminLoginPage() {
                                         className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors">
                                         {showPassword ? (
                                             <svg
-                                                className="w-[18px] h-[18px]"
+                                                className="w-4.5 h-4.5"
                                                 fill="none"
                                                 stroke="currentColor"
                                                 strokeWidth="2.5"
@@ -170,7 +170,7 @@ function AdminLoginPage() {
                                             </svg>
                                         ) : (
                                             <svg
-                                                className="w-[20px] h-[20px]"
+                                                className="w-5 h-5"
                                                 fill="none"
                                                 stroke="currentColor"
                                                 strokeWidth="2.5"
@@ -202,7 +202,7 @@ function AdminLoginPage() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full h-[52px] mt-2 bg-[#233f8e] hover:bg-[#1a2f6e] active:bg-[#11204d] disabled:opacity-50 rounded-[14px] text-white text-[15px] font-bold transition-colors shadow-md">
+                                className="w-full h-13 mt-2 bg-[#233f8e] hover:bg-[#1a2f6e] active:bg-[#11204d] disabled:opacity-50 rounded-[14px] text-white text-[15px] font-bold transition-colors shadow-md">
                                 {loading ? "Logging in..." : "Login"}
                             </button>
                         </form>

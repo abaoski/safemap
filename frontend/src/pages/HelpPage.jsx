@@ -157,7 +157,7 @@ export default function HelpPage() {
                     <div className="flex flex-col gap-3">
                         {/* Point 1 */}
                         <div className="flex items-start gap-4">
-                            <div className="w-6 h-6 px-2 pt-[3px] pb-1 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
+                            <div className="w-6 h-6 px-2 pt-0.75 pb-1 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
                                 <div className="text-white text-xs font-bold font-['DM_Sans']">
                                     1
                                 </div>
@@ -171,7 +171,7 @@ export default function HelpPage() {
 
                         {/* Point 2 */}
                         <div className="flex items-start gap-4">
-                            <div className="w-6 h-6 px-2 pt-[3px] pb-1 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
+                            <div className="w-6 h-6 px-2 pt-0.75 pb-1 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
                                 <div className="text-white text-xs font-bold font-['DM_Sans']">
                                     2
                                 </div>
@@ -184,7 +184,7 @@ export default function HelpPage() {
 
                         {/* Point 3 */}
                         <div className="flex items-start gap-4">
-                            <div className="w-6 h-6 px-2 pt-[3px] pb-1 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
+                            <div className="w-6 h-6 px-2 pt-0.75 pb-1 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
                                 <div className="text-white text-xs font-bold font-['DM_Sans']">
                                     3
                                 </div>

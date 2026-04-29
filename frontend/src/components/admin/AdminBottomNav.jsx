@@ -11,11 +11,8 @@ function AdminBottomNav({ activeTab }) {
     const renderInactiveTab = (Icon, label, tabId, path) => (
         <button
             onClick={() => handleTabClick(tabId, path)}
-            className="flex flex-col items-center gap-1.5 pt-2 cursor-pointer bg-transparent border-none w-[60px]">
-            <Icon
-                className="w-[22px] h-[22px] text-[#9ca3af]"
-                strokeWidth={2.5}
-            />
+            className="flex flex-col items-center gap-1.5 pt-2 cursor-pointer bg-transparent border-none w-15">
+            <Icon className="w-5.5 h-5.5 text-[#9ca3af]" strokeWidth={2.5} />
             <span className="text-[#9ca3af] text-[11px] font-medium font-['DM_Sans'] leading-none">
                 {label}
             </span>
@@ -24,13 +21,10 @@ function AdminBottomNav({ activeTab }) {
 
     const renderActiveTab = (Icon, label, tabId, path) => (
         <div
-            className="relative -top-[18px] flex flex-col items-center gap-1.5 cursor-pointer w-[60px]"
+            className="relative -top-4.5 flex flex-col items-center gap-1.5 cursor-pointer w-15"
             onClick={() => handleTabClick(tabId, path)}>
-            <div className="w-[52px] h-[52px] bg-[#1f295b] hover:bg-[#151c3d] transition-colors rounded-full shadow-[0px_6px_14px_rgba(31,41,91,0.35)] flex items-center justify-center border-[3.5px] border-slate-50">
-                <Icon
-                    className="w-[22px] h-[22px] text-white"
-                    strokeWidth={2.5}
-                />
+            <div className="w-13 h-13 bg-[#1f295b] hover:bg-[#151c3d] transition-colors rounded-full shadow-[0px_6px_14px_rgba(31,41,91,0.35)] flex items-center justify-center border-[3.5px] border-slate-50">
+                <Icon className="w-5.5 h-5.5 text-white" strokeWidth={2.5} />
             </div>
             <span className="text-[#1f295b] text-[11px] font-bold font-['DM_Sans'] leading-none">
                 {label}
@@ -39,7 +33,7 @@ function AdminBottomNav({ activeTab }) {
     )
 
     return (
-        <div className="fixed bottom-0 w-full max-w-[440px] h-[72px] bg-white rounded-t-[30px] flex justify-between items-center px-6 z-99999">
+        <div className="fixed bottom-0 w-full max-w-110 h-18 bg-white rounded-t-[30px] flex justify-between items-center px-6 z-99999">
             {activeTab === "queue"
                 ? renderActiveTab(List, "Queue", "queue", "/admin-queue")
                 : renderInactiveTab(List, "Queue", "queue", "/admin-queue")}

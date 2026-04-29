@@ -30,7 +30,7 @@ function AdminAnalyticsPage() {
             // Fetch stats
             const statsRes = await fetch(
                 "http://localhost:5000/api/reports/stats",
-                { headers }
+                { headers },
             )
             if (statsRes.status === 401) {
                 localStorage.removeItem("token")
@@ -123,7 +123,7 @@ function AdminAnalyticsPage() {
             {/* Stats Cards */}
             <div className="w-full max-w-sm px-4 mt-4 space-y-3">
                 {/* Total Reports */}
-                <div className="w-full h-[88px] bg-white rounded-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-blue-500 px-5 relative flex flex-col justify-center">
+                <div className="w-full h-22 bg-white rounded-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-blue-500 px-5 relative flex flex-col justify-center">
                     <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase">
                         Total Reports
                     </div>
@@ -133,7 +133,7 @@ function AdminAnalyticsPage() {
                 </div>
 
                 {/* Pending Review */}
-                <div className="w-full h-[88px] bg-white rounded-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-orange-500 px-5 relative flex flex-col justify-center">
+                <div className="w-full h-22 bg-white rounded-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-orange-500 px-5 relative flex flex-col justify-center">
                     <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase">
                         Pending Review
                     </div>
@@ -143,7 +143,7 @@ function AdminAnalyticsPage() {
                 </div>
 
                 {/* Approved */}
-                <div className="w-full h-[88px] bg-white rounded-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-green-500 px-5 relative flex flex-col justify-center">
+                <div className="w-full h-22 bg-white rounded-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-green-500 px-5 relative flex flex-col justify-center">
                     <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase">
                         Approved
                     </div>
@@ -153,7 +153,7 @@ function AdminAnalyticsPage() {
                 </div>
 
                 {/* Dismissed */}
-                <div className="w-full h-[88px] bg-white rounded-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-gray-400 px-5 relative flex flex-col justify-center">
+                <div className="w-full h-22 bg-white rounded-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[6px] border-gray-400 px-5 relative flex flex-col justify-center">
                     <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase">
                         Dismissed
                     </div>
@@ -173,10 +173,10 @@ function AdminAnalyticsPage() {
                         INTERNAL USE ONLY: Detailed per-district density
                     </p>
 
-                    <div className="w-full h-[240px] relative rounded-lg overflow-hidden border border-blue-100">
+                    <div className="w-full h-60 relative rounded-lg overflow-hidden border border-blue-100">
                         <IncidentHeatmapView heatPoints={heatPoints} />
 
-                        <div className="absolute bottom-3 left-3 bg-[#1e3a8a] rounded-lg p-3 w-[160px] shadow-lg z-998">
+                        <div className="absolute bottom-3 left-3 bg-[#1e3a8a] rounded-lg p-3 w-40 shadow-lg z-998">
                             <div className="text-blue-100 text-[9px] font-bold font-['DM_Sans'] tracking-wider mb-2">
                                 DENSITY INDEX
                             </div>
@@ -210,26 +210,49 @@ function AdminAnalyticsPage() {
                             const locations = {}
                             heatPoints.forEach(p => {
                                 const key = p.barangay || p.city || "Unknown"
-                                if (!locations[key]) locations[key] = { count: 0, severity: p.severity, name: key }
+                                if (!locations[key])
+                                    locations[key] = {
+                                        count: 0,
+                                        severity: p.severity,
+                                        name: key,
+                                    }
                                 locations[key].count++
-                                if (p.severity === 'critical') locations[key].severity = 'critical'
+                                if (p.severity === "critical")
+                                    locations[key].severity = "critical"
                             })
 
-                            const hotspots = Object.values(locations).filter(l => l.count >= 2)
-                            
+                            const hotspots = Object.values(locations).filter(
+                                l => l.count >= 2,
+                            )
+
                             if (hotspots.length === 0) {
-                                return <div className="text-center py-4 text-gray-400 text-xs italic">No recurring hotspots detected (minimum 2 reports required)</div>
+                                return (
+                                    <div className="text-center py-4 text-gray-400 text-xs italic">
+                                        No recurring hotspots detected (minimum
+                                        2 reports required)
+                                    </div>
+                                )
                             }
 
                             return hotspots.map((spot, i) => (
-                                <div key={i} className={`border-l-[3px] ${spot.severity === 'critical' ? 'border-red-500' : 'border-orange-400'} pl-4 py-1 relative`}>
+                                <div
+                                    key={i}
+                                    className={`border-l-[3px] ${spot.severity === "critical" ? "border-red-500" : "border-orange-400"} pl-4 py-1 relative`}>
                                     <div className="flex justify-between items-start mb-1">
                                         <div>
-                                            <div className="text-zinc-800 text-xs font-bold font-['DM_Sans']">{spot.name}</div>
-                                            <div className="text-gray-400 text-[10px] font-normal font-['DM_Sans']">{spot.count} reports in this area.</div>
+                                            <div className="text-zinc-800 text-xs font-bold font-['DM_Sans']">
+                                                {spot.name}
+                                            </div>
+                                            <div className="text-gray-400 text-[10px] font-normal font-['DM_Sans']">
+                                                {spot.count} reports in this
+                                                area.
+                                            </div>
                                         </div>
-                                        <div className={`px-2 py-0.5 ${spot.severity === 'critical' ? 'bg-red-100 text-red-500' : 'bg-orange-100 text-orange-500'} rounded text-[9px] font-bold font-['DM_Sans']`}>
-                                            {spot.severity === 'critical' ? 'High Risk' : 'Developing'}
+                                        <div
+                                            className={`px-2 py-0.5 ${spot.severity === "critical" ? "bg-red-100 text-red-500" : "bg-orange-100 text-orange-500"} rounded text-[9px] font-bold font-['DM_Sans']`}>
+                                            {spot.severity === "critical"
+                                                ? "High Risk"
+                                                : "Developing"}
                                         </div>
                                     </div>
                                 </div>
@@ -244,30 +267,37 @@ function AdminAnalyticsPage() {
                         Case Composition
                     </h2>
                     <div className="space-y-4">
-                        {stats?.by_category && Object.keys(stats.by_category).length > 0 ? (
-                            Object.entries(stats.by_category).map(([cat, count]) => {
-                                const pct = Math.round((count / stats.total) * 100)
-                                return (
-                                    <div key={cat}>
-                                        <div className="flex justify-between items-center mb-1">
-                                            <span className="text-zinc-800 text-[10px] font-bold font-['DM_Sans'] uppercase">
-                                                {cat.replace('_', ' ')}
-                                            </span>
-                                            <span className="text-[#1e3a8a] text-[11px] font-extrabold font-['DM_Sans']">
-                                                {pct}%
-                                            </span>
+                        {stats?.by_category &&
+                        Object.keys(stats.by_category).length > 0 ? (
+                            Object.entries(stats.by_category).map(
+                                ([cat, count]) => {
+                                    const pct = Math.round(
+                                        (count / stats.total) * 100,
+                                    )
+                                    return (
+                                        <div key={cat}>
+                                            <div className="flex justify-between items-center mb-1">
+                                                <span className="text-zinc-800 text-[10px] font-bold font-['DM_Sans'] uppercase">
+                                                    {cat.replace("_", " ")}
+                                                </span>
+                                                <span className="text-[#1e3a8a] text-[11px] font-extrabold font-['DM_Sans']">
+                                                    {pct}%
+                                                </span>
+                                            </div>
+                                            <div className="w-full h-1.5 bg-gray-100 rounded-full">
+                                                <div
+                                                    className="h-full bg-[#1e3a8a] rounded-full"
+                                                    style={{ width: `${pct}%` }}
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="w-full h-1.5 bg-gray-100 rounded-full">
-                                            <div 
-                                                className="h-full bg-[#1e3a8a] rounded-full" 
-                                                style={{ width: `${pct}%` }}
-                                            />
-                                        </div>
-                                    </div>
-                                )
-                            })
+                                    )
+                                },
+                            )
                         ) : (
-                            <div className="text-center py-4 text-gray-400 text-xs italic">No data available for case composition</div>
+                            <div className="text-center py-4 text-gray-400 text-xs italic">
+                                No data available for case composition
+                            </div>
                         )}
                     </div>
                 </div>
@@ -296,23 +326,23 @@ function AdminAnalyticsPage() {
                         </div>
                     </div>
 
-                    <div className="relative h-[200px] w-full flex items-end justify-between px-2">
+                    <div className="relative h-50 w-full flex items-end justify-between px-2">
                         {/* Grid lines */}
                         <div className="absolute inset-0 flex flex-col justify-between p-0 m-0 z-0">
                             {[100, 80, 60, 40, 20, 0].map(val => (
                                 <div
                                     key={val}
                                     className="w-full flex items-center gap-2">
-                                    <span className="text-gray-400 text-[9px] w-4 text-right mb-[1px]">
+                                    <span className="text-gray-400 text-[9px] w-4 text-right mb-px">
                                         {val}
                                     </span>
-                                    <div className="flex-1 h-[1px] border-b border-dashed border-gray-200" />
+                                    <div className="flex-1 h-px border-b border-dashed border-gray-200" />
                                 </div>
                             ))}
                         </div>
 
                         {/* Bars */}
-                        <div className="relative z-10 w-full h-[180px] flex items-end justify-around ml-6">
+                        <div className="relative z-10 w-full h-45 flex items-end justify-around ml-6">
                             <div className="w-4 bg-[#1e3a8a] h-[20%] rounded-t-sm" />
                             <div className="w-4 bg-[#1e3a8a] h-[40%] rounded-t-sm" />
                             <div className="w-4 bg-[#1e3a8a] h-[60%] rounded-t-sm" />

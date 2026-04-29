@@ -1,5 +1,3 @@
-import { Shield, Edit2, AlertCircle, LogIn } from "lucide-react"
-
 function AuditFeedPreview({ events }) {
     return (
         <div className="w-full max-w-sm px-4 mt-8">
@@ -12,12 +10,15 @@ function AuditFeedPreview({ events }) {
                     {events.map((event, idx) => (
                         <div key={idx} className="relative">
                             {/* Vertical Line Connector Circle */}
-                            <div className={`absolute -left-[31px] -top-0.5 w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-white ${event.iconBg}`}>
-                                <event.icon className={`w-3 h-3 ${event.iconColor}`} />
+                            <div
+                                className={`absolute -left-7.75 -top-0.5 w-6 h-6 rounded-full flex items-center justify-center border-2 border-white ${event.iconBg}`}>
+                                <event.icon
+                                    className={`w-3 h-3 ${event.iconColor}`}
+                                />
                             </div>
 
                             <div className="-mt-1">
-                                <div className="text-zinc-800 text-xs font-bold font-['DM_Sans'] leading-tight mb-1 break-words pr-2">
+                                <div className="text-zinc-800 text-xs font-bold font-['DM_Sans'] leading-tight mb-1 wrap-break-word pr-2">
                                     {event.description}
                                 </div>
                                 <div className="flex items-center gap-1.5">

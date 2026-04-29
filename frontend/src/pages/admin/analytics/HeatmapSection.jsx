@@ -10,10 +10,10 @@ function HeatmapSection({ heatPoints }) {
                 INTERNAL USE ONLY: Detailed per-district density
             </p>
 
-            <div className="w-full h-[240px] relative rounded-lg overflow-hidden border border-blue-100">
+            <div className="w-full h-60 relative rounded-lg overflow-hidden border border-blue-100">
                 <IncidentHeatmapView heatPoints={heatPoints} />
 
-                <div className="absolute bottom-3 left-3 bg-[#1e3a8a] rounded-lg p-3 w-[160px] shadow-lg z-[998]">
+                <div className="absolute bottom-3 left-3 bg-[#1e3a8a] rounded-lg p-3 w-40 shadow-lg z-998">
                     <div className="text-blue-100 text-[9px] font-bold font-['DM_Sans'] tracking-wider mb-2">
                         DENSITY INDEX
                     </div>

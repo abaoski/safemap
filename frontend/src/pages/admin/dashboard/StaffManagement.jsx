@@ -26,13 +26,16 @@ function StaffManagement({ staffList }) {
             {/* Staff List */}
             <div className="space-y-4">
                 {staffList.map((staff, idx) => (
-                    <div key={idx} className="w-full bg-white rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border-l-[4px] border-[#1e3a8a] p-4 flex flex-col pt-3 relative">
+                    <div
+                        key={idx}
+                        className="w-full bg-white rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border-l-4 border-[#1e3a8a] p-4 flex flex-col pt-3 relative">
                         {/* ID & Status */}
                         <div className="flex justify-between items-center mb-1">
                             <span className="text-gray-400 text-[9px] font-bold font-['DM_Sans'] uppercase tracking-wider">
                                 {staff.empId}
                             </span>
-                            <span className={`px-2 py-0.5 rounded text-[8px] font-bold font-['DM_Sans'] uppercase tracking-widest ${staff.status === "ACTIVE" ? "bg-blue-50 text-[#1e3a8a]" : "bg-gray-100 text-gray-500"}`}>
+                            <span
+                                className={`px-2 py-0.5 rounded text-[8px] font-bold font-['DM_Sans'] uppercase tracking-widest ${staff.status === "ACTIVE" ? "bg-blue-50 text-[#1e3a8a]" : "bg-gray-100 text-gray-500"}`}>
                                 {staff.status}
                             </span>
                         </div>
