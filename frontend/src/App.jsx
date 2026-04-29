@@ -27,6 +27,7 @@ import BottomNav from './components/BottomNav'
 import ChatWidget from './components/ChatWidget'
 import ReportButton from './components/ReportButton'
 import RiskLegend from './components/RiskLegend'
+import PrivacyConsentModal from './components/PrivacyConsentModal'
 
 function App() {
   const navigate = useNavigate()
@@ -95,9 +96,11 @@ function App() {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={
-        <div className="h-screen flex flex-col relative">
+    <>
+      <PrivacyConsentModal />
+      <Routes>
+        <Route path="/" element={
+          <div className="h-screen flex flex-col relative">
           {/* Header */}
           <Header 
             onSearch={handleSearch} 
@@ -201,7 +204,8 @@ function App() {
       <Route path="/admin-audit" element={<AdminAuditPage />} />
       <Route path="/admin-management" element={<AdminManagementPage />} />
       <Route path="/admin-settings" element={<AdminSettingsPage />} />
-    </Routes>
+      </Routes>
+    </>
   )
 }
 
