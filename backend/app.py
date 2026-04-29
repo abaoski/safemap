@@ -21,6 +21,11 @@ def create_app(config_class=None):
     db.init_app(app)
     limiter.init_app(app)
     CORS(app, origins=app.config['CORS_ORIGINS'], methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], allow_headers=['Content-Type', 'Authorization'])
+
+    # Ensure queue table exists for local development
+    with app.app_context():
+        from models import ReportQueue
+        ReportQueue.__table__.create(bind=db.engine, checkfirst=True)
     
     # Register blueprints
     from routes import api_bp

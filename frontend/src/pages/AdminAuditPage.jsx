@@ -1,4 +1,4 @@
-    import { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import {
     Search,
@@ -125,16 +125,16 @@ function AdminAuditPage() {
                 "http://localhost:5000/api/reports?per_page=100",
                 { headers: getAuthHeaders() },
             )
-            
-            console.log('Fetch response status:', response.status) // Debug
-            
+
+            console.log("Fetch response status:", response.status) // Debug
+
             if (response.ok) {
                 const data = await response.json()
-                console.log('Fetched reports data:', data) // Debug
-                
+                console.log("Fetched reports data:", data) // Debug
+
                 const allReports = data.reports || []
-                console.log('Total reports:', allReports.length) // Debug
-                
+                console.log("Total reports:", allReports.length) // Debug
+
                 setReports(allReports)
 
                 // Build audit entries from reviewed reports
@@ -144,17 +144,18 @@ function AdminAuditPage() {
                 // Stats
                 setAuditStats({
                     total: entries.length,
-                    submissions: entries.filter((e) => e.type === "submitted").length,
-                    pending: entries.filter((e) => e.type === "pending").length,
-                    approvals: entries.filter((e) => e.type === "approved")
+                    submissions: entries.filter(e => e.type === "submitted")
                         .length,
-                    dismissals: entries.filter((e) => e.type === "dismissed")
+                    pending: entries.filter(e => e.type === "pending").length,
+                    approvals: entries.filter(e => e.type === "approved")
                         .length,
-                    verifications: entries.filter((e) => e.type === "verified")
+                    dismissals: entries.filter(e => e.type === "dismissed")
+                        .length,
+                    verifications: entries.filter(e => e.type === "verified")
                         .length,
                 })
             } else {
-                console.error('Fetch failed with status:', response.status)
+                console.error("Fetch failed with status:", response.status)
             }
         } catch (err) {
             console.error("Error fetching data:", err)
@@ -163,10 +164,10 @@ function AdminAuditPage() {
         }
     }
 
-    const buildAuditEntries = (reports) => {
+    const buildAuditEntries = reports => {
         const entries = []
 
-        reports.forEach((report) => {
+        reports.forEach(report => {
             // 1. Report submission (created_at) - only for non-pending reports
             // For pending reports, we'll show "pending" instead of "submitted"
             if (report.created_at && report.status !== "pending_review") {
@@ -201,10 +202,7 @@ function AdminAuditPage() {
             }
 
             // 3. Approved reports
-            if (
-                report.status === "approved_awareness" &&
-                report.review_date
-            ) {
+            if (report.status === "in_progress" && report.review_date) {
                 entries.push({
                     id: `approve-${report.id}`,
                     type: "approved",
@@ -217,7 +215,7 @@ function AdminAuditPage() {
                         : "System",
                     notes: report.review_notes || "",
                     timestamp: report.review_date,
-                    description: `Approved case ${report.reference_code || `#SF-${report.id}`} for public awareness`,
+                    description: `Moved case ${report.reference_code || `#SF-${report.id}`} to in progress`,
                 })
             }
 
@@ -233,15 +231,18 @@ function AdminAuditPage() {
                     reviewedBy: report.reviewed_by
                         ? `Admin-${String(report.reviewed_by).padStart(2, "0")}`
                         : "System",
-                    notes:
-                        report.review_notes || "Dismissed as spam/duplicate",
+                    notes: report.review_notes || "Dismissed as spam/duplicate",
                     timestamp: report.review_date,
                     description: `Dismissed case ${report.reference_code || `#SF-${report.id}`}`,
                 })
             }
 
             // 5. Verified reports
-            if ((report.status === "verified_pnp" || report.status === "verified") && report.review_date) {
+            if (
+                (report.status === "verified_pnp" ||
+                    report.status === "verified") &&
+                report.review_date
+            ) {
                 entries.push({
                     id: `verify-${report.id}`,
                     type: "verified",
@@ -297,16 +298,14 @@ function AdminAuditPage() {
         })
 
         // Sort by timestamp (newest first)
-        entries.sort(
-            (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
-        )
+        entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
 
-        console.log('Built audit entries:', entries) // Debug log
+        console.log("Built audit entries:", entries) // Debug log
 
         return entries
     }
 
-    const formatDate = (dateStr) => {
+    const formatDate = dateStr => {
         if (!dateStr) return "—"
         const d = new Date(dateStr)
         return d.toLocaleDateString("en-US", {
@@ -316,7 +315,7 @@ function AdminAuditPage() {
         })
     }
 
-    const formatTime = (dateStr) => {
+    const formatTime = dateStr => {
         if (!dateStr) return ""
         const d = new Date(dateStr)
         return d.toLocaleTimeString("en-US", {
@@ -326,9 +325,9 @@ function AdminAuditPage() {
     }
 
     // Group entries by date
-    const groupByDate = (entries) => {
+    const groupByDate = entries => {
         const groups = {}
-        entries.forEach((entry) => {
+        entries.forEach(entry => {
             const date = formatDate(entry.timestamp)
             if (!groups[date]) groups[date] = []
             groups[date].push(entry)
@@ -337,7 +336,7 @@ function AdminAuditPage() {
     }
 
     // Filter entries
-    const filteredEntries = auditEntries.filter((entry) => {
+    const filteredEntries = auditEntries.filter(entry => {
         if (typeFilter && entry.type !== typeFilter) return false
         if (searchQuery) {
             const q = searchQuery.toLowerCase()
@@ -462,7 +461,7 @@ function AdminAuditPage() {
                         type="text"
                         placeholder="Search audit logs..."
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={e => setSearchQuery(e.target.value)}
                         className="flex-1 bg-transparent outline-none text-sm font-normal text-zinc-800 font-['DM_Sans'] placeholder-gray-400"
                     />
                 </div>
@@ -487,7 +486,7 @@ function AdminAuditPage() {
                             { key: "dismissed", label: "Dismissals" },
                             { key: "verified", label: "PNP Verify" },
                             { key: "flagged", label: "Flagged" },
-                        ].map((t) => (
+                        ].map(t => (
                             <button
                                 key={t.key}
                                 onClick={() => setTypeFilter(t.key)}
@@ -517,92 +516,86 @@ function AdminAuditPage() {
                         </div>
                     </div>
                 ) : (
-                    Object.entries(groupedEntries).map(
-                        ([date, entries]) => (
-                            <div key={date}>
-                                {/* Date Header */}
-                                <div className="flex items-center gap-3 mb-3">
-                                    <div className="text-gray-400 text-[10px] font-bold font-['DM_Sans'] uppercase tracking-wider whitespace-nowrap">
-                                        {date}
-                                    </div>
-                                    <div className="flex-1 h-[1px] bg-gray-200" />
+                    Object.entries(groupedEntries).map(([date, entries]) => (
+                        <div key={date}>
+                            {/* Date Header */}
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="text-gray-400 text-[10px] font-bold font-['DM_Sans'] uppercase tracking-wider whitespace-nowrap">
+                                    {date}
                                 </div>
+                                <div className="flex-1 h-[1px] bg-gray-200" />
+                            </div>
 
-                                {/* Timeline Card */}
-                                <div className="w-full bg-white rounded-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-offset-[-1px] outline-gray-100 p-5">
-                                    <div className="relative pl-7 border-l-[2px] border-gray-200 space-y-6">
-                                        {entries.map((entry) => {
-                                            const typeInfo =
-                                                AUDIT_TYPES[entry.type] ||
-                                                AUDIT_TYPES.modified
-                                            const Icon = typeInfo.icon
+                            {/* Timeline Card */}
+                            <div className="w-full bg-white rounded-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-offset-[-1px] outline-gray-100 p-5">
+                                <div className="relative pl-7 border-l-[2px] border-gray-200 space-y-6">
+                                    {entries.map(entry => {
+                                        const typeInfo =
+                                            AUDIT_TYPES[entry.type] ||
+                                            AUDIT_TYPES.modified
+                                        const Icon = typeInfo.icon
 
-                                            return (
+                                        return (
+                                            <div
+                                                key={entry.id}
+                                                className="relative">
+                                                {/* Timeline dot */}
                                                 <div
-                                                    key={entry.id}
-                                                    className="relative">
-                                                    {/* Timeline dot */}
-                                                    <div
-                                                        className={`w-8 h-8 ${typeInfo.bg} rounded-full flex items-center justify-center absolute -left-[43px] -top-1 border-[4px] border-white`}>
-                                                        <Icon
-                                                            className={`w-3.5 h-3.5 ${typeInfo.iconColor}`}
-                                                        />
+                                                    className={`w-8 h-8 ${typeInfo.bg} rounded-full flex items-center justify-center absolute -left-[43px] -top-1 border-[4px] border-white`}>
+                                                    <Icon
+                                                        className={`w-3.5 h-3.5 ${typeInfo.iconColor}`}
+                                                    />
+                                                </div>
+
+                                                <div className="flex flex-col -mt-1">
+                                                    {/* Description */}
+                                                    <div className="text-zinc-800 text-[12px] font-semibold font-['DM_Sans'] leading-tight">
+                                                        {entry.description}
                                                     </div>
 
-                                                    <div className="flex flex-col -mt-1">
-                                                        {/* Description */}
-                                                        <div className="text-zinc-800 text-[12px] font-semibold font-['DM_Sans'] leading-tight">
-                                                            {entry.description}
+                                                    {/* Review notes if present */}
+                                                    {entry.notes && (
+                                                        <div className="text-gray-400 text-[10px] font-normal font-['DM_Sans'] mt-1 line-clamp-2 italic">
+                                                            "{entry.notes}"
                                                         </div>
+                                                    )}
 
-                                                        {/* Review notes if present */}
-                                                        {entry.notes && (
-                                                            <div className="text-gray-400 text-[10px] font-normal font-['DM_Sans'] mt-1 line-clamp-2 italic">
-                                                                "
-                                                                {entry.notes}
-                                                                "
-                                                            </div>
-                                                        )}
-
-                                                        {/* Meta row */}
-                                                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                                                            <span className="text-gray-400 text-[10px] font-normal font-['DM_Sans']">
-                                                                {formatTime(
-                                                                    entry.timestamp,
-                                                                )}
-                                                            </span>
-                                                            <span
-                                                                className={`px-1.5 py-0.5 ${typeInfo.labelBg} ${typeInfo.labelText} text-[8px] font-bold font-['DM_Sans'] rounded tracking-wider`}>
+                                                    {/* Meta row */}
+                                                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                                                        <span className="text-gray-400 text-[10px] font-normal font-['DM_Sans']">
+                                                            {formatTime(
+                                                                entry.timestamp,
+                                                            )}
+                                                        </span>
+                                                        <span
+                                                            className={`px-1.5 py-0.5 ${typeInfo.labelBg} ${typeInfo.labelText} text-[8px] font-bold font-['DM_Sans'] rounded tracking-wider`}>
+                                                            {typeInfo.label}
+                                                        </span>
+                                                        {entry.reviewedBy && (
+                                                            <span className="text-gray-400 text-[9px] font-medium font-['DM_Sans']">
+                                                                by{" "}
                                                                 {
-                                                                    typeInfo.label
+                                                                    entry.reviewedBy
                                                                 }
                                                             </span>
-                                                            {entry.reviewedBy && (
-                                                                <span className="text-gray-400 text-[9px] font-medium font-['DM_Sans']">
-                                                                    by{" "}
-                                                                    {
-                                                                        entry.reviewedBy
-                                                                    }
-                                                                </span>
-                                                            )}
-                                                            {entry.category && (
-                                                                <span className="px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[8px] font-bold font-['DM_Sans'] rounded uppercase">
-                                                                    {entry.category?.replace(
-                                                                        "_",
-                                                                        " ",
-                                                                    )}
-                                                                </span>
-                                                            )}
-                                                        </div>
+                                                        )}
+                                                        {entry.category && (
+                                                            <span className="px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[8px] font-bold font-['DM_Sans'] rounded uppercase">
+                                                                {entry.category?.replace(
+                                                                    "_",
+                                                                    " ",
+                                                                )}
+                                                            </span>
+                                                        )}
                                                     </div>
                                                 </div>
-                                            )
-                                        })}
-                                    </div>
+                                            </div>
+                                        )
+                                    })}
                                 </div>
                             </div>
-                        ),
-                    )
+                        </div>
+                    ))
                 )}
             </div>
 

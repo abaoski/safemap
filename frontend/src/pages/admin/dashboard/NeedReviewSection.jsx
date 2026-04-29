@@ -224,7 +224,7 @@ function NeedReviewSection({ reports: initialReports, loading }) {
         switch (status) {
             case "pending_review":
                 return "border-amber-500"
-            case "approved_awareness":
+            case "in_progress":
                 return "border-blue-900"
             default:
                 return "border-gray-200"
@@ -235,7 +235,7 @@ function NeedReviewSection({ reports: initialReports, loading }) {
         switch (status) {
             case "pending_review":
                 return "bg-amber-100 text-amber-600 border-amber-200"
-            case "approved_awareness":
+            case "in_progress":
                 return "bg-blue-100 text-blue-900 border-blue-200"
             case "verified_pnp":
                 return "bg-green-100 text-green-600 border-green-200"
@@ -250,7 +250,7 @@ function NeedReviewSection({ reports: initialReports, loading }) {
         switch (status) {
             case "pending_review":
                 return "Pending Review"
-            case "approved_awareness":
+            case "in_progress":
                 return "In Progress"
             case "verified_pnp":
                 return "Resolved"

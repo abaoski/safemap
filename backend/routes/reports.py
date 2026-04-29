@@ -5,7 +5,8 @@ Handle safety report workflow - Public submission, Admin review
 
 from flask import request, jsonify
 from routes import api_bp
-from models import LedgerReportHeader as Report, SetupReportCategory as ReportCategory, LedgerReportEntry as ReportLedger, SysAuditLog, db
+from models import LedgerReportHeader as Report, SetupReportCategory as ReportCategory, LedgerReportEntry as ReportLedger, ReportQueue, SysAuditLog, db
+from sqlalchemy.exc import OperationalError
 from utils import validate_json, paginate_query, require_auth, get_current_user, rate_limit, sanitize_input
 from flask import request, jsonify
 from datetime import datetime
@@ -13,6 +14,32 @@ from datetime import datetime
 # Required fields for report submission
 REPORT_REQUIRED_FIELDS = ['title', 'description', 'latitude', 'longitude', 'category']
 REPORT_OPTIONAL_FIELDS = ['severity', 'barangay', 'address', 'image_url']
+
+
+def upsert_report_queue(report, status, assigned_to=None, notes=None, priority=None):
+    try:
+        queue_entry = ReportQueue.query.filter_by(report_header_id=report.id).first()
+    except OperationalError:
+        # Table missing or locked; skip queue update to avoid failing the request
+        return None
+    if not queue_entry:
+        queue_entry = ReportQueue(
+            report_header_id=report.id,
+            status=status,
+            priority=priority or report.severity or 'medium',
+            assigned_to=assigned_to,
+            notes=notes,
+        )
+        db.session.add(queue_entry)
+    else:
+        queue_entry.status = status
+        if priority:
+            queue_entry.priority = priority
+        if assigned_to is not None:
+            queue_entry.assigned_to = assigned_to
+        if notes is not None:
+            queue_entry.notes = notes
+    return queue_entry
 
 
 @api_bp.route('/reports/public', methods=['GET'])
@@ -24,7 +51,7 @@ def get_public_reports():
     
     # Include all statuses: pending, approved, verified, dismissed, false, spam
     query = Report.query.filter(
-        Report.status.in_(['pending_review', 'approved_awareness', 'verified', 'dismissed', 'false_report', 'spam'])
+        Report.status.in_(['pending_review', 'in_progress', 'verified', 'dismissed', 'false_report', 'spam'])
     )
     
     if category:
@@ -51,8 +78,8 @@ def get_pending_reports():
     from config import Config
     per_page = min(per_page, Config.MAX_ITEMS_PER_PAGE)
     
-    # "Need Review" should show pending_review and approved_awareness (In Progress) reports
-    query = Report.query.filter(Report.status.in_(['pending_review', 'approved_awareness']))
+    # "Need Review" should show pending_review and in_progress reports
+    query = Report.query.filter(Report.status.in_(['pending_review', 'in_progress']))
     
     pagination = paginate_query(query.order_by(Report.created_at.desc()), page, per_page)
     
@@ -104,7 +131,7 @@ def get_report(report_id):
     report = Report.query.get_or_404(report_id)
     
     # Public can only see approved reports
-    if report.status not in ['approved_awareness', 'verified']:
+    if report.status not in ['in_progress', 'verified']:
         # Check if user is authenticated admin
         try:
             current_user = get_current_user()
@@ -236,6 +263,7 @@ def submit_anonymous_report():
         status='pending_review',
         notes='Initial submission'
     )
+    upsert_report_queue(report, status='pending_review')
     db.session.commit()
     
     # Run basic safety check (placeholder - can be enhanced)
@@ -289,13 +317,24 @@ def approve_report(report_id):
     report = Report.query.get_or_404(report_id)
     data = request.get_json() or {}
     notes = data.get('notes', '')
+    severity = data.get('severity')
+    if severity:
+        if severity not in ['critical', 'high', 'medium', 'low']:
+            return jsonify({'error': 'Invalid severity'}), 400
+        report.severity = severity
     
     # Add ledger entry for approval
     report.add_ledger_entry(
         action='approve',
-        status='approved_awareness',
+        status='in_progress',
         actor_id=current_user.id,
         notes=notes
+    )
+    upsert_report_queue(
+        report,
+        status='in_progress',
+        assigned_to=current_user.id,
+        notes=notes,
     )
     
     # Log the system audit
@@ -312,7 +351,7 @@ def approve_report(report_id):
     db.session.commit()
     
     return jsonify({
-        'message': 'Report approved for awareness',
+        'message': 'Report moved to in progress',
         'report': report.to_dict()
     }), 200
 
@@ -341,6 +380,12 @@ def verify_report_pnp(report_id):
         status='verified',
         actor_id=current_user.id,
         notes=notes
+    )
+    upsert_report_queue(
+        report,
+        status='verified',
+        assigned_to=current_user.id,
+        notes=notes,
     )
     
     # Log the system audit
@@ -374,6 +419,11 @@ def dismiss_report(report_id):
     report = Report.query.get_or_404(report_id)
     data = request.get_json() or {}
     reason = data.get('reason', 'Dismissed by admin')
+    severity = data.get('severity')
+    if severity:
+        if severity not in ['critical', 'high', 'medium', 'low']:
+            return jsonify({'error': 'Invalid severity'}), 400
+        report.severity = severity
     
     # Add ledger entry for dismissal
     report.add_ledger_entry(
@@ -381,6 +431,12 @@ def dismiss_report(report_id):
         status='dismissed',
         actor_id=current_user.id,
         notes=reason
+    )
+    upsert_report_queue(
+        report,
+        status='dismissed',
+        assigned_to=current_user.id,
+        notes=reason,
     )
     
     # Log the system audit
@@ -422,6 +478,12 @@ def mark_report_false(report_id):
         actor_id=current_user.id,
         notes=notes
     )
+    upsert_report_queue(
+        report,
+        status='false_report',
+        assigned_to=current_user.id,
+        notes=notes,
+    )
     
     # Log the system audit
     SysAuditLog.log(
@@ -459,6 +521,12 @@ def mark_report_spam(report_id):
         status='spam',
         actor_id=current_user.id,
         notes='Marked as spam'
+    )
+    upsert_report_queue(
+        report,
+        status='spam',
+        assigned_to=current_user.id,
+        notes='Marked as spam',
     )
     
     # Log the system audit
@@ -515,7 +583,7 @@ def get_report_stats():
     # Total
     total = Report.query.count()
     public_count = Report.query.filter(
-        Report.status.in_(['approved_awareness', 'verified'])
+        Report.status.in_(['in_progress', 'verified'])
     ).count()
     verified_count = Report.query.filter_by(status='verified').count()
     

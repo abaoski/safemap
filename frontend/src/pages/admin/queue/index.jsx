@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useLocation } from "react-router-dom"
 import {
     Search,
@@ -30,6 +30,10 @@ function AdminQueuePage() {
         total: 0,
     })
     const [selectedReport, setSelectedReport] = useState(null)
+    const [selectedSeverity, setSelectedSeverity] = useState("")
+    const [hasScrolled, setHasScrolled] = useState(false)
+    const [actionLoading, setActionLoading] = useState("")
+    const reviewScrollRef = useRef(null)
 
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search)
@@ -43,6 +47,20 @@ function AdminQueuePage() {
     useEffect(() => {
         fetchData()
     }, [statusFilter, categoryFilter])
+
+    useEffect(() => {
+        if (!selectedReport) return
+        setSelectedSeverity("")
+        setHasScrolled(false)
+        setActionLoading("")
+        requestAnimationFrame(() => {
+            const el = reviewScrollRef.current
+            if (!el) return
+            if (el.scrollHeight <= el.clientHeight + 4) {
+                setHasScrolled(true)
+            }
+        })
+    }, [selectedReport])
 
     const getAuthHeaders = () => ({
         "Content-Type": "application/json",
@@ -81,7 +99,7 @@ function AdminQueuePage() {
                 const data = await statsRes.json()
                 setStats({
                     pending: data.pending_review || 0,
-                    approved: data.public_visible || 0,
+                    approved: data.by_status?.in_progress || 0,
                     dismissed: data.by_status?.dismissed || 0,
                     total: data.total || 0,
                 })
@@ -93,7 +111,7 @@ function AdminQueuePage() {
         }
     }
 
-    const handleApprove = async id => {
+    const handleApprove = async (id, severity) => {
         try {
             const res = await fetch(
                 `http://localhost:5000/api/reports/${id}/approve`,
@@ -101,34 +119,67 @@ function AdminQueuePage() {
                     method: "POST",
                     headers: getAuthHeaders(),
                     body: JSON.stringify({
-                        notes: "Approved for public awareness",
+                        notes: "Moved to in progress",
+                        severity,
                     }),
                 },
             )
-            if (res.ok) fetchData()
+            if (res.ok) {
+                await fetchData()
+                return true
+            }
         } catch (err) {
             console.error(err)
         }
+        return false
     }
 
-    const handleDismiss = async id => {
+    const handleDismiss = async (id, severity) => {
         try {
             const res = await fetch(
                 `http://localhost:5000/api/reports/${id}/dismiss`,
                 {
                     method: "POST",
                     headers: getAuthHeaders(),
-                    body: JSON.stringify({ reason: "Dismissed by admin" }),
+                    body: JSON.stringify({
+                        reason: "Dismissed by admin",
+                        severity,
+                    }),
                 },
             )
-            if (res.ok) fetchData()
+            if (res.ok) {
+                await fetchData()
+                return true
+            }
         } catch (err) {
             console.error(err)
         }
+        return false
     }
 
     const handleView = report => {
         setSelectedReport(report)
+    }
+
+    const handleReviewScroll = () => {
+        const el = reviewScrollRef.current
+        if (!el || hasScrolled) return
+        if (el.scrollTop + el.clientHeight >= el.scrollHeight - 8) {
+            setHasScrolled(true)
+        }
+    }
+
+    const handleReviewAction = async action => {
+        if (!selectedReport || actionLoading) return
+        setActionLoading(action)
+        const ok =
+            action === "approve"
+                ? await handleApprove(selectedReport.id, selectedSeverity)
+                : await handleDismiss(selectedReport.id, selectedSeverity)
+        if (ok) {
+            setSelectedReport(null)
+        }
+        setActionLoading("")
     }
 
     const filteredReports = allReports.filter(r => {
@@ -151,6 +202,13 @@ function AdminQueuePage() {
         "verbal_abuse",
         "emotional_abuse",
         "other",
+    ]
+
+    const SEVERITY_OPTIONS = [
+        { key: "critical", label: "Critical", color: "bg-red-500" },
+        { key: "high", label: "High", color: "bg-orange-500" },
+        { key: "medium", label: "Medium", color: "bg-amber-400" },
+        { key: "low", label: "Low", color: "bg-green-400" },
     ]
 
     return (
@@ -234,8 +292,6 @@ function AdminQueuePage() {
                         <QueueReportCard
                             key={report.id}
                             report={report}
-                            onApprove={handleApprove}
-                            onDismiss={handleDismiss}
                             onView={handleView}
                         />
                     ))
@@ -244,7 +300,7 @@ function AdminQueuePage() {
 
             {/* Report Details Modal */}
             {selectedReport && (
-                <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                <div className="fixed inset-0 z-9999 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
                     <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
                         {/* Modal Header */}
                         <div className="p-4 border-b flex items-center justify-between bg-[#1f295b] text-white">
@@ -265,11 +321,14 @@ function AdminQueuePage() {
                         </div>
 
                         {/* Modal Content */}
-                        <div className="p-6 overflow-y-auto custom-scrollbar">
-                            <div className="space-y-6">
+                        <div
+                            ref={reviewScrollRef}
+                            onScroll={handleReviewScroll}
+                            className="p-8 pb-10 overflow-y-auto custom-scrollbar flex-1">
+                            <div className="space-y-8">
                                 {/* Status & Severity */}
-                                <div className="flex items-center justify-between">
-                                    <div className="flex flex-col gap-1">
+                                <div className="flex items-center justify-between gap-4">
+                                    <div className="flex flex-col gap-2">
                                         <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">
                                             Status
                                         </span>
@@ -279,7 +338,7 @@ function AdminQueuePage() {
                                                 "pending_review"
                                                     ? "bg-amber-100 text-amber-600"
                                                     : selectedReport.status ===
-                                                        "approved_awareness"
+                                                        "in_progress"
                                                       ? "bg-green-100 text-green-600"
                                                       : selectedReport.status ===
                                                           "verified_pnp"
@@ -292,7 +351,7 @@ function AdminQueuePage() {
                                             )}
                                         </span>
                                     </div>
-                                    <div className="flex flex-col items-end gap-1">
+                                    <div className="flex flex-col items-end gap-2">
                                         <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tight text-right">
                                             Severity
                                         </span>
@@ -319,14 +378,14 @@ function AdminQueuePage() {
                                 </div>
 
                                 {/* Title & Category */}
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     <div className="flex items-center gap-2 text-gray-400">
                                         <Tag className="w-3.5 h-3.5" />
                                         <span className="text-[10px] font-bold uppercase tracking-tight">
                                             Title & Category
                                         </span>
                                     </div>
-                                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                                         <h4 className="text-zinc-800 font-bold text-sm mb-1">
                                             {selectedReport.title ||
                                                 "Untitled Report"}
@@ -341,27 +400,27 @@ function AdminQueuePage() {
                                 </div>
 
                                 {/* Description */}
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     <div className="flex items-center gap-2 text-gray-400">
                                         <AlertCircle className="w-3.5 h-3.5" />
                                         <span className="text-[10px] font-bold uppercase tracking-tight">
                                             Incident Description
                                         </span>
                                     </div>
-                                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 italic text-gray-600 text-sm leading-relaxed">
+                                    <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 italic text-gray-600 text-sm leading-relaxed">
                                         "{selectedReport.description}"
                                     </div>
                                 </div>
 
                                 {/* Location Details */}
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     <div className="flex items-center gap-2 text-gray-400">
                                         <MapPin className="w-3.5 h-3.5" />
                                         <span className="text-[10px] font-bold uppercase tracking-tight">
                                             Location Details
                                         </span>
                                     </div>
-                                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 space-y-2">
+                                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-3">
                                         <div className="flex justify-between items-center">
                                             <span className="text-[10px] text-gray-400 font-bold">
                                                 BARANGAY
@@ -398,14 +457,14 @@ function AdminQueuePage() {
                                 </div>
 
                                 {/* Date & Time */}
-                                <div className="space-y-2 pb-2">
+                                <div className="space-y-3 pb-2">
                                     <div className="flex items-center gap-2 text-gray-400">
                                         <Calendar className="w-3.5 h-3.5" />
                                         <span className="text-[10px] font-bold uppercase tracking-tight">
                                             Submission Date
                                         </span>
                                     </div>
-                                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 flex justify-between">
+                                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex justify-between">
                                         <span className="text-xs font-bold text-gray-700">
                                             {new Date(
                                                 selectedReport.created_at,
@@ -425,17 +484,82 @@ function AdminQueuePage() {
                                         </span>
                                     </div>
                                 </div>
+
+                                {/* Severity Selection (moved to bottom for better UX) */}
+                                <div className="space-y-3 pt-3">
+                                    <div className="flex items-center gap-2 text-gray-400">
+                                        <AlertCircle className="w-3.5 h-3.5" />
+                                        <span className="text-[10px] font-bold uppercase tracking-tight">
+                                            Severity (Required)
+                                        </span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {SEVERITY_OPTIONS.map(option => (
+                                            <button
+                                                key={option.key}
+                                                type="button"
+                                                onClick={() =>
+                                                    setSelectedSeverity(
+                                                        option.key,
+                                                    )
+                                                }
+                                                className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold uppercase transition-colors ${
+                                                    selectedSeverity ===
+                                                    option.key
+                                                        ? "border-[#1f295b] bg-[#eef2ff] text-[#1f295b]"
+                                                        : "border-gray-200 bg-white text-gray-500"
+                                                }`}>
+                                                <span
+                                                    className={`h-2.5 w-2.5 rounded-full ${option.color}`}
+                                                />
+                                                {option.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <p className="text-[10px] text-gray-400">
+                                        Select a severity to enable actions.
+                                    </p>
+                                </div>
+
+                                {/* Actions (Moved from Footer) */}
+                                <div className="space-y-4 pt-6 border-t border-gray-100">
+                                    {selectedReport?.status === "pending_review" && (
+                                        <p className="text-[10px] text-gray-400 italic">
+                                            {!hasScrolled
+                                                ? "Please scroll to review all details before taking action."
+                                                : "You can now proceed with the actions below."}
+                                        </p>
+                                    )}
+                                    <div className="flex flex-col gap-3">
+                                        <div className={`flex gap-3 transition-all duration-500 ease-in-out ${selectedSeverity ? 'opacity-100 transform translate-y-0' : 'opacity-40 grayscale pointer-events-none'}`}>
+                                            {selectedReport?.status === "pending_review" && (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleReviewAction("dismiss")}
+                                                        disabled={!hasScrolled || !selectedSeverity || !!actionLoading}
+                                                        className="flex-1 py-4 bg-red-50 text-red-600 text-xs font-bold uppercase tracking-wider rounded-2xl hover:bg-red-100 active:scale-95 transition-all disabled:opacity-50">
+                                                        {actionLoading === "dismiss" ? "Dismissing..." : "Dismiss"}
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleReviewAction("approve")}
+                                                        disabled={!hasScrolled || !selectedSeverity || !!actionLoading}
+                                                        className="flex-1 py-4 bg-[#1f295b] text-white text-xs font-bold uppercase tracking-wider rounded-2xl hover:shadow-lg hover:shadow-blue-900/20 active:scale-95 transition-all disabled:opacity-50">
+                                                        {actionLoading === "approve" ? "Approve Report" : "Approve Report"}
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                        <button
+                                            onClick={() => setSelectedReport(null)}
+                                            className="w-full py-3.5 bg-gray-50 text-gray-500 text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-gray-100 transition-colors">
+                                            Close Details
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Modal Footer */}
-                        <div className="p-4 bg-gray-50 border-t flex gap-3">
-                            <button
-                                onClick={() => setSelectedReport(null)}
-                                className="flex-1 py-3 bg-white border border-gray-200 text-gray-700 text-xs font-bold rounded-xl hover:bg-gray-100 transition-colors">
-                                Close
-                            </button>
-                        </div>
+
                     </div>
                 </div>
             )}

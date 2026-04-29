@@ -10,6 +10,7 @@ from extensions import db
 from models.setup_user import SetupUser
 from models.ledger_report import LedgerReportHeader, LedgerReportEntry, DecryptionError
 from models.setup_location import SetupLocation
+from models.report_queue import ReportQueue
 from models.ref_emergency import RefHelpCategory, RefHelpContact
 from models.setup_report_category import SetupReportCategory
 from models.sys_audit import SysAuditLog
@@ -21,6 +22,7 @@ __all__ = [
     'LedgerReportEntry',
     'DecryptionError',
     'SetupLocation',
+    'ReportQueue',
     'RefHelpCategory',
     'RefHelpContact',
     'SetupReportCategory',

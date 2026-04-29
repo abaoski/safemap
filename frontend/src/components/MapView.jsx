@@ -296,8 +296,11 @@ function ServicePin({ type }) {
 }
 
 // Neon aura circle — used for incidents
-function IncidentPin({ severity }) {
-    const cfg = SEVERITY_CONFIG[severity] || SEVERITY_CONFIG.medium
+function IncidentPin({ severity, status }) {
+    const isResolved = status === "verified"
+    const cfg = isResolved
+        ? SEVERITY_CONFIG.low
+        : SEVERITY_CONFIG[severity] || SEVERITY_CONFIG.medium
     return (
         <div
             style={{
@@ -349,8 +352,8 @@ function PopupCard({ title, subtitle, badge, badgeBg, status, extra }) {
     // Status badge colors
     const statusColors = {
         pending_review: "bg-yellow-500",
-        approved_awareness: "bg-green-500",
-        verified: "bg-blue-600",
+        in_progress: "bg-green-500",
+        verified: "bg-green-600",
         dismissed: "bg-gray-500",
         false_report: "bg-red-600",
         spam: "bg-orange-600",
@@ -358,8 +361,8 @@ function PopupCard({ title, subtitle, badge, badgeBg, status, extra }) {
 
     const statusLabels = {
         pending_review: "Pending",
-        approved_awareness: "Approved",
-        verified: "Verified",
+        in_progress: "In Progress",
+        verified: "Resolved",
         dismissed: "Dismissed",
         false_report: "False Report",
         spam: "Spam",
@@ -482,7 +485,10 @@ function MapView({ activeFilter }) {
                     longitude={report.location.longitude}
                     latitude={report.location.latitude}>
                     <MarkerContent>
-                        <IncidentPin severity={report.severity} />
+                        <IncidentPin
+                            severity={report.severity}
+                            status={report.status}
+                        />
                     </MarkerContent>
                     <MarkerTooltip>
                         <span className="font-semibold">{report.title}</span>
@@ -490,7 +496,9 @@ function MapView({ activeFilter }) {
                     <MarkerPopup closeButton>
                         <PopupCard
                             title={report.title}
-                            subtitle={report.category?.replace(/_/g, " ")}
+                            subtitle={
+                                report.description ? report.description : "N/A"
+                            }
                             badge={report.severity}
                             badgeBg={
                                 report.severity === "critical"

@@ -35,13 +35,13 @@
 
 ### Architecture
 
-| Layer | Technology | Description |
-|-------|-----------|-------------|
-| Frontend (Mobile-first) | React + Vite + Leaflet | Map view, report forms, help page, chat widget |
-| Legacy Frontend | Vanilla HTML/JS modules | Original map, chatbot, report, admin panels |
-| Backend API | Python Flask | RESTful API with JWT authentication |
-| Database | SQLite (dev) / PostgreSQL (prod) | Reports, users, help contacts, locations |
-| Authentication | JWT Bearer tokens | Access + refresh token flow |
+| Layer                   | Technology                       | Description                                    |
+| ----------------------- | -------------------------------- | ---------------------------------------------- |
+| Frontend (Mobile-first) | React + Vite + Leaflet           | Map view, report forms, help page, chat widget |
+| Legacy Frontend         | Vanilla HTML/JS modules          | Original map, chatbot, report, admin panels    |
+| Backend API             | Python Flask                     | RESTful API with JWT authentication            |
+| Database                | SQLite (dev) / PostgreSQL (prod) | Reports, users, help contacts, locations       |
+| Authentication          | JWT Bearer tokens                | Access + refresh token flow                    |
 
 ### API Base URL
 
@@ -66,11 +66,11 @@ A public (unauthenticated) user can perform the following actions without loggin
 
 - Tap **"Report Incident"** (the floating report button) on the main map screen.
 - The user is taken through a multi-step flow:
-  1. **Safety First** page — read emergency protocol and privacy rules, check both boxes.
-  2. **Incident Details** — select incident type, date/time, and description.
-  3. **Location Details** — pick location on an interactive map (drop a pin) or enter an address.
-  4. **Review & Submit** — review all details, then submit.
-  5. **Report Success** — receive a reference code and safety notice.
+    1. **Safety First** page — read emergency protocol and privacy rules, check both boxes.
+    2. **Incident Details** — select incident type, date/time, and description.
+    3. **Location Details** — pick location on an interactive map (drop a pin) or enter an address.
+    4. **Review & Submit** — review all details, then submit.
+    5. **Report Success** — receive a reference code and safety notice.
 - Full details of the submission workflow are in Section 4.
 
 ### 2.3 View the Hotspot Map
@@ -85,10 +85,10 @@ A public (unauthenticated) user can perform the following actions without loggin
 
 - Tap the **shield icon** ("Help") on the bottom navigation bar.
 - The Help Page shows:
-  - VAWC Support information with the Women and Children Protection Center card.
-  - Emergency hotline numbers (VAWC, PNP, WCPD, Emergency).
-  - "What to expect when you call" guidance.
-  - "Find Nearest WCPD Desk" button for geolocation-based lookup.
+    - VAWC Support information with the Women and Children Protection Center card.
+    - Emergency hotline numbers (VAWC, PNP, WCPD, Emergency).
+    - "What to expect when you call" guidance.
+    - "Find Nearest WCPD Desk" button for geolocation-based lookup.
 
 ### 2.5 Track a Previously Submitted Report
 
@@ -106,16 +106,16 @@ The chatbot is a keyword-driven assistant that processes user messages and retur
 
 When the chatbot opens, it displays these quick-tap suggestions:
 
-| ID | Suggestion Text | Icon |
-|----|----------------|------|
-| `how_to_report` | How do I submit a report? | clipboard |
-| `hotspot_colors` | What do hotspot colors mean? | palette |
-| `map_filters` | How do I use map filters? | filter |
-| `pnp_contact` | How do I contact PNP? | phone |
-| `vawc_contact` | Where can I find VAWC hotline? | heart |
-| `emergency_help` | I need emergency help | alert |
-| `check_reference` | Check my report status | search |
-| `safety_tips` | Safety tips | shield |
+| ID                | Suggestion Text                | Icon      |
+| ----------------- | ------------------------------ | --------- |
+| `how_to_report`   | How do I submit a report?      | clipboard |
+| `hotspot_colors`  | What do hotspot colors mean?   | palette   |
+| `map_filters`     | How do I use map filters?      | filter    |
+| `pnp_contact`     | How do I contact PNP?          | phone     |
+| `vawc_contact`    | Where can I find VAWC hotline? | heart     |
+| `emergency_help`  | I need emergency help          | alert     |
+| `check_reference` | Check my report status         | search    |
+| `safety_tips`     | Safety tips                    | shield    |
 
 ### 3.2 Topics the Chatbot Can Answer
 
@@ -125,13 +125,14 @@ When the chatbot opens, it displays these quick-tap suggestions:
 
 **Response:**
 To filter the hotspot map:
+
 1. Click the "Filter" button on the map controls.
 2. Select incident types you want to see:
-   - Theft/Robbery (🔴 Red)
-   - Assault (🟠 Orange)
-   - Fraud (🔵 Blue)
-   - Harassment (🟣 Purple)
-   - Accidents (🟡 Yellow)
+    - Theft/Robbery (🔴 Red)
+    - Assault (🟠 Orange)
+    - Fraud (🔵 Blue)
+    - Harassment (🟣 Purple)
+    - Accidents (🟡 Yellow)
 3. Toggle date range to see recent incidents.
 4. You can combine multiple filters at once.
 
@@ -140,6 +141,7 @@ To filter the hotspot map:
 **Trigger keywords:** `color`, `colors`, `hotspot`, `meaning`, `legend`
 
 **Response:**
+
 - 🔴 **RED (Critical/High)** — Serious crimes, verified incidents
 - 🟠 **ORANGE (High)** — Assault, violent incidents
 - 🟡 **YELLOW (Medium)** — Accidents, minor incidents
@@ -148,6 +150,7 @@ To filter the hotspot map:
 - ⚪ **WHITE/GRAY** — Pending review (only visible to admins)
 
 **Verification status indicators:**
+
 - ✅ Verified (PNP Confirmed) — Official records, shown as individual markers
 - ⭕ Unverified (Approved) — Under awareness, shown as heatmap aggregation
 
@@ -156,11 +159,13 @@ To filter the hotspot map:
 **Trigger keywords:** `report`, `reporting`, `submit`, `file report`, `how to report`
 
 **Response:**
+
 1. Click "Report Incident" on the main menu.
 2. Fill in details: incident type, description, date/time, and location (click on map or enter address).
 3. Click submit — you will receive a reference code.
 
 **Important facts:**
+
 - Reports are **anonymous by default**.
 - All submissions are reviewed by admin staff before appearing on the map.
 - Users receive a reference code in the format `SMPH-XXXXXX` (e.g., `SMPH-A1B2C3`).
@@ -172,31 +177,33 @@ To filter the hotspot map:
 **Trigger keywords:** `pnp`, `police`, `crime`
 
 **Response:**
+
 - **Emergency:** Dial 117 or 911
 - **Text PNP:** 0917-847-5757
 - **Website:** pnp.gov.ph
 
 **Local PNP stations in General Santos City:**
 
-| Station | Contact |
-|---------|---------|
-| GSC Police Office | 552-5573 / 0998-598-7207 |
-| Station 1 (Dadiangas East) | 0998-598-7208 |
-| Station 2 (Makar Wharf) | 0918-921-3580 |
-| Station 3 (Lagao) | 0998-598-7212 |
-| Station 4 (San Isidro) | 0998-598-7214 |
-| Station 5 | 0907-313-4517 |
-| Station 6 (Bula) | 0998-598-7218 |
-| Station 7 (Fatima) | 0998-598-7220 |
-| Station 8 (Tinagacan) | 0998-598-7223 |
-| Station 9 (Mabuhay) | 0948-874-1661 |
-| Station 10 (Calumpang) | 0999-548-9244 |
+| Station                    | Contact                  |
+| -------------------------- | ------------------------ |
+| GSC Police Office          | 552-5573 / 0998-598-7207 |
+| Station 1 (Dadiangas East) | 0998-598-7208            |
+| Station 2 (Makar Wharf)    | 0918-921-3580            |
+| Station 3 (Lagao)          | 0998-598-7212            |
+| Station 4 (San Isidro)     | 0998-598-7214            |
+| Station 5                  | 0907-313-4517            |
+| Station 6 (Bula)           | 0998-598-7218            |
+| Station 7 (Fatima)         | 0998-598-7220            |
+| Station 8 (Tinagacan)      | 0998-598-7223            |
+| Station 9 (Mabuhay)        | 0948-874-1661            |
+| Station 10 (Calumpang)     | 0999-548-9244            |
 
 #### WCPD / VAWC Contacts
 
 **Trigger keywords:** `wcpd`, `vawc`, `women`, `children`, `abuse`
 
 **Response:**
+
 - **VAWC Hotline:** 1388 (24/7)
 - **WCPD Hotline:** 02-8532-5003
 - VAWC desks are available at all local police stations.
@@ -209,10 +216,12 @@ To filter the hotspot map:
 **Trigger keywords:** `dswd`, `welfare`, `social`
 
 **Response:**
+
 - **DSWD Hotline:** 02-8931-8101
 - **SWAD Team (NCR):** 0932-529-8293
 
 **Services provided:**
+
 - Crisis intervention
 - Temporary shelter
 - Financial assistance
@@ -223,10 +232,12 @@ To filter the hotspot map:
 **Trigger keywords:** `fire`, `burning`
 
 **Response:**
+
 - **BFP Emergency:** Dial 117 or 911
 - **BFP GenSan:** 552-1160 / 0943-341-5561 / 160
 
 **What to do in case of fire:**
+
 1. Stay calm
 2. Alert others
 3. Call emergency hotlines
@@ -239,11 +250,13 @@ To filter the hotspot map:
 **Trigger keywords:** `medical`, `hospital`, `doctor`, `injured`
 
 **Response:**
+
 - **Emergency:** Dial 117 or 911
 - **Red Cross:** 143
 - Check the "Get Help Now" section on the map for nearest hospitals.
 
 **If someone is injured:**
+
 1. Call for help
 2. Don't move injured person unless in danger
 3. Apply first aid if trained
@@ -251,21 +264,22 @@ To filter the hotspot map:
 
 **Hospitals in General Santos City:**
 
-| Hospital | Contact |
-|----------|---------|
-| Gensan Medical Center | 887-9898 |
-| St. Elizabeth Hospital | 552-3162 / 0919-071-9004 |
-| Mindanao Medical Center | 553-8207 / 554-9640 |
-| Dadiangas Medical Center | 0917-190-2561 |
+| Hospital                                 | Contact                  |
+| ---------------------------------------- | ------------------------ |
+| Gensan Medical Center                    | 887-9898                 |
+| St. Elizabeth Hospital                   | 552-3162 / 0919-071-9004 |
+| Mindanao Medical Center                  | 553-8207 / 554-9640      |
+| Dadiangas Medical Center                 | 0917-190-2561            |
 | Sarangani Bay Specialists Medical Center | 887-8888 / 0919-067-8395 |
-| Gensan Doctors Hospital | 250-2777 / 0933-821-7257 |
-| Dr. Jorge P. Royeca City Hospital | 552-2811 / 0912-376-2331 |
+| Gensan Doctors Hospital                  | 250-2777 / 0933-821-7257 |
+| Dr. Jorge P. Royeca City Hospital        | 552-2811 / 0912-376-2331 |
 
 #### Immediate Emergency
 
 **Trigger keywords:** `emergency`, `help me`, `danger`, `urgent`, `now`
 
 **Response:**
+
 - **DIAL 911 or 117** (24/7 - All emergencies)
 - 🔴 Crime in progress → Police
 - 🔥 Fire → Fire Department
@@ -273,6 +287,7 @@ To filter the hotspot map:
 - 👨‍👩‍👧 Child/Women abuse → VAWC 1388
 
 **Stay safe:**
+
 - Move to a safe location if possible
 - Don't confront attackers
 - Note the location/description
@@ -283,11 +298,13 @@ To filter the hotspot map:
 **Trigger keywords:** `reference`, `code`, `check status`, `track`
 
 **Response:**
+
 1. Go to "Track Report" in the menu.
 2. Enter your reference code (e.g., `SMPH-A1B2C3`).
 3. View your current status.
 
 **Report statuses:**
+
 - ⏳ **Pending Review** — Under admin review
 - ✅ **Approved** — Visible on public heatmap
 - ✅ **Verified** — PNP confirmed
@@ -298,6 +315,7 @@ To filter the hotspot map:
 **Trigger keywords:** `safety`, `tips`, `advice`, `protect`
 
 **General Safety:**
+
 - Stay aware of your surroundings
 - Avoid isolated areas at night
 - Keep valuables hidden
@@ -305,11 +323,13 @@ To filter the hotspot map:
 - Trust your instincts
 
 **Online Safety:**
+
 - Don't share personal info
 - Verify before trusting
 - Report suspicious activity
 
 **In Case of Emergency:**
+
 - Call 911 immediately
 - Note your location
 - Stay calm
@@ -319,6 +339,7 @@ To filter the hotspot map:
 **Trigger keywords:** `hello`, `hi`, `hey`, `good`, `start`, `help`
 
 The chatbot introduces itself as "SafeMap Assistant" and lists everything it can help with:
+
 - Map Help (how to use filters, what hotspot colors mean)
 - Reporting (how to submit a report, check report status)
 - Emergency Contacts (PNP, VAWC, DSWD hotlines, Medical & Fire)
@@ -327,6 +348,7 @@ The chatbot introduces itself as "SafeMap Assistant" and lists everything it can
 ### 3.3 Default / Fallback Response
 
 If the chatbot does not recognize the query, it responds with:
+
 > I can help with: Reporting (how to submit incidents), Map (filters and hotspot colors), Contacts (PNP, VAWC, DSWD, emergency), Safety (tips and advice). Just ask me anything! Or type 'help' to see all options.
 
 ---
@@ -371,42 +393,42 @@ User taps "Report Incident"
 
 ### 4.2 Required Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `title` | String (max 200) | ✅ | Brief title of incident |
-| `description` | Text | ✅ | Detailed description (min 10 characters) |
-| `latitude` | Float | ✅ | Location latitude |
-| `longitude` | Float | ✅ | Location longitude |
-| `category` | String | ✅ | Must be one of the valid categories (see Section 10) |
+| Field         | Type             | Required | Description                                          |
+| ------------- | ---------------- | -------- | ---------------------------------------------------- |
+| `title`       | String (max 200) | ✅       | Brief title of incident                              |
+| `description` | Text             | ✅       | Detailed description (min 10 characters)             |
+| `latitude`    | Float            | ✅       | Location latitude                                    |
+| `longitude`   | Float            | ✅       | Location longitude                                   |
+| `category`    | String           | ✅       | Must be one of the valid categories (see Section 10) |
 
 ### 4.3 Optional Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `severity` | String | `low`, `medium` (default), `high`, `critical` |
-| `barangay` | String | Barangay name |
-| `address` | String | Street address |
-| `reporter_name` | String | Optional — marks report as having personal details |
-| `reporter_contact` | String | Optional — will be removed by admin during review |
-| `image_url` | String | URL to attached image |
+| Field              | Type   | Description                                        |
+| ------------------ | ------ | -------------------------------------------------- |
+| `severity`         | String | `low`, `medium` (default), `high`, `critical`      |
+| `barangay`         | String | Barangay name                                      |
+| `address`          | String | Street address                                     |
+| `reporter_name`    | String | Optional — marks report as having personal details |
+| `reporter_contact` | String | Optional — will be removed by admin during review  |
+| `image_url`        | String | URL to attached image                              |
 
 ### 4.4 What Happens After Submission
 
 1. **Validation:** System checks all required fields are present and valid.
-   - If fields are missing → returns error with list of missing fields.
-   - If category is invalid → returns error with valid categories list.
+    - If fields are missing → returns error with list of missing fields.
+    - If category is invalid → returns error with valid categories list.
 2. **Safety Check:** The system runs basic safety checks:
-   - Description must be at least 10 characters.
-   - Coordinates must be within the Philippines (Lat: 4.5–21.0, Lng: 116.0–127.0).
+    - Description must be at least 10 characters.
+    - Coordinates must be within the Philippines (Lat: 4.5–21.0, Lng: 116.0–127.0).
 3. **Save:** Report is saved to the anonymous database with:
-   - Status: `pending_review` (Unverified & Pending Review)
-   - `is_anonymous: true`
+    - Status: `pending_review` (Unverified & Pending Review)
+    - `is_anonymous: true`
 4. **Reference Code:** A unique reference code is generated in format `SMPH-XXXXXX` (e.g., `SMPH-A1B2C3`).
 5. **Response to User:**
-   - Reference code for tracking
-   - Status: `pending_review`
-   - Safety check result: `passed` or `needs_review`
-   - Safety notice: *"Your report has been submitted and is pending review. Do not confront any suspects directly. In case of emergency, dial 911. Save your reference code for tracking."*
+    - Reference code for tracking
+    - Status: `pending_review`
+    - Safety check result: `passed` or `needs_review`
+    - Safety notice: _"Your report has been submitted and is pending review. Do not confront any suspects directly. In case of emergency, dial 911. Save your reference code for tracking."_
 
 ### 4.5 API Endpoint
 
@@ -465,10 +487,10 @@ Response (200):
 
 ### 5.2 Two Display Layers
 
-| Layer | Data Source | Visual |
-|-------|-----------|--------|
-| **Heatmap** | Reports with status `approved_awareness` (unverified, approved) | Gradient overlay — blue → amber → red based on density |
-| **Markers** | Reports with status `verified` (PNP Confirmed) | Individual map markers with popup (type, date, description) |
+| Layer       | Data Source                                              | Visual                                                      |
+| ----------- | -------------------------------------------------------- | ----------------------------------------------------------- |
+| **Heatmap** | Reports with status `in_progress` (unverified, approved) | Gradient overlay — blue → amber → red based on density      |
+| **Markers** | Reports with status `verified` (PNP Confirmed)           | Individual map markers with popup (type, date, description) |
 
 ### 5.3 Heatmap Gradient
 
@@ -484,17 +506,19 @@ Response (200):
 
 Users can filter the map by:
 
-| Filter | Options |
-|--------|---------|
+| Filter            | Options                                                                                          |
+| ----------------- | ------------------------------------------------------------------------------------------------ |
 | **Incident Type** | Theft, Assault, Fraud, Harassment, Vandalism, Accident, Fire, Flood, Suspicious, Violence, Other |
-| **Status** | Pending, Approved (Unverified), Verified, Dismissed |
-| **Date Range** | From date, To date |
+| **Status**        | Pending, Approved (Unverified), Verified, Dismissed                                              |
+| **Date Range**    | From date, To date                                                                               |
 
 **API endpoint for public reports:**
+
 ```
 GET /api/reports/public?category={category}&city={city}
 ```
-Only returns reports with status `approved_awareness` or `verified`.
+
+Only returns reports with status `in_progress` or `verified`.
 
 ---
 
@@ -502,30 +526,30 @@ Only returns reports with status `approved_awareness` or `verified`.
 
 ### 6.1 Key National Emergency Numbers
 
-| Service | Number | Available |
-|---------|--------|-----------|
-| **National Emergency** | **911** | 24/7 |
-| **PNP Emergency** | **117** | 24/7 |
-| **VAWC Hotline** | **1388** | 24/7 |
-| **Red Cross** | **143** | 24/7 |
-| **BFP (Fire)** | **160** | 24/7 |
-| **PNP Text** | 0917-847-5757 | 24/7 |
-| **DSWD Hotline** | 02-8931-8101 | 24/7 |
-| **WCPD Hotline** | 02-8532-5003 | 24/7 |
-| **NDRRMC** | 02-8911-5061 | 24/7 |
+| Service                | Number        | Available |
+| ---------------------- | ------------- | --------- |
+| **National Emergency** | **911**       | 24/7      |
+| **PNP Emergency**      | **117**       | 24/7      |
+| **VAWC Hotline**       | **1388**      | 24/7      |
+| **Red Cross**          | **143**       | 24/7      |
+| **BFP (Fire)**         | **160**       | 24/7      |
+| **PNP Text**           | 0917-847-5757 | 24/7      |
+| **DSWD Hotline**       | 02-8931-8101  | 24/7      |
+| **WCPD Hotline**       | 02-8532-5003  | 24/7      |
+| **NDRRMC**             | 02-8911-5061  | 24/7      |
 
 ### 6.2 Help Categories in the System
 
-| Category ID | Full Name | Icon |
-|-------------|----------|------|
-| `pnp` | Philippine National Police | police |
-| `wcpd` | Women and Children Protection Center | shield |
-| `vawc` | Violence Against Women and Children | heart |
-| `dswd` | Department of Social Welfare | people |
-| `fire` | Bureau of Fire Protection | fire |
-| `medical` | Medical Emergency | hospital |
-| `disaster` | Disaster Response | alert |
-| `emergency` | General Emergency | warning |
+| Category ID | Full Name                            | Icon     |
+| ----------- | ------------------------------------ | -------- |
+| `pnp`       | Philippine National Police           | police   |
+| `wcpd`      | Women and Children Protection Center | shield   |
+| `vawc`      | Violence Against Women and Children  | heart    |
+| `dswd`      | Department of Social Welfare         | people   |
+| `fire`      | Bureau of Fire Protection            | fire     |
+| `medical`   | Medical Emergency                    | hospital |
+| `disaster`  | Disaster Response                    | alert    |
+| `emergency` | General Emergency                    | warning  |
 
 ### 6.3 "What to Expect When You Call" (VAWC)
 
@@ -560,6 +584,7 @@ Response: { "access_token": "...", "refresh_token": "...", "user": {...} }
 All admin endpoints require a `Bearer` token in the `Authorization` header.
 
 **User roles:** `user`, `moderator`, `admin`
+
 - Only `admin` and `moderator` roles can access report management endpoints.
 
 ### 7.2 Pending Reports Queue
@@ -582,7 +607,7 @@ For each pending report, the admin can:
 ```
 POST /api/reports/{id}/approve
 Body: { "notes": "Approved after review" }
-→ Sets status to: approved_awareness
+→ Sets status to: in_progress
 ```
 
 #### B. Verify / PNP Confirmed
@@ -638,7 +663,7 @@ Response:
   "public_visible": 80,
   "pnp_verified": 25,
   "pending_review": 45,
-  "by_status": { "pending_review": 45, "approved_awareness": 55, "verified": 25, "dismissed": 25 },
+  "by_status": { "pending_review": 45, "in_progress": 55, "verified": 25, "dismissed": 25 },
   "by_category": { "theft": 40, "assault": 30, ... },
   "by_severity": { "low": 20, "medium": 80, "high": 40, "critical": 10 }
 }
@@ -715,25 +740,25 @@ Authorization: Bearer {token} (admin only)
 
 ### 9.1 Public Users See
 
-| Component | What It Shows |
-|-----------|--------------|
-| **Hotspot Heatmap** | Aggregated heat overlay of approved (unverified) reports |
-| **Verified Markers** | Individual pins for PNP-confirmed incidents |
-| **Risk Legend** | Color-coded severity guide |
-| **Help Page** | Emergency hotlines, WCPD info, nearest station finder |
-| **Chat Widget** | AI-powered Q&A for map help, reporting, contacts, safety |
-| **Report Tracker** | Status lookup by reference code |
+| Component            | What It Shows                                            |
+| -------------------- | -------------------------------------------------------- |
+| **Hotspot Heatmap**  | Aggregated heat overlay of approved (unverified) reports |
+| **Verified Markers** | Individual pins for PNP-confirmed incidents              |
+| **Risk Legend**      | Color-coded severity guide                               |
+| **Help Page**        | Emergency hotlines, WCPD info, nearest station finder    |
+| **Chat Widget**      | AI-powered Q&A for map help, reporting, contacts, safety |
+| **Report Tracker**   | Status lookup by reference code                          |
 
 ### 9.2 Admins See
 
-| Component | What It Shows |
-|-----------|--------------|
-| **Pending Queue** | All reports awaiting review with full details |
-| **All Reports** | Filterable table of all reports (any status) |
-| **Statistics Dashboard** | Counts by status, category, severity |
-| **Activity Log** | Real-time log of system actions |
-| **User Management** | List/edit/delete system users |
-| **Help Directory Manager** | CRUD for emergency contacts and hotlines |
+| Component                  | What It Shows                                 |
+| -------------------------- | --------------------------------------------- |
+| **Pending Queue**          | All reports awaiting review with full details |
+| **All Reports**            | Filterable table of all reports (any status)  |
+| **Statistics Dashboard**   | Counts by status, category, severity          |
+| **Activity Log**           | Real-time log of system actions               |
+| **User Management**        | List/edit/delete system users                 |
+| **Help Directory Manager** | CRUD for emergency contacts and hotlines      |
 
 ### 9.3 AI Chatbot Availability
 
@@ -745,27 +770,27 @@ The chatbot is available on every screen to public users and provides contextual
 
 ### Categories
 
-| Value | Display Name | Map Color |
-|-------|-------------|-----------|
-| `theft` | Theft / Robbery | 🔴 Red |
-| `assault` | Physical Assault | 🟠 Orange |
-| `fraud` | Scam / Fraud | 🔵 Blue |
-| `harassment` | Harassment | 🟣 Purple |
-| `vandalism` | Vandalism | 🟡 Yellow |
-| `accident` | Traffic / Accident | 🟡 Yellow |
-| `fire` | Fire Incident | 🟠 Orange |
-| `flood` | Flooding | 🔵 Blue |
+| Value        | Display Name        | Map Color |
+| ------------ | ------------------- | --------- |
+| `theft`      | Theft / Robbery     | 🔴 Red    |
+| `assault`    | Physical Assault    | 🟠 Orange |
+| `fraud`      | Scam / Fraud        | 🔵 Blue   |
+| `harassment` | Harassment          | 🟣 Purple |
+| `vandalism`  | Vandalism           | 🟡 Yellow |
+| `accident`   | Traffic / Accident  | 🟡 Yellow |
+| `fire`       | Fire Incident       | 🟠 Orange |
+| `flood`      | Flooding            | 🔵 Blue   |
 | `suspicious` | Suspicious Activity | 🟡 Yellow |
-| `violence` | Violence | 🔴 Red |
-| `other` | Other | ⚪ Gray |
+| `violence`   | Violence            | 🔴 Red    |
+| `other`      | Other               | ⚪ Gray   |
 
 ### Severity Levels
 
-| Level | Description |
-|-------|-------------|
-| `low` | Minor incident, no immediate danger |
-| `medium` | Moderate concern (default) |
-| `high` | Serious incident requiring attention |
+| Level      | Description                                          |
+| ---------- | ---------------------------------------------------- |
+| `low`      | Minor incident, no immediate danger                  |
+| `medium`   | Moderate concern (default)                           |
+| `high`     | Serious incident requiring attention                 |
 | `critical` | Severe/life-threatening, requires immediate response |
 
 ---
@@ -787,7 +812,7 @@ The chatbot is available on every screen to public users and provides contextual
        ├─────────────────────────────────────┐
        ▼                                     ▼
 ┌──────────────────┐              ┌──────────────────┐
-│ approved_awareness│              │    dismissed      │
+│ in_progress      │              │    dismissed      │
 │ (Approved for     │              │ (Spam/Duplicate)  │
 │  Awareness)       │              │ Removed from      │
 │                   │              │ public view       │
@@ -808,7 +833,8 @@ The chatbot is available on every screen to public users and provides contextual
 ```
 
 **Key rules:**
-- Only `approved_awareness` and `verified` reports are visible to the public.
+
+- Only `in_progress` and `verified` reports are visible to the public.
 - Personal details are automatically removed when a report is approved, verified, or dismissed.
 - Admin review is recorded with `reviewed_by` (user ID), `review_notes`, and `review_date`.
 - Verified reports also record `pnp_case_number` and `verified_date`.
@@ -841,6 +867,7 @@ The chatbot is available on every screen to public users and provides contextual
 ### Pre-Submission Checkboxes
 
 Before starting a report, users must confirm:
+
 1. **Emergency Protocol:** "If you are in immediate danger, call 911 immediately."
 2. **Privacy Rule:** "Your report will be treated with strict confidentiality. We never share your personal information."
 
@@ -850,19 +877,19 @@ Before starting a report, users must confirm:
 
 ### National Emergency Contacts (Database Defaults)
 
-| Name | Category | Phone | Description | 24/7 |
-|------|----------|-------|-------------|------|
-| Emergency 911 | emergency | 911 | National Emergency Hotline | ✅ |
-| PNP Hotline | pnp | 117 | National Emergency Hotline | ✅ |
-| PNP Crime Report | pnp | 0917-847-5757 | Text PNP | ✅ |
-| WCPD Hotline | wcpd | 02-8532-5003 | Women and Children Protection Center | ✅ |
-| VAWC Hotline | vawc | 1388 | Violence Against Women and Children | ✅ |
-| DSWD Hotline | dswd | 02-8931-8101 | Dept. of Social Welfare and Development | ✅ |
-| DSWD SWAD | dswd | 0932-529-8293 | SWAD Team - NCR | ✅ |
-| BFP Hotline | fire | 117 | Bureau of Fire Protection Emergency | ✅ |
-| Red Cross | medical | 143 | Philippine Red Cross Emergency | ✅ |
-| Medical City | medical | 02-8988-1000 | The Medical City Hospital | ❌ |
-| NDRRMC | disaster | 02-8911-5061 | National Disaster Risk Reduction and Management Council | ✅ |
+| Name             | Category  | Phone         | Description                                             | 24/7 |
+| ---------------- | --------- | ------------- | ------------------------------------------------------- | ---- |
+| Emergency 911    | emergency | 911           | National Emergency Hotline                              | ✅   |
+| PNP Hotline      | pnp       | 117           | National Emergency Hotline                              | ✅   |
+| PNP Crime Report | pnp       | 0917-847-5757 | Text PNP                                                | ✅   |
+| WCPD Hotline     | wcpd      | 02-8532-5003  | Women and Children Protection Center                    | ✅   |
+| VAWC Hotline     | vawc      | 1388          | Violence Against Women and Children                     | ✅   |
+| DSWD Hotline     | dswd      | 02-8931-8101  | Dept. of Social Welfare and Development                 | ✅   |
+| DSWD SWAD        | dswd      | 0932-529-8293 | SWAD Team - NCR                                         | ✅   |
+| BFP Hotline      | fire      | 117           | Bureau of Fire Protection Emergency                     | ✅   |
+| Red Cross        | medical   | 143           | Philippine Red Cross Emergency                          | ✅   |
+| Medical City     | medical   | 02-8988-1000  | The Medical City Hospital                               | ❌   |
+| NDRRMC           | disaster  | 02-8911-5061  | National Disaster Risk Reduction and Management Council | ✅   |
 
 ---
 
@@ -870,39 +897,39 @@ Before starting a report, users must confirm:
 
 ### 15.1 Hospitals
 
-| Name | Latitude | Longitude | Contact |
-|------|----------|-----------|---------|
-| Gensan Medical Center | 6.1164 | 125.1716 | 887-9898 |
-| St. Elizabeth Hospital | 6.1128 | 125.1710 | 552-3162 / 0919-071-9004 |
-| Mindanao Medical Center | 6.1105 | 125.1745 | 553-8207 / 554-9640 |
-| Dadiangas Medical Center | 6.1150 | 125.1685 | 0917-190-2561 |
-| Sarangani Bay Specialists Medical Center | 6.1180 | 125.1650 | 887-8888 / 0919-067-8395 |
-| Gensan Doctors Hospital | 6.1135 | 125.1735 | 250-2777 / 0933-821-7257 |
-| Dr. Jorge P. Royeca City Hospital | 6.1200 | 125.1680 | 552-2811 / 0912-376-2331 |
+| Name                                     | Latitude | Longitude | Contact                  |
+| ---------------------------------------- | -------- | --------- | ------------------------ |
+| Gensan Medical Center                    | 6.1164   | 125.1716  | 887-9898                 |
+| St. Elizabeth Hospital                   | 6.1128   | 125.1710  | 552-3162 / 0919-071-9004 |
+| Mindanao Medical Center                  | 6.1105   | 125.1745  | 553-8207 / 554-9640      |
+| Dadiangas Medical Center                 | 6.1150   | 125.1685  | 0917-190-2561            |
+| Sarangani Bay Specialists Medical Center | 6.1180   | 125.1650  | 887-8888 / 0919-067-8395 |
+| Gensan Doctors Hospital                  | 6.1135   | 125.1735  | 250-2777 / 0933-821-7257 |
+| Dr. Jorge P. Royeca City Hospital        | 6.1200   | 125.1680  | 552-2811 / 0912-376-2331 |
 
 ### 15.2 Police Stations
 
-| Name | Latitude | Longitude | Contact |
-|------|----------|-----------|---------|
-| GSC Police Office | 6.1120 | 125.1715 | 552-5573 / 0998-598-7207 |
-| Police Station 1 (Dadiangas East) | 6.1185 | 125.1760 | 0998-598-7208 |
-| Police Station 2 (Makar Wharf) | 6.0945 | 125.1805 | 0918-921-3580 |
-| Police Station 3 (Lagao) | 6.1205 | 125.1685 | 0998-598-7212 |
-| Police Station 4 (San Isidro) | 6.1300 | 125.1850 | 0998-598-7214 |
-| Police Station 5 | 6.1000 | 125.1600 | 0907-313-4517 |
-| Police Station 6 (Bula) | 6.1350 | 125.1605 | 0998-598-7218 |
-| Police Station 7 (Fatima) | 6.1255 | 125.1720 | 0998-598-7220 |
-| Police Station 8 (Tinagacan) | 6.2000 | 125.0500 | 0998-598-7223 |
-| Police Station 9 (Mabuhay) | 6.1400 | 125.1400 | 0948-874-1661 |
-| Police Station 10 (Calumpang) | 6.1050 | 125.1850 | 0999-548-9244 |
+| Name                              | Latitude | Longitude | Contact                  |
+| --------------------------------- | -------- | --------- | ------------------------ |
+| GSC Police Office                 | 6.1120   | 125.1715  | 552-5573 / 0998-598-7207 |
+| Police Station 1 (Dadiangas East) | 6.1185   | 125.1760  | 0998-598-7208            |
+| Police Station 2 (Makar Wharf)    | 6.0945   | 125.1805  | 0918-921-3580            |
+| Police Station 3 (Lagao)          | 6.1205   | 125.1685  | 0998-598-7212            |
+| Police Station 4 (San Isidro)     | 6.1300   | 125.1850  | 0998-598-7214            |
+| Police Station 5                  | 6.1000   | 125.1600  | 0907-313-4517            |
+| Police Station 6 (Bula)           | 6.1350   | 125.1605  | 0998-598-7218            |
+| Police Station 7 (Fatima)         | 6.1255   | 125.1720  | 0998-598-7220            |
+| Police Station 8 (Tinagacan)      | 6.2000   | 125.0500  | 0998-598-7223            |
+| Police Station 9 (Mabuhay)        | 6.1400   | 125.1400  | 0948-874-1661            |
+| Police Station 10 (Calumpang)     | 6.1050   | 125.1850  | 0999-548-9244            |
 
 ### 15.3 Fire & Rescue
 
-| Name | Type | Latitude | Longitude | Contact |
-|------|------|----------|-----------|---------|
-| Bureau of Fire Protection (BFP) | Fire | 6.1130 | 125.1700 | 552-1160 / 0943-341-5561 / 160 |
-| CDRRMO Gensan | Rescue | 6.1125 | 125.1695 | 552-3939 / 0943-461-4548 |
-| Task Force Gensan | Rescue | 6.1135 | 125.1725 | 887-6018 / 0905-144-3676 |
+| Name                            | Type   | Latitude | Longitude | Contact                        |
+| ------------------------------- | ------ | -------- | --------- | ------------------------------ |
+| Bureau of Fire Protection (BFP) | Fire   | 6.1130   | 125.1700  | 552-1160 / 0943-341-5561 / 160 |
+| CDRRMO Gensan                   | Rescue | 6.1125   | 125.1695  | 552-3939 / 0943-461-4548       |
+| Task Force Gensan               | Rescue | 6.1135   | 125.1725  | 887-6018 / 0905-144-3676       |
 
 ---
 
@@ -952,23 +979,23 @@ A: Yes. Every approve, verify, and dismiss action is logged with your user ID, t
 
 ## 17. Glossary
 
-| Term | Definition |
-|------|-----------|
-| **BFP** | Bureau of Fire Protection |
-| **CDRRMO** | City Disaster Risk Reduction and Management Office |
-| **DSWD** | Department of Social Welfare and Development |
-| **DWSD** | Division for the Welfare of the Differently Abled (Authorized admin officers) |
-| **GenSan** | General Santos City, South Cotabato, Philippines |
-| **Heatmap** | A map overlay showing areas of high incident density using color gradients |
-| **Hotspot** | An area on the map with a high concentration of reported incidents |
-| **JWT** | JSON Web Token — used for authentication |
-| **NDRRMC** | National Disaster Risk Reduction and Management Council |
-| **PNP** | Philippine National Police |
-| **RAG** | Retrieval-Augmented Generation — an AI technique where the chatbot retrieves relevant knowledge before generating responses |
-| **Reference Code** | A unique code (SMPH-XXXXXX) given to users after submitting a report, used for tracking |
-| **SafeMap-PH** | The community safety mapping platform for the Philippines |
-| **SWAD** | Social Welfare and Development |
-| **VAWC** | Violence Against Women and Children |
-| **WCPD** | Women and Children Protection Desk |
-| **Verified** | A report confirmed by PNP with an official case number |
-| **Approved (Awareness)** | A report reviewed and approved by admin for public heatmap display, but not officially confirmed by PNP |
+| Term                     | Definition                                                                                                                  |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| **BFP**                  | Bureau of Fire Protection                                                                                                   |
+| **CDRRMO**               | City Disaster Risk Reduction and Management Office                                                                          |
+| **DSWD**                 | Department of Social Welfare and Development                                                                                |
+| **DWSD**                 | Division for the Welfare of the Differently Abled (Authorized admin officers)                                               |
+| **GenSan**               | General Santos City, South Cotabato, Philippines                                                                            |
+| **Heatmap**              | A map overlay showing areas of high incident density using color gradients                                                  |
+| **Hotspot**              | An area on the map with a high concentration of reported incidents                                                          |
+| **JWT**                  | JSON Web Token — used for authentication                                                                                    |
+| **NDRRMC**               | National Disaster Risk Reduction and Management Council                                                                     |
+| **PNP**                  | Philippine National Police                                                                                                  |
+| **RAG**                  | Retrieval-Augmented Generation — an AI technique where the chatbot retrieves relevant knowledge before generating responses |
+| **Reference Code**       | A unique code (SMPH-XXXXXX) given to users after submitting a report, used for tracking                                     |
+| **SafeMap-PH**           | The community safety mapping platform for the Philippines                                                                   |
+| **SWAD**                 | Social Welfare and Development                                                                                              |
+| **VAWC**                 | Violence Against Women and Children                                                                                         |
+| **WCPD**                 | Women and Children Protection Desk                                                                                          |
+| **Verified**             | A report confirmed by PNP with an official case number                                                                      |
+| **Approved (Awareness)** | A report reviewed and approved by admin for public heatmap display, but not officially confirmed by PNP                     |

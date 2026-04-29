@@ -37,6 +37,7 @@ class SetupUser(db.Model):
     # Relationships
     reports = db.relationship('LedgerReportHeader', backref='creator', lazy='dynamic', foreign_keys='LedgerReportHeader.created_by')
     actions = db.relationship('LedgerReportEntry', backref='actor', lazy='dynamic', foreign_keys='LedgerReportEntry.actor_id')
+    queue_assignments = db.relationship('ReportQueue', backref='assignee', lazy='dynamic', foreign_keys='ReportQueue.assigned_to')
     
     def __repr__(self):
         return f'<SetupUser {self.username}>'

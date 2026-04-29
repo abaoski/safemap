@@ -60,6 +60,7 @@ class LedgerReportHeader(db.Model):
     
     # Relationships
     ledger_entries = db.relationship('LedgerReportEntry', backref='header', lazy='dynamic', cascade='all, delete-orphan')
+    queue_entry = db.relationship('ReportQueue', backref='report', uselist=False, cascade='all, delete-orphan')
     
     @property
     def description(self):
@@ -137,11 +138,12 @@ class LedgerReportHeader(db.Model):
         return data
 
     def to_public_dict(self):
-        """Convert header to public dictionary (no sensitive data, no description decryption)"""
+        """Convert header to public dictionary (no sensitive data)"""
         try:
             return {
                 'id': self.id,
                 'title': self.title,
+                'description': self.description,
                 'category': self.category,
                 'severity': self.severity,
                 'status': self.status,

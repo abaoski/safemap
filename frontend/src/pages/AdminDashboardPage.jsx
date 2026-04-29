@@ -140,7 +140,7 @@ function AdminDashboardPage() {
         switch (status) {
             case "pending_review":
                 return "border-amber-500"
-            case "approved_awareness":
+            case "in_progress":
                 return "border-blue-900"
             case "verified":
             case "verified_pnp":
@@ -156,7 +156,7 @@ function AdminDashboardPage() {
         switch (status) {
             case "pending_review":
                 return "bg-amber-100 text-amber-600 border-amber-200"
-            case "approved_awareness":
+            case "in_progress":
                 return "bg-blue-100 text-blue-900 border-blue-200"
             case "verified":
             case "verified_pnp":
@@ -172,7 +172,7 @@ function AdminDashboardPage() {
         switch (status) {
             case "pending_review":
                 return "Pending Review"
-            case "approved_awareness":
+            case "in_progress":
                 return "In Progress"
             case "verified":
             case "verified_pnp":
