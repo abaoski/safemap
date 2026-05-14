@@ -9,6 +9,15 @@ cd "$ROOT"
 
 FAILED=0
 
+CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+PROTECTED_BRANCH="submain"
+
+if [ "$CURRENT_BRANCH" = "$PROTECTED_BRANCH" ]; then
+  printf "\n❌ Commit blocked — create a feature branch before committing.\n"
+  printf "   Current branch: %s\n" "$CURRENT_BRANCH"
+  exit 1
+fi
+
 run_step() {
   LABEL="$1"
   shift
