@@ -1,0 +1,11 @@
+{
+    "name": "safemap",
+    "private": true,
+    "scripts": {
+        "prepare": "husky"
+    },
+    "packageManager": "pnpm@9.33.2",
+    "devDependencies": {
+        "husky": "^9.1.7"
+    }
+}
