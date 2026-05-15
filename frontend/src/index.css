@@ -1,7 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap')
-layer(base);
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap") layer(base);
 
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @import "tw-animate-css";
 
@@ -168,7 +167,7 @@ layer(base);
 
 @layer base {
   * {
-    font-family: 'DM Sans', sans-serif;
+    font-family: "DM Sans", sans-serif;
   }
 }
 
@@ -223,14 +222,18 @@ layer(base);
   * {
     @apply border-border;
   }
-  html, body, #root {
+  html,
+  body,
+  #root {
     height: 100%;
     margin: 0;
     padding: 0;
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
   }
 }
 
@@ -302,7 +305,7 @@ layer(base);
 */
 @theme inline {
   --font-heading: var(--font-sans);
-  --font-sans: 'DM Sans Variable', sans-serif;
+  --font-sans: "DM Sans Variable", sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -417,6 +420,43 @@ layer(base);
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.6; transform: scale(1.35); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.35);
+  }
+}
+
+/* Legacy map layout helpers */
+.map-viewport {
+  height: calc(100vh - 200px);
+  min-height: 560px;
+}
+
+.mini-map {
+  height: 240px;
+  background: #f8fafc;
+}
+
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block !important;
+}
+
+.card-clean {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+}
+
+.sticky-panel {
+  position: sticky;
+  top: 96px;
 }
