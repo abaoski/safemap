@@ -36,7 +36,7 @@ function AdminManagementPage() {
         if (!confirm("Are you sure you want to delete this contact?")) return
         try {
             const res = await fetch(
-                `http://localhost:5000/api/help/contacts/${id}`,
+                `/api/help/contacts/${id}`,
                 {
                     method: "DELETE",
                     headers: getAuthHeaders(),
@@ -45,16 +45,14 @@ function AdminManagementPage() {
             if (res.ok) {
                 setDirectories(directories.filter(d => d.id !== id))
             }
-        } catch (err) {
-            console.error(err)
-        }
+        } catch (err) { /* ignore */ }
     }
 
     const handleDeleteCategory = async id => {
         if (!confirm("Are you sure you want to delete this category?")) return
         try {
             const res = await fetch(
-                `http://localhost:5000/api/reports/categories/${id}`,
+                `/api/reports/categories/${id}`,
                 {
                     method: "DELETE",
                     headers: getAuthHeaders(),
@@ -63,9 +61,7 @@ function AdminManagementPage() {
             if (res.ok) {
                 setCategories(categories.filter(c => c.id !== id))
             }
-        } catch (err) {
-            console.error(err)
-        }
+        } catch (err) { /* ignore */ }
     }
 
     useEffect(() => {
@@ -74,7 +70,7 @@ function AdminManagementPage() {
 
     const handleAddDirectory = async data => {
         try {
-            const res = await fetch("http://localhost:5000/api/help/contacts", {
+            const res = await fetch("/api/help/contacts", {
                 method: "POST",
                 headers: getAuthHeaders(),
                 body: JSON.stringify(data),
@@ -84,9 +80,7 @@ function AdminManagementPage() {
                 setDirectories([result.contact, ...directories])
                 setIsAddDirOpen(false)
             }
-        } catch (err) {
-            console.error(err)
-        }
+        } catch (err) { /* ignore */ }
     }
 
     const handleAddCategory = async () => {
@@ -97,7 +91,7 @@ function AdminManagementPage() {
 
         try {
             const res = await fetch(
-                "http://localhost:5000/api/reports/categories",
+                "/api/reports/categories",
                 {
                     method: "POST",
                     headers: getAuthHeaders(),
@@ -108,9 +102,7 @@ function AdminManagementPage() {
                 const newCat = await res.json()
                 setCategories([newCat, ...categories])
             }
-        } catch (err) {
-            console.error(err)
-        }
+        } catch (err) { /* ignore */ }
     }
 
     const handleEditDirectory = async dir => {
@@ -123,7 +115,7 @@ function AdminManagementPage() {
 
         try {
             const res = await fetch(
-                `http://localhost:5000/api/help/contacts/${dir.id}`,
+                `/api/help/contacts/${dir.id}`,
                 {
                     method: "PUT",
                     headers: getAuthHeaders(),
@@ -138,9 +130,7 @@ function AdminManagementPage() {
                     ),
                 )
             }
-        } catch (err) {
-            console.error(err)
-        }
+        } catch (err) { /* ignore */ }
     }
 
     const handleEditCategory = async cat => {
@@ -154,7 +144,7 @@ function AdminManagementPage() {
 
         try {
             const res = await fetch(
-                `http://localhost:5000/api/reports/categories/${cat.id}`,
+                `/api/reports/categories/${cat.id}`,
                 {
                     method: "PUT",
                     headers: getAuthHeaders(),
@@ -167,9 +157,7 @@ function AdminManagementPage() {
                     categories.map(c => (c.id === cat.id ? updatedCat : c)),
                 )
             }
-        } catch (err) {
-            console.error(err)
-        }
+        } catch (err) { /* ignore */ }
     }
 
     const loadData = async () => {
@@ -261,11 +249,11 @@ function AdminManagementPage() {
         try {
             // Attempt to fetch from backend
             const dirRes = await fetch(
-                "http://localhost:5000/api/help/contacts",
+                "/api/help/contacts",
                 { headers },
             )
             const catRes = await fetch(
-                "http://localhost:5000/api/reports/categories",
+                "/api/reports/categories",
                 { headers },
             )
 
@@ -277,9 +265,7 @@ function AdminManagementPage() {
                 setCategories(catData.categories || mockCategories)
                 return
             }
-        } catch (error) {
-            console.error("Management fetch failed, using fallback:", error)
-        }
+        } catch (error) { /* ignore */ }
         setDirectories(mockDirectories)
         setCategories(mockCategories)
     }

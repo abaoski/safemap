@@ -23,9 +23,7 @@ export default function ReportSuccessPage() {
         await navigator.clipboard.writeText(referenceCode)
         setShowCopyHint(true)
         setTimeout(() => setShowCopyHint(false), 2000)
-      } catch (err) {
-        console.error('Failed to copy:', err)
-      }
+      } catch (err) { /* ignore */ }
     }
   }
 

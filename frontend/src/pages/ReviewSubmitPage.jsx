@@ -76,10 +76,9 @@ export default function ReviewSubmitPage() {
         address: data.landmark || ''
       }
 
-      console.log('Submitting report:', payload)
 
       // Submit report to backend
-      const response = await fetch('http://localhost:5000/api/reports/submit', {
+      const response = await fetch('/api/reports/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -88,7 +87,6 @@ export default function ReviewSubmitPage() {
       })
 
       const result = await response.json()
-      console.log('Backend response:', result)
 
       if (response.ok) {
         // Clear localStorage draft on successful submission
@@ -105,10 +103,8 @@ export default function ReviewSubmitPage() {
         // Show specific error message from backend
         const errorMsg = result.message || result.error || 'Failed to submit report. Please try again.'
         alert(`Error: ${errorMsg}`)
-        console.error('Backend error:', result)
       }
     } catch (error) {
-      console.error('Error submitting report:', error)
       alert('Error submitting report. Please check your connection and try again.')
     }
   }
@@ -303,8 +299,8 @@ export default function ReviewSubmitPage() {
 
       {/* Bottom Navigation */}
       <BottomNav 
-        onHelpClick={() => {}} 
-        onChatClick={() => {}} 
+        onHelpClick={() => { /* ignore */ }} 
+        onChatClick={() => { /* ignore */ }} 
       />
     </div>
   )

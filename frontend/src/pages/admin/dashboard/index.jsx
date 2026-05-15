@@ -18,20 +18,18 @@ function AdminDashboardPage() {
         const fetchData = async () => {
             setLoading(true)
             try {
-                const statsRes = await fetch('http://localhost:5000/api/reports/stats', { headers: getAuthHeaders() })
+                const statsRes = await fetch('/api/reports/stats', { headers: getAuthHeaders() })
                 if (statsRes.ok) {
                     const data = await statsRes.json()
                     setStats(data)
                 }
 
-                const reportsRes = await fetch('http://localhost:5000/api/reports/pending', { headers: getAuthHeaders() })
+                const reportsRes = await fetch('/api/reports/pending', { headers: getAuthHeaders() })
                 if (reportsRes.ok) {
                     const data = await reportsRes.json()
                     setReports(data.reports || [])
                 }
-            } catch (err) {
-                console.error('Error fetching data:', err)
-            } finally {
+            } catch (err) { /* ignore */ } finally {
                 setLoading(false)
             }
         }

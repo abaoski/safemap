@@ -88,13 +88,10 @@ export default function LocationDetailsPage() {
           setLandmarkSuggestions(uniqueNames.slice(0, 10))
           setShowLandmarkDropdown(true)
         } else {
-          console.log('No landmarks/buildings found from API')
           setShowLandmarkDropdown(false)
         }
       }
-    } catch (error) {
-      console.error('Error fetching landmarks:', error)
-    }
+    } catch (error) { /* ignore */ }
   }
 
   // Handle getting user's current location
@@ -160,23 +157,19 @@ export default function LocationDetailsPage() {
         if (draftData.ageGroup) setAgeGroup(draftData.ageGroup)
         if (draftData.relationship) setRelationship(draftData.relationship)
         if (draftData.description) setDescription(draftData.description)
-      } catch (e) {
-        console.error('Error loading draft:', e)
-      }
+      } catch (e) { /* ignore */ }
     }
   }, [])
 
   // Save to localStorage whenever data changes
   useEffect(() => {
     const draft = localStorage.getItem('safemap_report_draft')
-    let draftData = {}
+    let draftData = { /* ignore */ }
     
     if (draft) {
       try {
         draftData = JSON.parse(draft)
-      } catch (e) {
-        console.error('Error parsing draft:', e)
-      }
+      } catch (e) { /* ignore */ }
     }
 
     // Update draft with current data
@@ -423,8 +416,8 @@ export default function LocationDetailsPage() {
 
       {/* Bottom Navigation */}
       <BottomNav 
-        onHelpClick={() => {}} 
-        onChatClick={() => {}} 
+        onHelpClick={() => { /* ignore */ }} 
+        onChatClick={() => { /* ignore */ }} 
       />
     </div>
   )

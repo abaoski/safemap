@@ -156,7 +156,7 @@ export default function MapPage() {
       {/* Bottom Navigation */}
       <BottomNav
         onHelpClick={handleHelpClick}
-        onChatClick={() => {}}
+        onChatClick={() => { /* ignore */ }}
       />
 
       {/* Flowise Chat Widget - self-managed bubble */}

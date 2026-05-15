@@ -1,14 +1,17 @@
 # API Endpoint Verification Report
 
 ## Summary
+
 This document verifies that frontend API calls match the backend endpoints.
 
 ## Backend Base URL
+
 - **Backend runs on**: `http://localhost:5000`
 - **API prefix**: `/api`
 - **Full base URL**: `http://localhost:5000/api`
 
 ## Frontend Configuration
+
 - **Vite proxy configured**: ✅ Yes (vite.config.js)
 - **API base URL**: `http://localhost:5000/api`
 
@@ -18,38 +21,40 @@ This document verifies that frontend API calls match the backend endpoints.
 
 ### ✅ Authentication Endpoints
 
-| Frontend Call | Backend Route | Status |
-|--------------|---------------|--------|
-| `POST /api/auth/login` | `@api_bp.route('/auth/login', methods=['POST'])` | ✅ Match |
+| Frontend Call             | Backend Route                                       | Status   |
+| ------------------------- | --------------------------------------------------- | -------- |
+| `POST /api/auth/login`    | `@api_bp.route('/auth/login', methods=['POST'])`    | ✅ Match |
 | `POST /api/auth/register` | `@api_bp.route('/auth/register', methods=['POST'])` | ✅ Match |
-| `POST /api/auth/logout` | `@api_bp.route('/auth/logout', methods=['POST'])` | ✅ Match |
-| `GET /api/auth/verify` | `@api_bp.route('/auth/verify', methods=['GET'])` | ✅ Match |
+| `POST /api/auth/logout`   | `@api_bp.route('/auth/logout', methods=['POST'])`   | ✅ Match |
+| `GET /api/auth/verify`    | `@api_bp.route('/auth/verify', methods=['GET'])`    | ✅ Match |
 
 **Frontend Files:**
+
 - `safemap/frontend/src/pages/AdminLoginPage.jsx` - Line 21
 
 ---
 
 ### ✅ Reports Endpoints
 
-| Frontend Call | Backend Route | Status |
-|--------------|---------------|--------|
-| `GET /api/reports/public` | `@api_bp.route('/reports/public', methods=['GET'])` | ✅ Match |
-| `GET /api/reports/pending` | `@api_bp.route('/reports/pending', methods=['GET'])` | ✅ Match |
-| `GET /api/reports` | `@api_bp.route('/reports', methods=['GET'])` | ✅ Match |
-| `GET /api/reports/reference/:code` | `@api_bp.route('/reports/reference/<reference_code>', methods=['GET'])` | ✅ Match |
-| `POST /api/reports/submit` | `@api_bp.route('/reports/submit', methods=['POST'])` | ✅ Match |
-| `POST /api/reports/:id/approve` | `@api_bp.route('/reports/<int:report_id>/approve', methods=['POST'])` | ✅ Match |
-| `POST /api/reports/:id/verify` | `@api_bp.route('/reports/<int:report_id>/verify', methods=['POST'])` | ✅ Match |
-| `POST /api/reports/:id/dismiss` | `@api_bp.route('/reports/<int:report_id>/dismiss', methods=['POST'])` | ✅ Match |
-| `GET /api/reports/stats` | `@api_bp.route('/reports/stats', methods=['GET'])` | ✅ Match |
-| `GET /api/reports/heatmap` | `@api_bp.route('/reports/heatmap', methods=['GET'])` | ✅ Match |
-| `GET /api/reports/categories` | `@api_bp.route('/reports/categories', methods=['GET'])` | ✅ Match |
-| `POST /api/reports/categories` | `@api_bp.route('/reports/categories', methods=['POST'])` | ✅ Match |
-| `PUT /api/reports/categories/:id` | `@api_bp.route('/reports/categories/<int:cat_id>', methods=['PUT'])` | ✅ Match |
+| Frontend Call                        | Backend Route                                                           | Status   |
+| ------------------------------------ | ----------------------------------------------------------------------- | -------- |
+| `GET /api/reports/public`            | `@api_bp.route('/reports/public', methods=['GET'])`                     | ✅ Match |
+| `GET /api/reports/pending`           | `@api_bp.route('/reports/pending', methods=['GET'])`                    | ✅ Match |
+| `GET /api/reports`                   | `@api_bp.route('/reports', methods=['GET'])`                            | ✅ Match |
+| `GET /api/reports/reference/:code`   | `@api_bp.route('/reports/reference/<reference_code>', methods=['GET'])` | ✅ Match |
+| `POST /api/reports/submit`           | `@api_bp.route('/reports/submit', methods=['POST'])`                    | ✅ Match |
+| `POST /api/reports/:id/approve`      | `@api_bp.route('/reports/<int:report_id>/approve', methods=['POST'])`   | ✅ Match |
+| `POST /api/reports/:id/verify`       | `@api_bp.route('/reports/<int:report_id>/verify', methods=['POST'])`    | ✅ Match |
+| `POST /api/reports/:id/dismiss`      | `@api_bp.route('/reports/<int:report_id>/dismiss', methods=['POST'])`   | ✅ Match |
+| `GET /api/reports/stats`             | `@api_bp.route('/reports/stats', methods=['GET'])`                      | ✅ Match |
+| `GET /api/reports/heatmap`           | `@api_bp.route('/reports/heatmap', methods=['GET'])`                    | ✅ Match |
+| `GET /api/reports/categories`        | `@api_bp.route('/reports/categories', methods=['GET'])`                 | ✅ Match |
+| `POST /api/reports/categories`       | `@api_bp.route('/reports/categories', methods=['POST'])`                | ✅ Match |
+| `PUT /api/reports/categories/:id`    | `@api_bp.route('/reports/categories/<int:cat_id>', methods=['PUT'])`    | ✅ Match |
 | `DELETE /api/reports/categories/:id` | `@api_bp.route('/reports/categories/<int:cat_id>', methods=['DELETE'])` | ✅ Match |
 
 **Frontend Files:**
+
 - `safemap/frontend/src/components/MapView.jsx` - Line 132
 - `safemap/frontend/src/pages/ReviewSubmitPage.jsx` - Line 58
 - `safemap/frontend/src/pages/TrackReportPage.jsx` - Line 43
@@ -64,26 +69,28 @@ This document verifies that frontend API calls match the backend endpoints.
 
 ### ✅ Help/Emergency Contacts Endpoints
 
-| Frontend Call | Backend Route | Status |
-|--------------|---------------|--------|
-| `GET /api/help/contacts` | `@api_bp.route('/help/contacts', methods=['GET'])` | ✅ Match |
-| `POST /api/help/contacts` | `@api_bp.route('/help/contacts', methods=['POST'])` | ✅ Match |
-| `PUT /api/help/contacts/:id` | `@api_bp.route('/help/contacts/<int:contact_id>', methods=['PUT'])` | ✅ Match |
+| Frontend Call                   | Backend Route                                                          | Status   |
+| ------------------------------- | ---------------------------------------------------------------------- | -------- |
+| `GET /api/help/contacts`        | `@api_bp.route('/help/contacts', methods=['GET'])`                     | ✅ Match |
+| `POST /api/help/contacts`       | `@api_bp.route('/help/contacts', methods=['POST'])`                    | ✅ Match |
+| `PUT /api/help/contacts/:id`    | `@api_bp.route('/help/contacts/<int:contact_id>', methods=['PUT'])`    | ✅ Match |
 | `DELETE /api/help/contacts/:id` | `@api_bp.route('/help/contacts/<int:contact_id>', methods=['DELETE'])` | ✅ Match |
 
 **Frontend Files:**
+
 - `safemap/frontend/src/pages/admin/management/index.jsx` - Lines 27, 60, 105, 179
 
 ---
 
 ### ✅ Health Check Endpoint
 
-| Frontend Call | Backend Route | Status |
-|--------------|---------------|--------|
+| Frontend Call | Backend Route           | Status   |
+| ------------- | ----------------------- | -------- |
 | `GET /health` | `@app.route('/health')` | ✅ Match |
 
 **Frontend Files:**
-- `safemap/modules/api.js` - Line 262
+
+- None in React frontend (no `/health` call)
 
 ---
 
@@ -91,10 +98,10 @@ This document verifies that frontend API calls match the backend endpoints.
 
 The following endpoints have rate limiting enabled:
 
-| Endpoint | Rate Limit | Status |
-|----------|-----------|--------|
-| `POST /api/reports/submit` | 10 per minute | ✅ Implemented |
-| `GET /api/reports/public` | 30 per minute | ✅ Implemented |
+| Endpoint                           | Rate Limit    | Status         |
+| ---------------------------------- | ------------- | -------------- |
+| `POST /api/reports/submit`         | 10 per minute | ✅ Implemented |
+| `GET /api/reports/public`          | 30 per minute | ✅ Implemented |
 | `GET /api/reports/reference/:code` | 30 per minute | ✅ Implemented |
 
 ---
@@ -102,6 +109,7 @@ The following endpoints have rate limiting enabled:
 ## CORS Configuration
 
 **Backend CORS Origins (config.py):**
+
 ```python
 CORS_ORIGINS = [
     'http://localhost:3000',
@@ -122,8 +130,7 @@ CORS_ORIGINS = [
 1. **Login**: `POST /api/auth/login`
    - Returns JWT token
    - Token stored in localStorage
-   
-2. **Protected Endpoints**: 
+2. **Protected Endpoints**:
    - Require `Authorization: Bearer <token>` header
    - Implemented via `@require_auth` decorator
 
@@ -169,6 +176,7 @@ To verify the API integration is working:
 **Start Command**: `python app.py` (from safemap/backend directory)
 
 **Expected Output**:
+
 ```
 * Running on http://0.0.0.0:5000
 * Debug mode: off (in production)
@@ -177,6 +185,7 @@ To verify the API integration is working:
 **Health Check**: `http://localhost:5000/health`
 
 Expected Response:
+
 ```json
 {
   "status": "healthy",
@@ -192,6 +201,7 @@ Expected Response:
 ✅ **All frontend API calls are correctly configured and match the backend endpoints.**
 
 The SafeMap-PH application has a properly structured API with:
+
 - Consistent endpoint naming
 - Proper authentication and authorization
 - Rate limiting on public endpoints

@@ -25,11 +25,11 @@ function AdminAnalyticsPage() {
         setLoading(true)
         try {
             const token = localStorage.getItem("token")
-            const headers = token ? { Authorization: `Bearer ${token}` } : {}
+            const headers = token ? { Authorization: `Bearer ${token}` } : { /* ignore */ }
 
             // Fetch stats
             const statsRes = await fetch(
-                "http://localhost:5000/api/reports/stats",
+                "/api/reports/stats",
                 { headers },
             )
             if (statsRes.status === 401) {
@@ -44,7 +44,7 @@ function AdminAnalyticsPage() {
 
             // Fetch heatmap points (admin endpoint – needs token)
             const heatRes = await fetch(
-                "http://localhost:5000/api/reports/heatmap",
+                "/api/reports/heatmap",
                 { headers },
             )
             if (heatRes.status === 401) {
@@ -57,7 +57,6 @@ function AdminAnalyticsPage() {
                 setHeatPoints(data.points || [])
             }
         } catch (err) {
-            console.error("Error fetching data:", err)
             // Leave heatPoints empty – map renders but without heatmap
         } finally {
             setLoading(false)
@@ -207,7 +206,7 @@ function AdminAnalyticsPage() {
 
                     <div className="space-y-5">
                         {(() => {
-                            const locations = {}
+                            const locations = { /* ignore */ }
                             heatPoints.forEach(p => {
                                 const key = p.barangay || p.city || "Unknown"
                                 if (!locations[key])
