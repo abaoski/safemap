@@ -44,7 +44,7 @@ export default function TrackReportPage() {
 
         try {
             const response = await fetch(
-                `http://localhost:5000/api/reports/reference/${referenceCode.trim()}`,
+                `/api/reports/reference/${referenceCode.trim()}`,
             )
             const data = await response.json()
 
@@ -293,7 +293,7 @@ export default function TrackReportPage() {
 
             {/* Bottom Navigation - Fixed at footer */}
             <div className="fixed bottom-0 left-0 right-0">
-                <BottomNav onHelpClick={() => {}} onChatClick={() => {}} />
+                <BottomNav onHelpClick={() => { /* ignore */ }} onChatClick={() => { /* ignore */ }} />
             </div>
         </div>
     )

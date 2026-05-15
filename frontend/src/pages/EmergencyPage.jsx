@@ -60,7 +60,6 @@ export default function EmergencyPage() {
         },
         () => {
           // Default to center of Gensan if permission denied
-          console.log('Using default location')
         }
       )
     }
@@ -342,7 +341,7 @@ export default function EmergencyPage() {
       {/* Bottom Navigation */}
       <BottomNav 
         onHelpClick={() => navigate('/help')} 
-        onChatClick={() => {}} 
+        onChatClick={() => { /* ignore */ }} 
       />
     </div>
   )

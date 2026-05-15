@@ -124,7 +124,7 @@ export default function PrivacyPolicyPage() {
 
       <BottomNav 
         onHelpClick={() => navigate('/help')} 
-        onChatClick={() => {}} 
+        onChatClick={() => { /* ignore */ }} 
       />
     </div>
   )

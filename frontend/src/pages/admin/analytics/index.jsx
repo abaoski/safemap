@@ -23,7 +23,7 @@ function AdminAnalyticsPage() {
         try {
             const headers = { Authorization: `Bearer ${token}` }
 
-            const statsRes = await fetch("http://localhost:5000/api/reports/stats", { headers })
+            const statsRes = await fetch("/api/reports/stats", { headers })
             if (statsRes.status === 401) {
                 localStorage.removeItem("token")
                 window.location.href = "/admin"
@@ -31,7 +31,7 @@ function AdminAnalyticsPage() {
             }
             if (statsRes.ok) setStats(await statsRes.json())
 
-            const heatRes = await fetch("http://localhost:5000/api/reports/heatmap", { headers })
+            const heatRes = await fetch("/api/reports/heatmap", { headers })
             if (heatRes.status === 401) {
                 localStorage.removeItem("token")
                 window.location.href = "/admin"
@@ -41,9 +41,7 @@ function AdminAnalyticsPage() {
                 const data = await heatRes.json()
                 setHeatPoints(data.points || [])
             }
-        } catch (err) {
-            console.error("Error fetching analytics data:", err)
-        }
+        } catch (err) { /* ignore */ }
     }
 
     return (

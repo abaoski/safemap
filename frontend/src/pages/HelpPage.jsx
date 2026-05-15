@@ -21,9 +21,7 @@ export default function HelpPage() {
             if (data.emergency_contacts) {
                 setEmergencyContacts(data.emergency_contacts)
             }
-        } catch (error) {
-            console.error("Error fetching emergency contacts:", error)
-        } finally {
+        } catch (error) { /* ignore */ } finally {
             setLoading(false)
         }
     }
@@ -211,7 +209,7 @@ export default function HelpPage() {
             </div>
 
             {/* Bottom Navigation */}
-            <BottomNav onHelpClick={() => {}} onChatClick={() => {}} />
+            <BottomNav onHelpClick={() => { /* ignore */ }} onChatClick={() => { /* ignore */ }} />
         </div>
     )
 }

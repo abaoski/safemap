@@ -27,9 +27,7 @@ export default function ReportPage() {
           // Clear expired draft
           localStorage.removeItem('safemap_report_draft')
         }
-      } catch (e) {
-        console.error('Error parsing draft:', e)
-      }
+      } catch (e) { /* ignore */ }
     }
   }, [])
 

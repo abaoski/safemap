@@ -34,7 +34,7 @@ function AdminDashboardPage() {
         try {
             if (activeTab === "dashboard" || activeTab === "review") {
                 const response = await fetch(
-                    "http://localhost:5000/api/reports/pending",
+                    "/api/reports/pending",
                     {
                         headers: getAuthHeaders(),
                     },
@@ -51,7 +51,7 @@ function AdminDashboardPage() {
             }
             if (activeTab === "dashboard" || activeTab === "analytics") {
                 const response = await fetch(
-                    "http://localhost:5000/api/reports/stats",
+                    "/api/reports/stats",
                     {
                         headers: getAuthHeaders(),
                     },
@@ -66,9 +66,7 @@ function AdminDashboardPage() {
                     setStats(data)
                 }
             }
-        } catch (err) {
-            console.error("Error fetching data:", err)
-        } finally {
+        } catch (err) { /* ignore */ } finally {
             setLoading(false)
         }
     }
@@ -78,7 +76,7 @@ function AdminDashboardPage() {
 
         try {
             const response = await fetch(
-                `http://localhost:5000/api/reports/${reportId}/verify`,
+                `/api/reports/${reportId}/verify`,
                 {
                     method: "POST",
                     headers: getAuthHeaders(),
@@ -95,7 +93,6 @@ function AdminDashboardPage() {
                 alert(data.error || "Failed to resolve report")
             }
         } catch (err) {
-            console.error("Error resolving report:", err)
             alert("Network error. Please try again.")
         }
     }
@@ -111,7 +108,7 @@ function AdminDashboardPage() {
 
         try {
             const response = await fetch(
-                `http://localhost:5000/api/reports/${reportId}/dismiss`,
+                `/api/reports/${reportId}/dismiss`,
                 {
                     method: "POST",
                     headers: getAuthHeaders(),
@@ -125,7 +122,6 @@ function AdminDashboardPage() {
                 alert(data.error || "Failed to dismiss report")
             }
         } catch (err) {
-            console.error("Error dismissing report:", err)
             alert("Network error. Please try again.")
         }
     }

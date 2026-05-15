@@ -153,7 +153,7 @@ export default function TermsOfServicePage() {
 
       <BottomNav 
         onHelpClick={() => navigate('/help')} 
-        onChatClick={() => {}} 
+        onChatClick={() => { /* ignore */ }} 
       />
     </div>
   )

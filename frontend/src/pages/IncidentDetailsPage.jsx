@@ -29,9 +29,7 @@ export default function IncidentDetailsPage() {
           const draftData = JSON.parse(draft)
           if (draftData.incidentType) setIncidentType(draftData.incidentType)
           if (draftData.description) setDescription(draftData.description)
-        } catch (e) {
-          console.error('Error loading draft:', e)
-        }
+        } catch (e) { /* ignore */ }
       }
     }
   }, [location])
@@ -39,14 +37,12 @@ export default function IncidentDetailsPage() {
   // Save to localStorage whenever data changes
   useEffect(() => {
     const draft = localStorage.getItem('safemap_report_draft')
-    let draftData = {}
+    let draftData = { /* ignore */ }
     
     if (draft) {
       try {
         draftData = JSON.parse(draft)
-      } catch (e) {
-        console.error('Error parsing draft:', e)
-      }
+      } catch (e) { /* ignore */ }
     }
 
     // Update draft with current data
@@ -250,8 +246,8 @@ export default function IncidentDetailsPage() {
 
       {/* Bottom Navigation */}
       <BottomNav 
-        onHelpClick={() => {}} 
-        onChatClick={() => {}} 
+        onHelpClick={() => { /* ignore */ }} 
+        onChatClick={() => { /* ignore */ }} 
       />
     </div>
   )

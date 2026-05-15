@@ -403,10 +403,10 @@ function MapView({ activeFilter }) {
     const [reports, setReports] = useState([])
 
     useEffect(() => {
-        fetch("http://localhost:5000/api/reports/public")
+        fetch("/api/reports/public")
             .then(r => (r.ok ? r.json() : { reports: [] }))
             .then(d => setReports(d.reports || []))
-            .catch(() => {})
+            .catch(() => { /* ignore */ })
     }, [])
 
     const SERVICE_TYPES = ["hospital", "police", "fire", "rescue"]

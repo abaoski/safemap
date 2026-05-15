@@ -27,11 +27,11 @@ function ReviewOverlay({ report, onClose, onAction }) {
             }
             const bodies = {
                 resolve: { notes: "Approved for public awareness" },
-                spam: {},
+                spam: { /* ignore */ },
                 dismiss: { reason: "Dismissed by admin" },
             }
             const res = await fetch(
-                `http://localhost:5000${endpoints[action]}`,
+                `${endpoints[action]}`,
                 {
                     method: "POST",
                     headers: getAuthHeaders(),
@@ -42,9 +42,7 @@ function ReviewOverlay({ report, onClose, onAction }) {
                 onAction(report.id, action)
                 onClose()
             }
-        } catch (err) {
-            console.error(err)
-        } finally {
+        } catch (err) { /* ignore */ } finally {
             setLoading(null)
         }
     }
@@ -196,7 +194,7 @@ function NeedReviewSection({ reports: initialReports, loading }) {
 
         try {
             const res = await fetch(
-                `http://localhost:5000${endpoints[action]}`,
+                `${endpoints[action]}`,
                 {
                     method: "POST",
                     headers: {
@@ -209,9 +207,7 @@ function NeedReviewSection({ reports: initialReports, loading }) {
             if (res.ok) {
                 handleAction(id)
             }
-        } catch (err) {
-            console.error(err)
-        } finally {
+        } catch (err) { /* ignore */ } finally {
             setProcessingIds(prev => {
                 const next = new Set(prev)
                 next.delete(id)

@@ -32,7 +32,7 @@ function AdminAuditPage() {
         setLoading(true)
         try {
             const response = await fetch(
-                "http://localhost:5000/api/reports?per_page=100",
+                "/api/reports?per_page=100",
                 { headers: getAuthHeaders() },
             )
             if (response.ok) {
@@ -53,9 +53,7 @@ function AdminAuditPage() {
                         .length,
                 })
             }
-        } catch (err) {
-            console.error("Error fetching data:", err)
-        } finally {
+        } catch (err) { /* ignore */ } finally {
             setLoading(false)
         }
     }
@@ -217,7 +215,7 @@ function AdminAuditPage() {
         return true
     })
 
-    const groupedEntries = {}
+    const groupedEntries = { /* ignore */ }
     filteredEntries.forEach(entry => {
         const date = formatDate(entry.timestamp)
         if (!groupedEntries[date]) groupedEntries[date] = []

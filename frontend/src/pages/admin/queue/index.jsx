@@ -73,7 +73,7 @@ function AdminQueuePage() {
 
         setLoading(true)
         try {
-            let url = "http://localhost:5000/api/reports?per_page=50"
+            let url = "/api/reports?per_page=50"
             if (statusFilter) url += `&status=${statusFilter}`
             if (categoryFilter) url += `&category=${categoryFilter}`
 
@@ -87,7 +87,7 @@ function AdminQueuePage() {
                 setAllReports((await response.json()).reports || [])
 
             const statsRes = await fetch(
-                "http://localhost:5000/api/reports/stats",
+                "/api/reports/stats",
                 { headers: getAuthHeaders() },
             )
             if (statsRes.status === 401) {
@@ -104,9 +104,7 @@ function AdminQueuePage() {
                     total: data.total || 0,
                 })
             }
-        } catch (err) {
-            console.error("Error fetching data:", err)
-        } finally {
+        } catch (err) { /* ignore */ } finally {
             setLoading(false)
         }
     }
@@ -114,7 +112,7 @@ function AdminQueuePage() {
     const handleApprove = async (id, severity) => {
         try {
             const res = await fetch(
-                `http://localhost:5000/api/reports/${id}/approve`,
+                `/api/reports/${id}/approve`,
                 {
                     method: "POST",
                     headers: getAuthHeaders(),
@@ -128,16 +126,14 @@ function AdminQueuePage() {
                 await fetchData()
                 return true
             }
-        } catch (err) {
-            console.error(err)
-        }
+        } catch (err) { /* ignore */ }
         return false
     }
 
     const handleDismiss = async (id, severity) => {
         try {
             const res = await fetch(
-                `http://localhost:5000/api/reports/${id}/dismiss`,
+                `/api/reports/${id}/dismiss`,
                 {
                     method: "POST",
                     headers: getAuthHeaders(),
@@ -151,9 +147,7 @@ function AdminQueuePage() {
                 await fetchData()
                 return true
             }
-        } catch (err) {
-            console.error(err)
-        }
+        } catch (err) { /* ignore */ }
         return false
     }
 

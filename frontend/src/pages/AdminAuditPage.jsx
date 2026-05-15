@@ -122,18 +122,15 @@ function AdminAuditPage() {
         try {
             // Fetch all reports to derive audit entries from review data
             const response = await fetch(
-                "http://localhost:5000/api/reports?per_page=100",
+                "/api/reports?per_page=100",
                 { headers: getAuthHeaders() },
             )
 
-            console.log("Fetch response status:", response.status) // Debug
 
             if (response.ok) {
                 const data = await response.json()
-                console.log("Fetched reports data:", data) // Debug
 
                 const allReports = data.reports || []
-                console.log("Total reports:", allReports.length) // Debug
 
                 setReports(allReports)
 
@@ -154,12 +151,8 @@ function AdminAuditPage() {
                     verifications: entries.filter(e => e.type === "verified")
                         .length,
                 })
-            } else {
-                console.error("Fetch failed with status:", response.status)
-            }
-        } catch (err) {
-            console.error("Error fetching data:", err)
-        } finally {
+            } else { /* ignore */ }
+        } catch (err) { /* ignore */ } finally {
             setLoading(false)
         }
     }
@@ -300,7 +293,6 @@ function AdminAuditPage() {
         // Sort by timestamp (newest first)
         entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
 
-        console.log("Built audit entries:", entries) // Debug log
 
         return entries
     }
@@ -326,7 +318,7 @@ function AdminAuditPage() {
 
     // Group entries by date
     const groupByDate = entries => {
-        const groups = {}
+        const groups = { /* ignore */ }
         entries.forEach(entry => {
             const date = formatDate(entry.timestamp)
             if (!groups[date]) groups[date] = []

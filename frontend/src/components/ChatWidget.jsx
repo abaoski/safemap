@@ -8,7 +8,6 @@ function ChatWidget() {
     // Handle the open chat event from QuickActions
     useEffect(() => {
         const handleOpenChat = () => {
-            console.log('AI Assistant clicked - opening chat window...')
             setAutoOpen(true)
             setChatKey(prev => prev + 1)
         }
