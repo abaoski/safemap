@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
+import { API_BASE } from "@/lib/api-base"
 import logoImg from "/src/assets/images/Logo.svg"
 import rptBackImg from "/src/assets/images/rpt_back.svg"
 import wacCenterImg from "/src/assets/images/WAC_center.svg"
@@ -16,7 +17,7 @@ export default function HelpPage() {
 
     const fetchEmergencyContacts = async () => {
         try {
-            const response = await fetch("/api/help/emergency")
+            const response = await fetch(`${API_BASE}/help/emergency`)
             const data = await response.json()
             if (data.emergency_contacts) {
                 setEmergencyContacts(data.emergency_contacts)

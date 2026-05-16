@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { API_BASE } from "@/lib/api-base"
 import {
     Search,
     CheckCircle,
@@ -122,7 +123,7 @@ function AdminAuditPage() {
         try {
             // Fetch all reports to derive audit entries from review data
             const response = await fetch(
-                "/api/reports?per_page=100",
+                `${API_BASE}/reports?per_page=100`,
                 { headers: getAuthHeaders() },
             )
 

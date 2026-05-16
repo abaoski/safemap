@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { API_BASE } from "@/lib/api-base"
 import { Calendar, Download, MapPin } from "lucide-react"
 import logoImg from "/src/assets/images/Logo.svg"
 import backImg from "/src/assets/images/rpt_back.svg"
@@ -29,7 +30,7 @@ function AdminAnalyticsPage() {
 
             // Fetch stats
             const statsRes = await fetch(
-                "/api/reports/stats",
+                `${API_BASE}/reports/stats`,
                 { headers },
             )
             if (statsRes.status === 401) {
@@ -44,7 +45,7 @@ function AdminAnalyticsPage() {
 
             // Fetch heatmap points (admin endpoint – needs token)
             const heatRes = await fetch(
-                "/api/reports/heatmap",
+                `${API_BASE}/reports/heatmap`,
                 { headers },
             )
             if (heatRes.status === 401) {

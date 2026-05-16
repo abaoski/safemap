@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { API_BASE } from "@/lib/api-base"
 import { Check, Edit2, Ban, LogIn, Search, Shield, Mail } from "lucide-react"
 import logoImg from "/src/assets/images/Logo.svg"
 import backImg from "/src/assets/images/rpt_back.svg"
@@ -34,7 +35,7 @@ function AdminDashboardPage() {
         try {
             if (activeTab === "dashboard" || activeTab === "review") {
                 const response = await fetch(
-                    "/api/reports/pending",
+                    `${API_BASE}/reports/pending`,
                     {
                         headers: getAuthHeaders(),
                     },
@@ -51,7 +52,7 @@ function AdminDashboardPage() {
             }
             if (activeTab === "dashboard" || activeTab === "analytics") {
                 const response = await fetch(
-                    "/api/reports/stats",
+                    `${API_BASE}/reports/stats`,
                     {
                         headers: getAuthHeaders(),
                     },
@@ -76,7 +77,7 @@ function AdminDashboardPage() {
 
         try {
             const response = await fetch(
-                `/api/reports/${reportId}/verify`,
+                `${API_BASE}/reports/${reportId}/verify`,
                 {
                     method: "POST",
                     headers: getAuthHeaders(),
@@ -108,7 +109,7 @@ function AdminDashboardPage() {
 
         try {
             const response = await fetch(
-                `/api/reports/${reportId}/dismiss`,
+                `${API_BASE}/reports/${reportId}/dismiss`,
                 {
                     method: "POST",
                     headers: getAuthHeaders(),

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { API_BASE } from "@/lib/api-base"
 import {
     Search,
     Map,
@@ -36,7 +37,7 @@ function AdminManagementPage() {
         if (!confirm("Are you sure you want to delete this contact?")) return
         try {
             const res = await fetch(
-                `/api/help/contacts/${id}`,
+                `${API_BASE}/help/contacts/${id}`,
                 {
                     method: "DELETE",
                     headers: getAuthHeaders(),
@@ -52,7 +53,7 @@ function AdminManagementPage() {
         if (!confirm("Are you sure you want to delete this category?")) return
         try {
             const res = await fetch(
-                `/api/reports/categories/${id}`,
+                `${API_BASE}/reports/categories/${id}`,
                 {
                     method: "DELETE",
                     headers: getAuthHeaders(),
@@ -70,7 +71,7 @@ function AdminManagementPage() {
 
     const handleAddDirectory = async data => {
         try {
-            const res = await fetch("/api/help/contacts", {
+            const res = await fetch(`${API_BASE}/help/contacts`, {
                 method: "POST",
                 headers: getAuthHeaders(),
                 body: JSON.stringify(data),
@@ -91,7 +92,7 @@ function AdminManagementPage() {
 
         try {
             const res = await fetch(
-                "/api/reports/categories",
+                `${API_BASE}/reports/categories`,
                 {
                     method: "POST",
                     headers: getAuthHeaders(),
@@ -115,7 +116,7 @@ function AdminManagementPage() {
 
         try {
             const res = await fetch(
-                `/api/help/contacts/${dir.id}`,
+                `${API_BASE}/help/contacts/${dir.id}`,
                 {
                     method: "PUT",
                     headers: getAuthHeaders(),
@@ -144,7 +145,7 @@ function AdminManagementPage() {
 
         try {
             const res = await fetch(
-                `/api/reports/categories/${cat.id}`,
+                `${API_BASE}/reports/categories/${cat.id}`,
                 {
                     method: "PUT",
                     headers: getAuthHeaders(),
@@ -249,11 +250,11 @@ function AdminManagementPage() {
         try {
             // Attempt to fetch from backend
             const dirRes = await fetch(
-                "/api/help/contacts",
+                `${API_BASE}/help/contacts`,
                 { headers },
             )
             const catRes = await fetch(
-                "/api/reports/categories",
+                `${API_BASE}/reports/categories`,
                 { headers },
             )
 

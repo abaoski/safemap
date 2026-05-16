@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import { useLocation } from "react-router-dom"
+import { API_BASE } from "@/lib/api-base"
 import {
     Search,
     Filter,
@@ -73,7 +74,7 @@ function AdminQueuePage() {
 
         setLoading(true)
         try {
-            let url = "/api/reports?per_page=50"
+            let url = `${API_BASE}/reports?per_page=50`
             if (statusFilter) url += `&status=${statusFilter}`
             if (categoryFilter) url += `&category=${categoryFilter}`
 
@@ -87,7 +88,7 @@ function AdminQueuePage() {
                 setAllReports((await response.json()).reports || [])
 
             const statsRes = await fetch(
-                "/api/reports/stats",
+                `${API_BASE}/reports/stats`,
                 { headers: getAuthHeaders() },
             )
             if (statsRes.status === 401) {
@@ -112,7 +113,7 @@ function AdminQueuePage() {
     const handleApprove = async (id, severity) => {
         try {
             const res = await fetch(
-                `/api/reports/${id}/approve`,
+                `${API_BASE}/reports/${id}/approve`,
                 {
                     method: "POST",
                     headers: getAuthHeaders(),
@@ -133,7 +134,7 @@ function AdminQueuePage() {
     const handleDismiss = async (id, severity) => {
         try {
             const res = await fetch(
-                `/api/reports/${id}/dismiss`,
+                `${API_BASE}/reports/${id}/dismiss`,
                 {
                     method: "POST",
                     headers: getAuthHeaders(),
