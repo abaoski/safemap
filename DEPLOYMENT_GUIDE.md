@@ -83,13 +83,15 @@ The frontend will be available at `http://localhost:5173`
 #### Backend (Python/Flask with Gunicorn)
 
 1. **Install production dependencies**:
+
 ```bash
 cd backend
 pip install -r requirements.txt
 ```
 
 2. **Configure environment variables**:
-Create a `.env` file with the following **required** variables:
+   Create a `.env` file with the following **required** variables:
+
 ```env
 # Flask Configuration
 FLASK_ENV=production
@@ -115,6 +117,7 @@ CORS_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
 ```
 
 **Important Security Notes:**
+
 - `SECRET_KEY` and `JWT_SECRET_KEY` must be at least 32 characters long and cryptographically random
 - `ENCRYPTION_KEY` must be a valid Fernet key (generate using: `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`)
 - `ADMIN_PASSWORD` must be at least 8 characters with uppercase, lowercase, and numbers
@@ -122,6 +125,7 @@ CORS_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
 - The application will fail to start in production mode if required secrets are missing or use default values
 
 3. **Run with Gunicorn**:
+
 ```bash
 gunicorn -w 4 -b 0.0.0.0:5000 "app:create_app()"
 ```
@@ -129,6 +133,7 @@ gunicorn -w 4 -b 0.0.0.0:5000 "app:create_app()"
 #### Frontend (React/Vite)
 
 1. **Build the application**:
+
 ```bash
 cd frontend
 pnpm install
@@ -136,7 +141,8 @@ pnpm build
 ```
 
 2. **Serve static files**:
-You can use any static file server (Nginx, Apache, or serve):
+   You can use any static file server (Nginx, Apache, or serve):
+
 ```bash
 # Using serve
 npx serve dist -l 3000
@@ -145,6 +151,7 @@ npx serve dist -l 3000
 ### Option B: Docker Deployment
 
 1. **Create Dockerfile for Backend**:
+
 ```dockerfile
 FROM python:3.11-slim
 WORKDIR /app
@@ -156,6 +163,7 @@ CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:create_app()"]
 ```
 
 2. **Create Dockerfile for Frontend**:
+
 ```dockerfile
 FROM node:18-alpine as build
 WORKDIR /app
@@ -169,8 +177,9 @@ EXPOSE 80
 ```
 
 3. **Create docker-compose.yml**:
+
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   backend:
     build: ./backend
@@ -188,6 +197,7 @@ services:
 ```
 
 4. **Run Docker**:
+
 ```bash
 docker-compose up -d
 ```
@@ -246,6 +256,7 @@ docker-compose up -d
 ### Environment Variables
 
 Required production variables:
+
 ```env
 # Flask Configuration
 FLASK_ENV=production
@@ -310,6 +321,7 @@ server {
 ## Default Admin Account
 
 After running `init_db.py`, a default admin account is created:
+
 - **Username**: `admin`
 - **Password**: `admin123`
 
@@ -364,12 +376,14 @@ As part of the backend security refactor, the report status naming has been simp
 #### When to Run This Migration
 
 Run this migration if you have existing data in your database with the old `verified_pnp` status. This migration should be run:
+
 - After deploying the updated backend code
 - Before the application starts serving traffic with the new status naming
 
 #### Pre-Migration Steps
 
 1. **Backup your database**:
+
 ```bash
 # For SQLite
 cp safemap.db safemap.db.backup
@@ -398,12 +412,14 @@ python migrations/migrate_verified_status.py
 #### Expected Output
 
 The migration script will display:
+
 - Number of records updated in `ledger_report_header` table
 - Number of records updated in `ledger_report_entry` table
 - Verification that no old `verified_pnp` status values remain
 - Current count of records with the new `verified` status
 
 Example output:
+
 ```
 Starting migration: verified_pnp -> verified
 --------------------------------------------------
@@ -434,6 +450,7 @@ Current 'verified' status counts:
 #### Post-Migration Steps
 
 1. **Verify the migration**:
+
 ```bash
 # Check that no old status values remain
 sqlite3 safemap.db "SELECT COUNT(*) FROM ledger_report_header WHERE status = 'verified_pnp';"
@@ -465,6 +482,7 @@ python migrations/migrate_verified_status.py --rollback
 ```
 
 You will be prompted to confirm the rollback:
+
 ```
 ⚠️  WARNING: You are about to rollback the migration!
 This will revert 'verified' status back to 'verified_pnp'
@@ -499,25 +517,27 @@ SELECT COUNT(*) FROM ledger_report_entry WHERE status_to = 'verified_pnp';
 #### Troubleshooting
 
 **Migration fails with "No module named 'app'"**:
+
 - Ensure you're in the `safemap/backend` directory
 - Ensure your virtual environment is activated
 - Ensure all dependencies are installed: `pip install -r requirements.txt`
 
 **Migration fails with database connection error**:
+
 - Check that your `.env` file has correct database configuration
 - Ensure the database file exists (for SQLite)
 - Ensure database server is running (for PostgreSQL)
 
 **Migration shows 0 records updated**:
+
 - This is normal if you don't have any existing data with `verified_pnp` status
 - The migration is safe to run multiple times (idempotent)
 
 **Application shows errors after migration**:
+
 - Verify the backend code has been updated to use `verified` status
 - Check application logs for specific error messages
 - Ensure the migration completed successfully (check verification output)
-
-
 
 ---
 
@@ -529,34 +549,36 @@ SELECT COUNT(*) FROM ledger_report_entry WHERE status_to = 'verified_pnp';
 
 The following environment variables are **mandatory** for production deployment:
 
-| Variable | Purpose | Requirements | Example |
-| :--- | :--- | :--- | :--- |
-| `SECRET_KEY` | Flask session encryption | Min 32 chars, cryptographically random | `python -c "import secrets; print(secrets.token_urlsafe(32))"` |
-| `JWT_SECRET_KEY` | JWT token signing | Min 32 chars, cryptographically random | `python -c "import secrets; print(secrets.token_urlsafe(32))"` |
-| `ENCRYPTION_KEY` | Report description encryption | Valid Fernet key (base64) | `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"` |
-| `ADMIN_PASSWORD` | Initial admin account | Min 8 chars, mixed case + numbers | Set via environment or interactive prompt |
+| Variable         | Purpose                       | Requirements                           | Example                                                                                     |
+| :--------------- | :---------------------------- | :------------------------------------- | :------------------------------------------------------------------------------------------ |
+| `SECRET_KEY`     | Flask session encryption      | Min 32 chars, cryptographically random | `python -c "import secrets; print(secrets.token_urlsafe(32))"`                              |
+| `JWT_SECRET_KEY` | JWT token signing             | Min 32 chars, cryptographically random | `python -c "import secrets; print(secrets.token_urlsafe(32))"`                              |
+| `ENCRYPTION_KEY` | Report description encryption | Valid Fernet key (base64)              | `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"` |
+| `ADMIN_PASSWORD` | Initial admin account         | Min 8 chars, mixed case + numbers      | Set via environment or interactive prompt                                                   |
 
 **Critical:** The application will refuse to start in production mode (`FLASK_ENV=production`) if any of these variables are missing or contain default/insecure values.
 
 #### Optional Security Variables
 
-| Variable | Purpose | Default | Recommended |
-| :--- | :--- | :--- | :--- |
-| `FORCE_HTTPS` | Redirect HTTP to HTTPS | `false` | `true` in production |
-| `CORS_ORIGINS` | Allowed cross-origin domains | `http://localhost:3000,http://localhost:5173` | Your production domain(s) |
-| `FLASK_ENV` | Environment mode | `development` | `production` |
-| `LOG_LEVEL` | Logging verbosity | `INFO` | `WARNING` or `ERROR` in production |
+| Variable       | Purpose                      | Default                                       | Recommended                        |
+| :------------- | :--------------------------- | :-------------------------------------------- | :--------------------------------- |
+| `FORCE_HTTPS`  | Redirect HTTP to HTTPS       | `false`                                       | `true` in production               |
+| `CORS_ORIGINS` | Allowed cross-origin domains | `http://localhost:3000,http://localhost:5173` | Your production domain(s)          |
+| `FLASK_ENV`    | Environment mode             | `development`                                 | `production`                       |
+| `LOG_LEVEL`    | Logging verbosity            | `INFO`                                        | `WARNING` or `ERROR` in production |
 
 ### HTTPS and Transport Security
 
 #### Enable HTTPS Enforcement
 
 Set the following in your production `.env`:
+
 ```env
 FORCE_HTTPS=true
 ```
 
 This will:
+
 - Redirect all HTTP requests to HTTPS
 - Set secure cookie flags (`Secure`, `HttpOnly`, `SameSite=Lax`)
 - Prevent session hijacking over insecure connections
@@ -566,6 +588,7 @@ This will:
 If using Nginx or Apache as a reverse proxy, ensure proper headers are forwarded:
 
 **Nginx Example:**
+
 ```nginx
 location /api {
     proxy_pass http://localhost:5000;
@@ -592,10 +615,10 @@ CORS_ORIGINS=https://safemap.example.com,https://www.safemap.example.com
 
 The application enforces rate limiting on public endpoints to prevent abuse:
 
-| Endpoint | Rate Limit | Purpose |
-| :--- | :--- | :--- |
-| `/api/reports/submit` | 10 requests/minute | Prevent spam report submissions |
-| `/api/reports/public` | 30 requests/minute | Prevent excessive heatmap queries |
+| Endpoint                        | Rate Limit         | Purpose                            |
+| :------------------------------ | :----------------- | :--------------------------------- |
+| `/api/reports/submit`           | 10 requests/minute | Prevent spam report submissions    |
+| `/api/reports/public`           | 30 requests/minute | Prevent excessive heatmap queries  |
 | `/api/reports/reference/<code>` | 30 requests/minute | Prevent reference code enumeration |
 
 #### Configure Rate Limit Storage
@@ -629,6 +652,7 @@ DATABASE_URL=postgresql://username:password@localhost:5432/safemap
 ```
 
 Benefits:
+
 - Better concurrency handling
 - Row-level locking
 - Full ACID compliance
@@ -639,12 +663,14 @@ Benefits:
 Set up automated daily backups:
 
 **PostgreSQL:**
+
 ```bash
 # Add to crontab
 0 2 * * * pg_dump -U username safemap > /backups/safemap_$(date +\%Y\%m\%d).sql
 ```
 
 **SQLite:**
+
 ```bash
 # Add to crontab
 0 2 * * * cp /path/to/safemap.db /backups/safemap_$(date +\%Y\%m\%d).db
@@ -683,6 +709,7 @@ After initial deployment, immediately change the admin password:
 #### Password Requirements
 
 Admin passwords must meet the following requirements:
+
 - Minimum 8 characters
 - At least one uppercase letter
 - At least one lowercase letter
@@ -701,6 +728,7 @@ The application uses structured logging with the following levels:
 - `ERROR`: Error messages for failures
 
 Set appropriate log level in production:
+
 ```env
 LOG_LEVEL=WARNING
 ```
@@ -708,6 +736,7 @@ LOG_LEVEL=WARNING
 #### Monitor Error Logs
 
 Key events that are logged:
+
 - Failed authentication attempts
 - Rate limit violations
 - Input validation failures
