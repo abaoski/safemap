@@ -26,6 +26,6 @@ export function normalizeApiBaseUrl(
  *   If the variable is absent the app falls back to "/api" (same-origin).
  */
 export const API_BASE = normalizeApiBaseUrl(
-    import.meta.env.VITE_API_BASE_URL as string | undefined,
+    (import.meta as { env?: Record<string, string> }).env?.VITE_API_BASE_URL,
     "/api",
 )
