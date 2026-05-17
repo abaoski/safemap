@@ -79,7 +79,7 @@ function AdminLayout({ activeTab, children }) {
   const initials = getInitials(user?.name || user?.username)
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 overflow-x-hidden flex flex-col items-center pt-0">
+    <div className="w-full min-h-screen bg-slate-50 flex flex-col items-center pt-0">
       {/* Header */}
       <div className="w-full max-w-sm px-4 pt-4 pb-2">
         <div className="relative flex items-center justify-center mb-5">
@@ -95,15 +95,13 @@ function AdminLayout({ activeTab, children }) {
                 className="w-8 h-8 hover:bg-[#1f295b]/10 transition-colors rounded-lg flex items-center justify-center relative cursor-pointer border-none outline-none"
               >
                 <BellIcon className="w-4 h-4 text-[#1f295b]" />
-                {/* Unread indicator dot */}
                 {notifications.some((n) => n.unread) && (
-                  <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-red-500 rounded-full border border-[#1f295b]"></div>
+                  <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-red-500 rounded-full border border-[#1f295b]" />
                 )}
               </button>
 
-              {/* Dropdown Menu */}
               {isNotifOpen && (
-                <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-[0px_8px_24px_rgba(149,157,165,0.2)] border border-slate-100 overflow-hidden z-9999">
+                <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-[0px_8px_24px_rgba(149,157,165,0.2)] border border-slate-100 overflow-hidden z-[9999]">
                   <div className="px-4 py-3 border-b border-slate-50 flex items-center justify-between">
                     <h3 className="text-slate-800 text-sm font-bold font-['DM_Sans']">Notifications</h3>
                     <button className="text-[#1e3a8a] text-[10px] font-bold font-['DM_Sans'] hover:underline">
@@ -156,9 +154,8 @@ function AdminLayout({ activeTab, children }) {
                 )}
               </button>
 
-              {/* Dropdown Menu */}
               {isProfileOpen && (
-                <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-[0px_8px_24px_rgba(149,157,165,0.2)] border border-slate-100 overflow-hidden z-9999">
+                <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-[0px_8px_24px_rgba(149,157,165,0.2)] border border-slate-100 overflow-hidden z-[9999]">
                   <div className="px-4 py-3 border-b border-slate-50 flex items-center gap-3">
                     <div className="shrink-0">
                       {avatarUrl ? (
@@ -184,20 +181,14 @@ function AdminLayout({ activeTab, children }) {
                   </div>
                   <div className="py-2 flex flex-col items-start w-full">
                     <button
-                      onClick={() => {
-                        setIsProfileOpen(false)
-                        navigate("/admin-settings")
-                      }}
+                      onClick={() => { setIsProfileOpen(false); navigate("/admin-settings") }}
                       className="w-full text-left px-4 py-2.5 text-xs text-slate-700 font-medium font-['DM_Sans'] hover:bg-slate-50 transition-colors flex items-center gap-3 border-none outline-none"
                     >
                       <User className="w-4 h-4 text-slate-400" />
                       Profile
                     </button>
                     <button
-                      onClick={() => {
-                        setIsProfileOpen(false)
-                        navigate("/admin-settings")
-                      }}
+                      onClick={() => { setIsProfileOpen(false); navigate("/admin-settings") }}
                       className="w-full text-left px-4 py-2.5 text-xs text-slate-700 font-medium font-['DM_Sans'] hover:bg-slate-50 transition-colors flex items-center gap-3 border-none outline-none"
                     >
                       <Settings className="w-4 h-4 text-slate-400" />
@@ -206,10 +197,7 @@ function AdminLayout({ activeTab, children }) {
                   </div>
                   <div className="py-2 border-t border-slate-50">
                     <button
-                      onClick={() => {
-                        setIsProfileOpen(false)
-                        handleLogout()
-                      }}
+                      onClick={() => { setIsProfileOpen(false); handleLogout() }}
                       className="w-full text-left px-4 py-2.5 text-xs text-red-600 font-medium font-['DM_Sans'] hover:bg-red-50 transition-colors flex items-center gap-3 border-none outline-none"
                     >
                       <LogOut className="w-4 h-4 text-red-500" />
@@ -222,7 +210,7 @@ function AdminLayout({ activeTab, children }) {
           </div>
         </div>
 
-        {/* Page content injected here — first child is typically the title row */}
+        {/* First child (page title row) rendered inside header container */}
       </div>
 
       {/* Page body */}
@@ -230,8 +218,6 @@ function AdminLayout({ activeTab, children }) {
 
       {/* Bottom Navigation */}
       <AdminBottomNav activeTab={activeTab} />
-
-      {/* Removed Back / Logout Button to use Avatar Dropdown Instead */}
     </div>
   )
 }

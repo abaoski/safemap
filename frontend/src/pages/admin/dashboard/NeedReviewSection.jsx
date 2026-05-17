@@ -1,10 +1,25 @@
 import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { API_BASE } from "@/lib/api-base"
 import { MapPin, X, CheckCircle, Ban, AlertOctagon, Calendar } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 function ReviewOverlay({ report, onClose, onAction }) {
   const [loading, setLoading] = useState(null)
+  const navigate = useNavigate()
+  const isInProgress = report.status === "in_progress"
+  const hasSeverity = Boolean(report.severity)
+  const primaryAction = isInProgress ? "verify" : "approve"
+  const primaryLabel = !hasSeverity ? "Review" : isInProgress ? "Resolve" : "Approve"
+
+  // Lock body scroll while open
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [])
 
   const getAuthHeaders = () => ({
     "Content-Type": "application/json",
@@ -15,18 +30,18 @@ function ReviewOverlay({ report, onClose, onAction }) {
     setLoading(action)
     try {
       const endpoints = {
-        resolve: `${API_BASE}/reports/${report.id}/approve`,
+        approve: `${API_BASE}/reports/${report.id}/approve`,
+        verify: `${API_BASE}/reports/${report.id}/verify`,
         spam: `${API_BASE}/reports/${report.id}/spam`,
         dismiss: `${API_BASE}/reports/${report.id}/dismiss`,
       }
       const bodies = {
-        resolve: { notes: "Approved for public awareness" },
-        spam: {
-          /* ignore */
-        },
+        approve: { notes: "Approved for public awareness" },
+        verify: { notes: "Resolved by admin" },
+        spam: {},
         dismiss: { reason: "Dismissed by admin" },
       }
-      const res = await fetch(`${endpoints[action]}`, {
+      const res = await fetch(endpoints[action], {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify(bodies[action]),
@@ -47,19 +62,24 @@ function ReviewOverlay({ report, onClose, onAction }) {
     high: "bg-amber-100 text-amber-600",
     medium: "bg-blue-100 text-blue-600",
     low: "bg-slate-100 text-slate-500",
+    unassigned: "bg-slate-100 text-slate-500",
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onClose}>
+  return createPortal(
+    <div
+      className="fixed inset-0 flex items-end justify-center"
+      style={{ zIndex: 999999 }}
+      onClick={onClose}
+    >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
-      {/* Sheet */}
+      {/* Bottom sheet */}
       <div
-        className="relative w-full max-w-sm bg-white rounded-t-3xl shadow-2xl pb-50 max-h-[85vh] overflow-y-auto"
+        className="relative w-full max-w-lg bg-white rounded-t-3xl shadow-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Handle */}
+        {/* Drag handle */}
         <div className="flex justify-center pt-3 pb-1">
           <div className="w-10 h-1 bg-slate-200 rounded-full" />
         </div>
@@ -85,9 +105,9 @@ function ReviewOverlay({ report, onClose, onAction }) {
         {/* Badges */}
         <div className="flex flex-wrap gap-2 px-5 pt-4">
           <span
-            className={`px-2.5 py-1 rounded-full text-[10px] font-bold font-['DM_Sans'] uppercase ${severityColor[report.severity] || severityColor.medium}`}
+            className={`px-2.5 py-1 rounded-full text-[10px] font-bold font-['DM_Sans'] uppercase ${severityColor[report.severity] || severityColor.unassigned}`}
           >
-            {report.severity || "medium"}
+            {report.severity || "unassigned"}
           </span>
           <span className="px-2.5 py-1 rounded-full text-[10px] font-bold font-['DM_Sans'] uppercase bg-slate-100 text-slate-600">
             {report.category?.replace(/_/g, " ")}
@@ -120,15 +140,22 @@ function ReviewOverlay({ report, onClose, onAction }) {
         </div>
 
         {/* Actions */}
-        <div className="px-5 pt-6 grid grid-cols-3 gap-2">
+        <div className="px-5 pt-6 pb-8 grid grid-cols-3 gap-3">
           <button
-            onClick={() => handleAction("resolve")}
+            onClick={() => {
+              if (!hasSeverity) {
+                onClose()
+                navigate(`/admin-queue?id=${report.id}`)
+                return
+              }
+              handleAction(primaryAction)
+            }}
             disabled={!!loading}
             className="flex flex-col items-center gap-1.5 py-3 bg-emerald-50 text-emerald-600 rounded-2xl hover:bg-emerald-100 transition-colors disabled:opacity-50"
           >
             <CheckCircle size={20} />
             <span className="text-[10px] font-bold font-['DM_Sans'] uppercase">
-              {loading === "resolve" ? "..." : "Resolve"}
+              {loading === primaryAction ? "..." : primaryLabel}
             </span>
           </button>
           <button
@@ -153,7 +180,8 @@ function ReviewOverlay({ report, onClose, onAction }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
@@ -163,7 +191,6 @@ function NeedReviewSection({ reports: initialReports, loading }) {
   const [selectedReport, setSelectedReport] = useState(null)
   const [processingIds, setProcessingIds] = useState(new Set())
 
-  // Sync if parent updates
   useEffect(() => {
     if (initialReports) setReports(initialReports)
   }, [initialReports])
@@ -172,25 +199,23 @@ function NeedReviewSection({ reports: initialReports, loading }) {
     setReports((prev) => prev.filter((r) => r.id !== id))
   }
 
-  const handleQuickAction = async (id, action) => {
-    if (processingIds.has(id)) return
-
-    setProcessingIds((prev) => new Set(prev).add(id))
+  const handleQuickAction = async (report, action) => {
+    if (processingIds.has(report.id)) return
+    setProcessingIds((prev) => new Set(prev).add(report.id))
 
     const endpoints = {
-      resolve: `${API_BASE}/reports/${id}/verify`,
-      dismiss: `${API_BASE}/reports/${id}/dismiss`,
+      approve: `${API_BASE}/reports/${report.id}/approve`,
+      verify: `${API_BASE}/reports/${report.id}/verify`,
+      dismiss: `${API_BASE}/reports/${report.id}/dismiss`,
     }
     const bodies = {
-      resolve: {
-        notes: "Verified by administrator",
-        case_number: "ADMIN-RESOLVED",
-      },
+      approve: { notes: "Approved for public awareness" },
+      verify: { notes: "Resolved by admin" },
       dismiss: { reason: "Dismissed by admin" },
     }
 
     try {
-      const res = await fetch(`${endpoints[action]}`, {
+      const res = await fetch(endpoints[action], {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -198,15 +223,13 @@ function NeedReviewSection({ reports: initialReports, loading }) {
         },
         body: JSON.stringify(bodies[action]),
       })
-      if (res.ok) {
-        handleAction(id)
-      }
+      if (res.ok) handleAction(report.id)
     } catch (err) {
       /* ignore */
     } finally {
       setProcessingIds((prev) => {
         const next = new Set(prev)
-        next.delete(id)
+        next.delete(report.id)
         return next
       })
     }
@@ -214,42 +237,31 @@ function NeedReviewSection({ reports: initialReports, loading }) {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "pending_review":
-        return "border-amber-500"
-      case "in_progress":
-        return "border-blue-900"
-      default:
-        return "border-gray-200"
+      case "pending_review": return "border-amber-500"
+      case "in_progress": return "border-blue-900"
+      default: return "border-gray-200"
     }
   }
 
   const getStatusBadge = (status) => {
     switch (status) {
-      case "pending_review":
-        return "bg-amber-100 text-amber-600 border-amber-200"
-      case "in_progress":
-        return "bg-blue-100 text-blue-900 border-blue-200"
-      case "verified_pnp":
-        return "bg-green-100 text-green-600 border-green-200"
-      case "dismissed":
-        return "bg-red-100 text-red-500 border-red-200"
-      default:
-        return "bg-gray-100 text-gray-500 border-gray-200"
+      case "pending_review": return "bg-amber-100 text-amber-600"
+      case "in_progress": return "bg-blue-100 text-blue-900"
+      case "verified": return "bg-green-100 text-green-600"       // backend value
+      case "verified_pnp": return "bg-green-100 text-green-600"   // legacy fallback
+      case "dismissed": return "bg-red-100 text-red-500"
+      default: return "bg-gray-100 text-gray-500"
     }
   }
 
   const getStatusLabel = (status) => {
     switch (status) {
-      case "pending_review":
-        return "Pending Review"
-      case "in_progress":
-        return "In Progress"
-      case "verified_pnp":
-        return "Resolved"
-      case "dismissed":
-        return "Dismissed"
-      default:
-        return status
+      case "pending_review": return "Pending Review"
+      case "in_progress": return "In Progress"
+      case "verified": return "Resolved"        // backend value
+      case "verified_pnp": return "Resolved"   // legacy fallback
+      case "dismissed": return "Dismissed"
+      default: return status
     }
   }
 
@@ -262,11 +274,11 @@ function NeedReviewSection({ reports: initialReports, loading }) {
             onClick={() => navigate("/admin-queue")}
             className="text-[#1e3a8a] text-xs font-bold font-['DM_Sans'] hover:underline"
           >
-            View Queue
+            View Queue →
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {loading && reports.length === 0 ? (
             <div className="text-center py-8 text-gray-400 text-xs italic font-['DM_Sans']">Loading reports...</div>
           ) : reports.length === 0 ? (
@@ -283,36 +295,31 @@ function NeedReviewSection({ reports: initialReports, loading }) {
                   className={`w-full bg-white rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border-l-4 p-4 flex gap-3 ${getStatusColor(report.status)} cursor-pointer hover:bg-slate-50 transition-colors ${isProcessing ? "opacity-50 pointer-events-none" : ""}`}
                 >
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1.5">
+                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                       <span className="text-gray-400 text-[10px] font-bold font-['DM_Sans']">
                         {report.reference_code || `SF-${report.id}`}
                       </span>
-                      <span
-                        className={`px-2 py-0.5 rounded text-[8px] font-bold font-['DM_Sans'] uppercase tracking-wider ${getStatusBadge(report.status)}`}
-                      >
+                      <span className={`px-2 py-0.5 rounded text-[8px] font-bold font-['DM_Sans'] uppercase tracking-wider ${getStatusBadge(report.status)}`}>
                         {getStatusLabel(report.status)}
                       </span>
                       <span className="px-2 py-0.5 rounded text-[8px] font-bold font-['DM_Sans'] uppercase tracking-wider bg-gray-100 text-gray-500">
-                        {report.category?.replace("_", " ")}
+                        {report.category?.replace(/_/g, " ")}
                       </span>
                     </div>
                     <h3 className="text-zinc-800 text-[13px] font-bold font-['DM_Sans'] leading-tight mb-1.5">
                       {report.title}
                     </h3>
-                    <div className="flex items-center gap-1.5 mb-3 text-gray-400 text-[10px] font-normal font-['DM_Sans']">
+                    <div className="flex items-center gap-1.5 mb-3 text-gray-400 text-[10px] font-['DM_Sans']">
                       <MapPin className="w-3 h-3" />
                       {report.location?.barangay || report.location?.city || "General Santos City"}
                     </div>
                     <div className="flex items-center justify-between mt-1">
-                      <span className="text-gray-400 text-[10px] font-normal font-['DM_Sans']">
+                      <span className="text-gray-400 text-[10px] font-['DM_Sans']">
                         {new Date(report.created_at).toLocaleDateString()}
                       </span>
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleQuickAction(report.id, "dismiss")
-                          }}
+                          onClick={(e) => { e.stopPropagation(); handleQuickAction(report, "dismiss") }}
                           disabled={isProcessing}
                           className="h-7 px-3 bg-red-50 hover:bg-red-100 transition-colors rounded-lg text-red-500 text-[10px] font-bold font-['DM_Sans'] flex items-center justify-center min-w-16"
                         >
@@ -321,12 +328,13 @@ function NeedReviewSection({ reports: initialReports, loading }) {
                         <button
                           onClick={(e) => {
                             e.stopPropagation()
-                            handleQuickAction(report.id, "resolve")
+                            if (!report.severity) { setSelectedReport(report); return }
+                            handleQuickAction(report, report.status === "in_progress" ? "verify" : "approve")
                           }}
                           disabled={isProcessing}
                           className="h-7 px-3 bg-[#1f295b] hover:bg-[#151c3d] transition-colors rounded-lg text-white text-[10px] font-bold font-['DM_Sans'] flex items-center justify-center min-w-16"
                         >
-                          {isProcessing ? "..." : "Resolve"}
+                          {isProcessing ? "..." : !report.severity ? "Review" : report.status === "in_progress" ? "Resolve" : "Approve"}
                         </button>
                       </div>
                     </div>
@@ -339,7 +347,11 @@ function NeedReviewSection({ reports: initialReports, loading }) {
       </div>
 
       {selectedReport && (
-        <ReviewOverlay report={selectedReport} onClose={() => setSelectedReport(null)} onAction={handleAction} />
+        <ReviewOverlay
+          report={selectedReport}
+          onClose={() => setSelectedReport(null)}
+          onAction={handleAction}
+        />
       )}
     </>
   )

@@ -42,7 +42,7 @@ function AdminDashboardPage() {
 
   return (
     <AdminLayout activeTab="dashboard">
-      {/* Header Area */}
+      {/* Header */}
       <div className="w-full max-w-sm px-4">
         <div className="flex items-center justify-between">
           <h1 className="text-zinc-800 text-lg font-extrabold font-['DM_Sans']">Dashboard</h1>

@@ -31,7 +31,7 @@ function AdminBottomNav({ activeTab }) {
   )
 
   return (
-    <div className="fixed bottom-0 w-full max-w-110 h-18 bg-white rounded-t-[30px] flex justify-between items-center px-6 z-99999">
+    <div className="fixed bottom-0 w-full max-w-110 h-18 bg-white rounded-t-[30px] flex justify-between items-center px-6 z-[99999]">
       {activeTab === "queue"
         ? renderActiveTab(List, "Queue", "queue", "/admin-queue")
         : renderInactiveTab(List, "Queue", "queue", "/admin-queue")}

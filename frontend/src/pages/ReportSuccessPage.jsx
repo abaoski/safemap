@@ -34,7 +34,7 @@ export default function ReportSuccessPage() {
   }
 
   const handleBackToHome = () => {
-    navigate("/")
+    navigate("/map")
   }
 
   return (

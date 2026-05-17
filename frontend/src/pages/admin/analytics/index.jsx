@@ -49,7 +49,7 @@ function AdminAnalyticsPage() {
 
   return (
     <AdminLayout activeTab="analytics">
-      {/* Title & Actions — rendered inside the header's max-w-sm container */}
+      {/* Title & Actions */}
       <div className="w-full max-w-sm px-4">
         <div className="flex flex-col gap-4 mt-2">
           <h1 className="text-zinc-800 text-xl font-extrabold font-['DM_Sans']">System Analytics & Trends</h1>

@@ -69,6 +69,28 @@ function AdminDashboardPage() {
   }
 
   const handleApprove = async (reportId) => {
+    if (!confirm("Are you sure you want to approve this report for public awareness?")) return
+
+    try {
+      const response = await fetch(`${API_BASE}/reports/${reportId}/approve`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          notes: "Approved for public awareness",
+        }),
+      })
+      if (response.ok) {
+        fetchData()
+      } else {
+        const data = await response.json()
+        alert(data.error || "Failed to approve report")
+      }
+    } catch (err) {
+      alert("Network error. Please try again.")
+    }
+  }
+
+  const handleVerify = async (reportId) => {
     if (!confirm("Are you sure you want to resolve this report?")) return
 
     try {
@@ -76,8 +98,7 @@ function AdminDashboardPage() {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify({
-          notes: "Verified by administrator",
-          case_number: "ADMIN-RESOLVED",
+          notes: "Resolved by admin",
         }),
       })
       if (response.ok) {
@@ -190,7 +211,7 @@ function AdminDashboardPage() {
   return (
     <div className="w-full min-h-screen bg-slate-50 overflow-x-hidden flex flex-col items-center">
       {/* Header */}
-      <div className="w-full max-w-sm px-4 pt-8 pb-2">
+      <div className="w-full max-w-2xl px-4 pt-8 pb-2">
         {/* Top row: logo centered, icons right */}
         <div className="relative flex items-center justify-center mb-5">
           <img className="h-12 w-auto" src={logoImg} alt="SafeMap" />
@@ -228,45 +249,44 @@ function AdminDashboardPage() {
         </div>
       </div>
       {/* Stats Cards */}
-      <div className="w-full max-w-sm px-4 mt-6 space-y-3">
-        {/* Active Cases */}
-        <div className="w-full h-18 bg-white rounded-r-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-blue-500 px-5 flex flex-col justify-center gap-1">
-          <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wide">
-            Total Reports
-          </div>
-          <div className="flex items-baseline gap-2">
-            <div className="text-[#1e3a8a] text-[26px] font-extrabold font-['DM_Sans'] leading-none">
-              {stats?.total || 0}
+      <div className="w-full max-w-2xl px-4 mt-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="col-span-2 sm:col-span-1 bg-white rounded-2xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-blue-500 px-4 py-4 flex flex-col justify-between gap-2">
+            <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wide">
+              Total Reports
+            </div>
+            <div className="flex items-baseline gap-2">
+              <div className="text-[#1e3a8a] text-2xl sm:text-[26px] font-extrabold font-['DM_Sans'] leading-none">
+                {stats?.total || 0}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Pending Review */}
-        <div className="w-full h-18 bg-white rounded-r-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-amber-500 px-5 flex flex-col justify-center gap-1">
-          <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wide">
-            Pending Review
-          </div>
-          <div className="flex items-baseline gap-2">
-            <div className="text-[#1e3a8a] text-[26px] font-extrabold font-['DM_Sans'] leading-none">
-              {stats?.pending_review || 0}
+          <div className="bg-white rounded-2xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-amber-500 px-4 py-4 flex flex-col justify-between gap-2">
+            <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wide">
+              Pending Review
+            </div>
+            <div className="flex items-baseline gap-2">
+              <div className="text-[#1e3a8a] text-2xl sm:text-[26px] font-extrabold font-['DM_Sans'] leading-none">
+                {stats?.pending_review || 0}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Resolved Reports */}
-        <div className="w-full h-18 bg-white rounded-r-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-green-500 px-5 flex flex-col justify-center gap-1">
-          <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wide">
-            Resolved Reports
-          </div>
-          <div className="flex items-baseline gap-2">
-            <div className="text-[#1e3a8a] text-[26px] font-extrabold font-['DM_Sans'] leading-none">
-              {stats?.pnp_verified || 0}
+          <div className="bg-white rounded-2xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-green-500 px-4 py-4 flex flex-col justify-between gap-2">
+            <div className="text-gray-400 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wide">
+              Resolved Reports
+            </div>
+            <div className="flex items-baseline gap-2">
+              <div className="text-[#1e3a8a] text-2xl sm:text-[26px] font-extrabold font-['DM_Sans'] leading-none">
+                {stats?.pnp_verified || 0}
+              </div>
             </div>
           </div>
         </div>
       </div>
       {/* Need Review Section */}
-      <div className="mt-8 px-4 w-full max-w-sm">
+      <div className="mt-8 px-4 w-full max-w-2xl">
         <div className="flex justify-between items-center mb-4">
           <div className="text-zinc-800 text-lg font-extrabold font-['DM_Sans']">Need Review</div>
           <div
@@ -283,11 +303,15 @@ function AdminDashboardPage() {
           <div className="text-center py-8 text-gray-500">No pending reports</div>
         ) : (
           <div className="space-y-4">
-            {reports.slice(0, 3).map((report) => (
-              <div
-                key={report.id}
-                className={`w-full bg-white rounded-xl shadow-sm border-l-[5px] ${getStatusColor(report.status)} p-4 flex flex-col gap-3 relative`}
-              >
+            {reports.slice(0, 3).map((report) => {
+              const needsSeverity = !report.severity
+              const isInProgress = report.status === "in_progress"
+              const primaryLabel = needsSeverity ? "Review" : isInProgress ? "Resolve" : "Approve"
+              return (
+                <div
+                  key={report.id}
+                  className={`w-full bg-white rounded-xl shadow-sm border-l-[5px] ${getStatusColor(report.status)} p-4 flex flex-col gap-3 relative`}
+                >
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center shrink-0">
                     <div className="w-4 h-3.5 bg-red-500 rounded-sm" />
@@ -328,15 +352,26 @@ function AdminDashboardPage() {
                       <span className="text-red-500 text-xs font-bold font-['DM_Sans']">Dismiss</span>
                     </button>
                     <button
-                      onClick={() => handleApprove(report.id)}
+                      onClick={() => {
+                        if (needsSeverity) {
+                          navigate(`/admin-queue?id=${report.id}`)
+                          return
+                        }
+                        if (isInProgress) {
+                          handleVerify(report.id)
+                          return
+                        }
+                        handleApprove(report.id)
+                      }}
                       className="h-8 px-3 bg-[#1f295b] hover:bg-[#151c3d] transition-colors rounded-lg flex items-center justify-center cursor-pointer"
                     >
-                      <span className="text-white text-xs font-bold font-['DM_Sans']">Resolve</span>
+                      <span className="text-white text-xs font-bold font-['DM_Sans']">{primaryLabel}</span>
                     </button>
                   </div>
                 </div>
-              </div>
-            ))}
+                </div>
+              )
+            })}
           </div>
         )}
       </div>

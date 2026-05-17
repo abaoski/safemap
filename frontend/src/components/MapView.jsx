@@ -243,6 +243,12 @@ const SEVERITY_CONFIG = {
     aura: "rgba(48,209,88,0.22)",
     label: "Low",
   },
+  unassigned: {
+    color: "#9CA3AF",
+    glow: "rgba(156,163,175,0.5)",
+    aura: "rgba(156,163,175,0.2)",
+    label: "Unassigned",
+  },
 }
 
 // ── Pin components ───────────────────────────────────────────────────────────
@@ -290,7 +296,9 @@ function ServicePin({ type }) {
 
 function IncidentPin({ severity, status }) {
   const isResolved = status === "verified" || status === "verified_pnp"
-  const cfg = isResolved ? SEVERITY_CONFIG.low : SEVERITY_CONFIG[severity] || SEVERITY_CONFIG.medium
+  const cfg = isResolved
+    ? SEVERITY_CONFIG.low
+    : SEVERITY_CONFIG[severity] || SEVERITY_CONFIG.unassigned
   return (
     <div
       style={{
@@ -454,34 +462,39 @@ function MapView({ activeFilter }) {
         </MapMarker>
       ))}
 
-      {filteredReports.map((report) => (
-        <MapMarker key={`rpt-${report.id}`} longitude={report.location.longitude} latitude={report.location.latitude}>
-          <MarkerContent>
-            <IncidentPin severity={report.severity} status={report.status} />
-          </MarkerContent>
-          <MarkerTooltip>
-            <span className="font-semibold">{report.title}</span>
-          </MarkerTooltip>
-          <MarkerPopup closeButton>
-            <PopupCard
-              title={report.title}
-              subtitle={report.description ? report.description : "N/A"}
-              badge={report.severity}
-              badgeBg={
-                report.severity === "critical"
-                  ? "bg-red-600"
-                  : report.severity === "high"
-                    ? "bg-orange-500"
-                    : report.severity === "medium"
-                      ? "bg-amber-400"
-                      : "bg-green-500"
-              }
-              status={report.status}
-              extra={new Date(report.created_at).toLocaleDateString()}
-            />
-          </MarkerPopup>
-        </MapMarker>
-      ))}
+      {filteredReports.map((report) => {
+        const displaySeverity = report.status === "pending_review" ? null : report.severity
+        return (
+          <MapMarker key={`rpt-${report.id}`} longitude={report.location.longitude} latitude={report.location.latitude}>
+            <MarkerContent>
+              <IncidentPin severity={displaySeverity} status={report.status} />
+            </MarkerContent>
+            <MarkerTooltip>
+              <span className="font-semibold">{report.title}</span>
+            </MarkerTooltip>
+            <MarkerPopup closeButton>
+              <PopupCard
+                title={report.title}
+                subtitle={report.description ? report.description : "N/A"}
+                badge={displaySeverity || "unassigned"}
+                badgeBg={
+                  displaySeverity === "critical"
+                    ? "bg-red-600"
+                    : displaySeverity === "high"
+                      ? "bg-orange-500"
+                      : displaySeverity === "medium"
+                        ? "bg-amber-400"
+                        : displaySeverity === "low"
+                          ? "bg-green-500"
+                          : "bg-gray-500"
+                }
+                status={report.status}
+                extra={new Date(report.created_at).toLocaleDateString()}
+              />
+            </MarkerPopup>
+          </MapMarker>
+        )
+      })}
     </Map>
   )
 }

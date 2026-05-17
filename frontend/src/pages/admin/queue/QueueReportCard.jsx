@@ -8,10 +8,17 @@ const STATUS_BADGES = {
     border: "border-amber-400",
   },
   in_progress: {
-    bg: "bg-green-100",
-    text: "text-green-600",
+    bg: "bg-blue-100",
+    text: "text-blue-700",
     label: "IN PROGRESS",
-    border: "border-green-500",
+    border: "border-blue-500",
+  },
+  // Backend returns 'verified' (not 'verified_pnp')
+  verified: {
+    bg: "bg-green-100",
+    text: "text-green-800",
+    label: "VERIFIED",
+    border: "border-green-600",
   },
   verified_pnp: {
     bg: "bg-green-100",
