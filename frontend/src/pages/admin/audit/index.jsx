@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { API_BASE } from "@/lib/api-base"
 import { Search, Filter, ChevronDown, Activity } from "lucide-react"
 import AdminLayout from "../../../components/admin/AdminLayout"
 import AuditSummaryCards from "./AuditSummaryCards"
@@ -31,7 +32,7 @@ function AdminAuditPage() {
   const fetchData = async () => {
     setLoading(true)
     try {
-      const response = await fetch("/api/reports?per_page=100", { headers: getAuthHeaders() })
+      const response = await fetch(`${API_BASE}/reports?per_page=100`, { headers: getAuthHeaders() })
       if (response.ok) {
         const data = await response.json()
         const entries = buildAuditEntries(data.reports || [])

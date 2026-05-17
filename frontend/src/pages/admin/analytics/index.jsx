@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { API_BASE } from "@/lib/api-base"
 import { Calendar, Download } from "lucide-react"
 import AdminLayout from "../../../components/admin/AdminLayout"
 import StatsCards from "./StatsCards"
@@ -23,7 +24,7 @@ function AdminAnalyticsPage() {
     try {
       const headers = { Authorization: `Bearer ${token}` }
 
-      const statsRes = await fetch("/api/reports/stats", { headers })
+      const statsRes = await fetch(`${API_BASE}/reports/stats`, { headers })
       if (statsRes.status === 401) {
         localStorage.removeItem("token")
         window.location.href = "/admin"
@@ -31,7 +32,7 @@ function AdminAnalyticsPage() {
       }
       if (statsRes.ok) setStats(await statsRes.json())
 
-      const heatRes = await fetch("/api/reports/heatmap", { headers })
+      const heatRes = await fetch(`${API_BASE}/reports/heatmap`, { headers })
       if (heatRes.status === 401) {
         localStorage.removeItem("token")
         window.location.href = "/admin"

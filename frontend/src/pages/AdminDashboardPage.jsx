@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { API_BASE } from "@/lib/api-base"
 import { Check, Edit2, Ban, LogIn, Search, Shield, Mail } from "lucide-react"
 import logoImg from "/src/assets/images/Logo.svg"
 import backImg from "/src/assets/images/rpt_back.svg"
@@ -33,7 +34,7 @@ function AdminDashboardPage() {
     setLoading(true)
     try {
       if (activeTab === "dashboard" || activeTab === "review") {
-        const response = await fetch("/api/reports/pending", {
+        const response = await fetch(`${API_BASE}/reports/pending`, {
           headers: getAuthHeaders(),
         })
         if (response.status === 401) {
@@ -47,7 +48,7 @@ function AdminDashboardPage() {
         }
       }
       if (activeTab === "dashboard" || activeTab === "analytics") {
-        const response = await fetch("/api/reports/stats", {
+        const response = await fetch(`${API_BASE}/reports/stats`, {
           headers: getAuthHeaders(),
         })
         if (response.status === 401) {
@@ -71,7 +72,7 @@ function AdminDashboardPage() {
     if (!confirm("Are you sure you want to resolve this report?")) return
 
     try {
-      const response = await fetch(`/api/reports/${reportId}/verify`, {
+      const response = await fetch(`${API_BASE}/reports/${reportId}/verify`, {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify({
@@ -97,7 +98,7 @@ function AdminDashboardPage() {
     if (!confirm("Are you sure you want to dismiss this report?")) return
 
     try {
-      const response = await fetch(`/api/reports/${reportId}/dismiss`, {
+      const response = await fetch(`${API_BASE}/reports/${reportId}/dismiss`, {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify({ reason }),

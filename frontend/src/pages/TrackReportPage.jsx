@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
+import { API_BASE } from "@/lib/api-base"
 import logoImg from "/src/assets/images/Logo.svg"
 import rptBackImg from "/src/assets/images/rpt_back.svg"
 import { Button } from "@/components/ui/button"
@@ -40,7 +41,7 @@ export default function TrackReportPage() {
     setReportStatus(null)
 
     try {
-      const response = await fetch(`/api/reports/reference/${referenceCode.trim()}`)
+      const response = await fetch(`${API_BASE}/reports/reference/${referenceCode.trim()}`)
       const data = await response.json()
 
       if (response.ok) {

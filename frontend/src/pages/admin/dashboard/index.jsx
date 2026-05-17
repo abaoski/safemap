@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { API_BASE } from "@/lib/api-base"
 import AdminLayout from "../../../components/admin/AdminLayout"
 import DashboardStats from "./DashboardStats"
 import NeedReviewSection from "./NeedReviewSection"
@@ -18,13 +19,13 @@ function AdminDashboardPage() {
     const fetchData = async () => {
       setLoading(true)
       try {
-        const statsRes = await fetch("/api/reports/stats", { headers: getAuthHeaders() })
+        const statsRes = await fetch(`${API_BASE}/reports/stats`, { headers: getAuthHeaders() })
         if (statsRes.ok) {
           const data = await statsRes.json()
           setStats(data)
         }
 
-        const reportsRes = await fetch("/api/reports/pending", { headers: getAuthHeaders() })
+        const reportsRes = await fetch(`${API_BASE}/reports/pending`, { headers: getAuthHeaders() })
         if (reportsRes.ok) {
           const data = await reportsRes.json()
           setReports(data.reports || [])

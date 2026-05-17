@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { API_BASE } from "@/lib/api-base"
 import { Search, Map, Trash2, Filter, Plus, Send, Settings2, Activity, Tag, Shield } from "lucide-react"
 import AdminLayout from "../../../components/admin/AdminLayout"
 import DirectoryAddDialog from "../../../components/admin/management/DirectoryAddDialog"
@@ -24,7 +25,7 @@ function AdminManagementPage() {
   const handleDeleteDirectory = async (id) => {
     if (!confirm("Are you sure you want to delete this contact?")) return
     try {
-      const res = await fetch(`/api/help/contacts/${id}`, {
+      const res = await fetch(`${API_BASE}/help/contacts/${id}`, {
         method: "DELETE",
         headers: getAuthHeaders(),
       })
@@ -39,7 +40,7 @@ function AdminManagementPage() {
   const handleDeleteCategory = async (id) => {
     if (!confirm("Are you sure you want to delete this category?")) return
     try {
-      const res = await fetch(`/api/reports/categories/${id}`, {
+      const res = await fetch(`${API_BASE}/reports/categories/${id}`, {
         method: "DELETE",
         headers: getAuthHeaders(),
       })
@@ -57,7 +58,7 @@ function AdminManagementPage() {
 
   const handleAddDirectory = async (data) => {
     try {
-      const res = await fetch("/api/help/contacts", {
+      const res = await fetch(`${API_BASE}/help/contacts`, {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify(data),
@@ -79,7 +80,7 @@ function AdminManagementPage() {
     if (!label) return
 
     try {
-      const res = await fetch("/api/reports/categories", {
+      const res = await fetch(`${API_BASE}/reports/categories`, {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify({ name, label, priority: "medium" }),
@@ -102,7 +103,7 @@ function AdminManagementPage() {
     if (!location) return
 
     try {
-      const res = await fetch(`/api/help/contacts/${dir.id}`, {
+      const res = await fetch(`${API_BASE}/help/contacts/${dir.id}`, {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify({ name, phone, location }),
@@ -123,7 +124,7 @@ function AdminManagementPage() {
     if (!priority) return
 
     try {
-      const res = await fetch(`/api/reports/categories/${cat.id}`, {
+      const res = await fetch(`${API_BASE}/reports/categories/${cat.id}`, {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify({ label, priority }),
@@ -225,8 +226,8 @@ function AdminManagementPage() {
     const headers = { Authorization: `Bearer ${token}` }
     try {
       // Attempt to fetch from backend
-      const dirRes = await fetch("/api/help/contacts", { headers })
-      const catRes = await fetch("/api/reports/categories", { headers })
+      const dirRes = await fetch(`${API_BASE}/help/contacts`, { headers })
+      const catRes = await fetch(`${API_BASE}/reports/categories`, { headers })
 
       if (dirRes.ok && catRes.ok) {
         const dirData = await dirRes.json()

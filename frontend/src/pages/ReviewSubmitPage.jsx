@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom"
 import { useState, useEffect } from "react"
+import { API_BASE } from "@/lib/api-base"
 import logoImg from "/src/assets/images/Logo.svg"
 import rptBackImg from "/src/assets/images/rpt_back.svg"
 import rptImpReminderImg from "/src/assets/images/rpt_imp_reminder.svg"
@@ -76,7 +77,7 @@ export default function ReviewSubmitPage() {
       }
 
       // Submit report to backend
-      const response = await fetch("/api/reports/submit", {
+      const response = await fetch(`${API_BASE}/reports/submit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

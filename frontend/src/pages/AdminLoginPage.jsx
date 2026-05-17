@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { API_BASE } from "@/lib/api-base"
 import logoImg from "/src/assets/images/Logo.svg"
 import backImg from "/src/assets/images/rpt_back.svg"
 
@@ -17,7 +18,7 @@ function AdminLoginPage() {
     setError("")
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: email, password }),

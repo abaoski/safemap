@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { API_BASE } from "@/lib/api-base"
 import { Map, MapMarker, MarkerContent, MarkerPopup, MarkerTooltip } from "@/components/ui/map"
 import { Hospital, Siren, Flame, Ambulance, AlertTriangle } from "lucide-react"
 import ZoomControls from "./ZoomControls"
@@ -188,8 +189,7 @@ const EMERGENCY_LOCATIONS = {
   ],
 }
 
-// ── Service pin styles ───────────────────────────────────────────────────────
-// ── Service config — teardrop pin (same shape as incident) ──────────────────
+// ── Service config — teardrop pin ────────────────────────────────────────────
 const SERVICE_CONFIG = {
   hospital: {
     color: "#0EA5E9",
@@ -247,7 +247,6 @@ const SEVERITY_CONFIG = {
 
 // ── Pin components ───────────────────────────────────────────────────────────
 
-// Teardrop badge pin — used for services
 function ServicePin({ type }) {
   const cfg = SERVICE_CONFIG[type] || SERVICE_CONFIG.hospital
   const { Icon } = cfg
@@ -260,7 +259,6 @@ function ServicePin({ type }) {
         filter: `drop-shadow(0 4px 8px ${cfg.glow})`,
       }}
     >
-      {/* badge body */}
       <div
         style={{
           width: 40,
@@ -276,7 +274,6 @@ function ServicePin({ type }) {
       >
         <Icon size={18} color="white" strokeWidth={2.5} />
       </div>
-      {/* tail */}
       <div
         style={{
           width: 0,
@@ -291,7 +288,6 @@ function ServicePin({ type }) {
   )
 }
 
-// Neon aura circle — used for incidents
 function IncidentPin({ severity, status }) {
   const isResolved = status === "verified" || status === "verified_pnp"
   const cfg = isResolved ? SEVERITY_CONFIG.low : SEVERITY_CONFIG[severity] || SEVERITY_CONFIG.medium
@@ -305,7 +301,6 @@ function IncidentPin({ severity, status }) {
         height: 44,
       }}
     >
-      {/* outer aura ring */}
       <div
         style={{
           position: "absolute",
@@ -317,7 +312,6 @@ function IncidentPin({ severity, status }) {
           animation: "pulse 2s ease-in-out infinite",
         }}
       />
-      {/* inner glow ring */}
       <div
         style={{
           position: "absolute",
@@ -328,7 +322,6 @@ function IncidentPin({ severity, status }) {
           boxShadow: `0 0 10px ${cfg.glow}, inset 0 0 6px ${cfg.aura}`,
         }}
       />
-      {/* core dot */}
       <div
         style={{
           position: "absolute",
@@ -344,7 +337,6 @@ function IncidentPin({ severity, status }) {
 }
 
 function PopupCard({ title, subtitle, badge, badgeBg, status, extra }) {
-  // Status badge colors
   const statusColors = {
     pending_review: "bg-yellow-500",
     in_progress: "bg-green-500",
@@ -392,7 +384,7 @@ function MapView({ activeFilter }) {
   const [reports, setReports] = useState([])
 
   useEffect(() => {
-    fetch("/api/reports/public")
+    fetch(`${API_BASE}/reports/public`)
       .then((r) => (r.ok ? r.json() : { reports: [] }))
       .then((d) => setReports(d.reports || []))
       .catch(() => {
@@ -406,16 +398,12 @@ function MapView({ activeFilter }) {
   const isServiceFilter = SERVICE_TYPES.includes(activeFilter)
   const isSeverityFilter = SEVERITY_TYPES.includes(activeFilter)
 
-  // Service markers: show all when no filter, show only type when service filter,
-  // hide all when severity filter is active
   const filteredLocations = EMERGENCY_LOCATIONS.features.filter((f) => {
     if (!activeFilter) return true
     if (isSeverityFilter) return false
     return f.properties.type === activeFilter
   })
 
-  // Incident markers: show all when no filter, hide when service filter,
-  // show only matching severity when severity filter is active
   const filteredReports = reports.filter((r) => {
     if (!activeFilter) return true
     if (isServiceFilter) return false
@@ -439,7 +427,6 @@ function MapView({ activeFilter }) {
     >
       <ZoomControls />
 
-      {/* Emergency service markers */}
       {filteredLocations.map((f, i) => (
         <MapMarker key={`svc-${i}`} longitude={f.properties.lng} latitude={f.properties.lat}>
           <MarkerContent>
@@ -467,7 +454,6 @@ function MapView({ activeFilter }) {
         </MapMarker>
       ))}
 
-      {/* Incident report markers */}
       {filteredReports.map((report) => (
         <MapMarker key={`rpt-${report.id}`} longitude={report.location.longitude} latitude={report.location.latitude}>
           <MarkerContent>

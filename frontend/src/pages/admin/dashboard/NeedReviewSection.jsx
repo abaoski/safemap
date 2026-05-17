@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { API_BASE } from "@/lib/api-base"
 import { MapPin, X, CheckCircle, Ban, AlertOctagon, Calendar } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
@@ -14,9 +15,9 @@ function ReviewOverlay({ report, onClose, onAction }) {
     setLoading(action)
     try {
       const endpoints = {
-        resolve: `/api/reports/${report.id}/approve`,
-        spam: `/api/reports/${report.id}/spam`,
-        dismiss: `/api/reports/${report.id}/dismiss`,
+        resolve: `${API_BASE}/reports/${report.id}/approve`,
+        spam: `${API_BASE}/reports/${report.id}/spam`,
+        dismiss: `${API_BASE}/reports/${report.id}/dismiss`,
       }
       const bodies = {
         resolve: { notes: "Approved for public awareness" },
@@ -177,8 +178,8 @@ function NeedReviewSection({ reports: initialReports, loading }) {
     setProcessingIds((prev) => new Set(prev).add(id))
 
     const endpoints = {
-      resolve: `/api/reports/${id}/verify`,
-      dismiss: `/api/reports/${id}/dismiss`,
+      resolve: `${API_BASE}/reports/${id}/verify`,
+      dismiss: `${API_BASE}/reports/${id}/dismiss`,
     }
     const bodies = {
       resolve: {
