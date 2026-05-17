@@ -5,8 +5,7 @@ import rptBackImg from "/src/assets/images/rpt_back.svg"
 import rptImpReminderImg from "/src/assets/images/rpt_imp_reminder.svg"
 import { Button } from "@/components/ui/button"
 import BottomNav from "@/components/BottomNav"
-import { MapContainer, TileLayer, Marker } from "react-leaflet"
-import "leaflet/dist/leaflet.css"
+import { Map, MapMarker, MarkerContent } from "@/components/ui/map"
 
 export default function ReviewSubmitPage() {
   const navigate = useNavigate()
@@ -208,17 +207,17 @@ export default function ReviewSubmitPage() {
           </div>
           {/* Mini Map */}
           <div className="h-32 w-full">
-            <MapContainer
-              center={[data.locationCoords?.lat || 6.1167, data.locationCoords?.lng || 125.1667]}
+            <Map
+              center={[data.locationCoords?.lng || 125.1667, data.locationCoords?.lat || 6.1167]}
               zoom={14}
               className="h-full w-full"
-              zoomControl={false}
-              dragging={false}
-              scrollWheelZoom={false}
+              theme="light"
+              interactive={false}
             >
-              <TileLayer attribution="&copy; OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <Marker position={[data.locationCoords?.lat || 6.1167, data.locationCoords?.lng || 125.1667]} />
-            </MapContainer>
+              <MapMarker longitude={data.locationCoords?.lng || 125.1667} latitude={data.locationCoords?.lat || 6.1167}>
+                <MarkerContent />
+              </MapMarker>
+            </Map>
           </div>
         </div>
 

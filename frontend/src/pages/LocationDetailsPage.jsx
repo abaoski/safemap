@@ -5,14 +5,24 @@ import rptBackImg from "/src/assets/images/rpt_back.svg"
 import rptImpReminderImg from "/src/assets/images/rpt_imp_reminder.svg"
 import { Button } from "@/components/ui/button"
 import BottomNav from "@/components/BottomNav"
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet"
-import "leaflet/dist/leaflet.css"
+import { Map, MapMarker, MarkerContent, useMap } from "@/components/ui/map"
 
-// Component to handle map clicks
-function LocationMarker({ setLocation, onMapClick }) {
-  useMapEvents({
-    click: onMapClick,
-  })
+function MapClickHandler({ onMapClick }) {
+  const { map, isLoaded } = useMap()
+
+  useEffect(() => {
+    if (!map || !isLoaded) return
+
+    const handleClick = (event) => {
+      onMapClick(event.lngLat)
+    }
+
+    map.on("click", handleClick)
+
+    return () => {
+      map.off("click", handleClick)
+    }
+  }, [map, isLoaded, onMapClick])
 
   return null
 }
@@ -123,10 +133,11 @@ export default function LocationDetailsPage() {
   }
 
   // Handle pin placement on map
-  const handleMapClick = (e) => {
-    const { lat, lng } = e.latlng
-    setLocationCoords(e.latlng)
-    setSelectedLocation(e.latlng)
+  const handleMapClick = (lngLat) => {
+    const { lat, lng } = lngLat
+    const coords = { lat, lng }
+    setLocationCoords(coords)
+    setSelectedLocation(coords)
     fetchLandmarks(lat, lng)
   }
 
@@ -255,14 +266,14 @@ export default function LocationDetailsPage() {
 
         {/* Map */}
         <div className="w-full h-56 rounded-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] overflow-hidden mb-4 relative">
-          <MapContainer center={[6.1167, 125.1667]} zoom={13} className="h-full w-full" zoomControl={true}>
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <LocationMarker setLocation={setSelectedLocation} onMapClick={handleMapClick} />
-            {selectedLocation && <Marker position={selectedLocation} />}
-          </MapContainer>
+          <Map center={[125.1667, 6.1167]} zoom={13} minZoom={11} maxZoom={18} className="h-full w-full" theme="light">
+            <MapClickHandler onMapClick={handleMapClick} />
+            {selectedLocation && (
+              <MapMarker longitude={selectedLocation.lng} latitude={selectedLocation.lat}>
+                <MarkerContent />
+              </MapMarker>
+            )}
+          </Map>
 
           {/* Use My Location Button - Overlay */}
           <button
