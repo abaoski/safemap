@@ -1,23 +1,17 @@
-import React, { useEffect, useRef } from "react"
-import { useNavigate } from "react-router-dom"
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
-  Shield,
-  MapPin,
-  EyeOff,
-  Bell,
-  ArrowRight,
-  Users,
-  MessageSquare,
-  Bot,
-  AlertTriangle,
-  CheckCircle,
-  Lock,
-  BarChart,
-  Mail,
-  Globe,
-  Phone,
-} from "lucide-react"
-import logoImg from "/src/assets/images/Logo.svg"
+  MapPin, EyeOff, ArrowRight,
+  Bot, AlertTriangle,
+  CheckCircle, Lock, BarChart, Mail, Globe, Phone
+} from 'lucide-react';
+import logoImg from '/src/assets/images/Logo.svg';
+
+const mapImg = 'https://res.cloudinary.com/djc0ndwqf/image/upload/v1779091696/820a9d4f-1544-4ffa-b715-6b500ddf8538_mncgoj.jpg';
+const person1Img = 'https://i.pravatar.cc/150?img=1';
+const person2Img = 'https://i.pravatar.cc/150?img=2';
+const person3Img = 'https://i.pravatar.cc/150?img=3';
+const person4Img = 'https://i.pravatar.cc/150?img=4';
 
 /* ─── Scroll-reveal hook ─────────────────────────────────── */
 function useScrollReveal() {
@@ -113,7 +107,7 @@ const LandingPage = () => {
           {/* Full-bleed background image */}
           <div className="absolute inset-0 z-0">
             <img
-              src="https://placehold.co/1600x900?text=Hero+Image"
+              src={"https://res.cloudinary.com/djc0ndwqf/image/upload/v1779092398/691084559_3471095136379671_3729025007564393409_n_zxevwj.jpg"}
               alt="Hero Background"
               className="w-full h-full object-cover"
             />
@@ -164,13 +158,13 @@ const LandingPage = () => {
             <Reveal delay={400}>
               <div className="flex items-center gap-6">
                 <div className="flex -space-x-3">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div
+                  {[person1Img, person2Img, person3Img, person4Img].map((src, i) => (
+                    <img
                       key={i}
-                      className="w-10 h-10 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[10px] font-bold"
-                    >
-                      {i}
-                    </div>
+                      src={src}
+                      alt={`Community member ${i + 1}`}
+                      className="w-10 h-10 rounded-full border-2 border-white object-cover shadow-sm"
+                    />
                   ))}
                 </div>
                 <p className="text-sm font-medium" style={{ color: "#1A3A8F" }}>
@@ -306,76 +300,102 @@ const LandingPage = () => {
         {/* ── How It Works ────────────────────────────────────── */}
         <section id="how-it-works" className="py-24 bg-slate-50">
           <div className="container mx-auto px-6">
-            <Reveal className="text-center max-w-2xl mx-auto mb-20 space-y-4">
+            <Reveal className="text-center max-w-3xl mx-auto mb-20 space-y-4">
+              <span className="inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-primary/10 text-primary mb-2">Simple & Powerful</span>
               <h2 className="text-4xl font-bold text-slate-900">How It Works</h2>
-              <p className="text-slate-600">
-                Our system is designed to be intuitive and fast, even in high-stress situations.
-              </p>
+              <p className="text-lg text-slate-600 leading-relaxed">Our system is designed to be intuitive and fast, even in high-stress situations. Three powerful features working together to keep your community safe.</p>
             </Reveal>
 
-            <div className="space-y-24 max-w-5xl mx-auto">
+            <div className="space-y-32 max-w-6xl mx-auto">
               {/* Step 1 */}
-              <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="grid md:grid-cols-2 gap-16 items-center">
                 <Reveal className="order-2 md:order-1 space-y-6">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-primary font-bold text-2xl">
-                    1
+                  <div className="flex items-center gap-3">
+                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-primary font-bold text-2xl">1</div>
+                    <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold uppercase tracking-wide">GIS Technology</span>
                   </div>
                   <h3 className="text-3xl font-bold text-slate-900">Real-Time Incident Map (GIS)</h3>
-                  <p className="text-lg text-slate-600 leading-relaxed">
-                    Instantly visualizes incident frequency to help users avoid high-risk zones.
-                  </p>
+                  <p className="text-lg text-slate-600 leading-relaxed">Instantly visualizes incident frequency to help users avoid high-risk zones. Our Geographic Information System maps every verified report onto an interactive heatmap.</p>
+                  <ul className="space-y-3 pt-2">
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
+                      <span className="text-slate-600">Color-coded heatmaps showing incident density by area</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
+                      <span className="text-slate-600">Filter by incident type — theft, harassment, fire, and more</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
+                      <span className="text-slate-600">Live updates as new reports are verified in real-time</span>
+                    </li>
+                  </ul>
                 </Reveal>
                 <Reveal className="order-1 md:order-2" delay={150}>
-                  <div className="aspect-4/3 bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-lg">
-                    <img
-                      src="https://placehold.co/800x600?text=Map+Image"
-                      alt="Real-Time Map"
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="rounded-3xl overflow-hidden shadow-xl border border-slate-200">
+                    <img src={mapImg} alt="Real-Time Map" className="w-full h-auto" />
                   </div>
                 </Reveal>
               </div>
 
               {/* Step 2 */}
-              <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="grid md:grid-cols-2 gap-16 items-center">
                 <Reveal className="order-1" delay={150}>
-                  <div className="aspect-4/3 bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-lg">
-                    <img
-                      src="https://placehold.co/800x600?text=Portal+Image"
-                      alt="Anonymous Portal"
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="rounded-3xl overflow-hidden shadow-xl border border-slate-200">
+                    <img src={"https://res.cloudinary.com/djc0ndwqf/image/upload/v1779091528/9c16a648-5bf0-43de-aaab-926839cae956.png"} alt="Anonymous Portal" className="w-full h-auto" />
                   </div>
                 </Reveal>
                 <Reveal className="order-2 space-y-6">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-primary font-bold text-2xl">
-                    2
+                  <div className="flex items-center gap-3">
+                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-primary font-bold text-2xl">2</div>
+                    <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold uppercase tracking-wide">Zero Identity Required</span>
                   </div>
                   <h3 className="text-3xl font-bold text-slate-900">Anonymous Portal</h3>
-                  <p className="text-lg text-slate-600 leading-relaxed">
-                    Allows for "one-click" incident reporting without requiring a name or personal ID.
-                  </p>
+                  <p className="text-lg text-slate-600 leading-relaxed">Allows for "one-click" incident reporting without requiring a name or personal ID. Your courage to report should never be limited by fear of retaliation.</p>
+                  <ul className="space-y-3 pt-2">
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
+                      <span className="text-slate-600">No registration, login, or personal data collection</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
+                      <span className="text-slate-600">Attach photos and pinpoint the exact location on a map</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
+                      <span className="text-slate-600">Unique tracking code lets you follow up without revealing identity</span>
+                    </li>
+                  </ul>
                 </Reveal>
               </div>
 
               {/* Step 3 */}
-              <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="grid md:grid-cols-2 gap-16 items-center">
                 <Reveal className="order-2 md:order-1 space-y-6">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-primary font-bold text-2xl">
-                    3
+                  <div className="flex items-center gap-3">
+                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-primary font-bold text-2xl">3</div>
+                    <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-semibold uppercase tracking-wide">AI-Powered</span>
                   </div>
                   <h3 className="text-3xl font-bold text-slate-900">AI Safety Chatbot</h3>
-                  <p className="text-lg text-slate-600 leading-relaxed">
-                    Provides 24/7 automated support, station locators, and immediate help resources.
-                  </p>
+                  <p className="text-lg text-slate-600 leading-relaxed">Provides 24/7 automated support, station locators, and immediate help resources. Get instant assistance any time of day — no waiting, no hold times.</p>
+                  <ul className="space-y-3 pt-2">
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
+                      <span className="text-slate-600">Instant emergency protocols and step-by-step safety guidance</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
+                      <span className="text-slate-600">Nearest police station and emergency service locator</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
+                      <span className="text-slate-600">Smart categorization to connect you with the right responders</span>
+                    </li>
+                  </ul>
                 </Reveal>
                 <Reveal className="order-1 md:order-2" delay={150}>
-                  <div className="aspect-4/3 bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-lg">
-                    <img
-                      src="https://placehold.co/800x600?text=Chatbot+Image"
-                      alt="AI Chatbot"
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="rounded-3xl overflow-hidden shadow-xl border border-slate-200">
+                    <img src={"https://res.cloudinary.com/djc0ndwqf/image/upload/v1779091721/cfa7963b-bbac-46b6-82de-38ad890379b0_o3xqg3.jpg"} alt="AI Chatbot" className="w-full h-auto" />
                   </div>
                 </Reveal>
               </div>
@@ -390,7 +410,7 @@ const LandingPage = () => {
               <div className="bg-[#1A2A6C] rounded-[3rem] p-12 md:p-24 text-center text-white relative overflow-hidden">
                 <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
                 <div className="relative z-10 space-y-8">
-                  <h2 className="text-4xl md:text-6xl font-bold">Be a Hero in Your Barangay.</h2>
+                  <h2 className="text-4xl md:text-6xl font-bold">Be a Hero in Your Community.</h2>
                   <p className="text-xl text-white/80 max-w-xl mx-auto">
                     Join the network of vigilant citizens making the Philippines safer, one report at a time.
                   </p>
@@ -501,4 +521,4 @@ const LandingPage = () => {
   )
 }
 
-export default LandingPage
+export default LandingPage;
