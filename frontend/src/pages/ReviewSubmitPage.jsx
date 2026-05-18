@@ -6,46 +6,7 @@ import rptBackImg from "/src/assets/images/rpt_back.svg"
 import rptImpReminderImg from "/src/assets/images/rpt_imp_reminder.svg"
 import { Button } from "@/components/ui/button"
 import BottomNav from "@/components/BottomNav"
-import { MapContainer, TileLayer, Marker } from "react-leaflet"
-import "leaflet/dist/leaflet.css"
-
-// ── OTP helpers ──────────────────────────────────────────────────────────────
-
-function generateOTP() {
-  return Math.floor(100000 + Math.random() * 900000).toString()
-}
-
-/**
- * Send OTP via backend → dbuddyz WhatsApp OTP service.
- * Returns { ok: true } on success or { ok: false, error: string } on failure.
- */
-async function sendOTP(phone) {
-  const res = await fetch(`${API_BASE}/otp/send`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ phone }),
-  })
-  const data = await res.json()
-  if (!res.ok) return { ok: false, error: data.error || "Failed to send OTP" }
-  return { ok: true }
-}
-
-/**
- * Verify OTP via backend.
- * Returns { ok: true } on success or { ok: false, error: string } on failure.
- */
-async function verifyOTP(phone, code) {
-  const res = await fetch(`${API_BASE}/otp/verify`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ phone, code }),
-  })
-  const data = await res.json()
-  if (!res.ok) return { ok: false, error: data.error || "Verification failed" }
-  return { ok: true }
-}
-
-// ── Component ────────────────────────────────────────────────────────────────
+import { Map, MapMarker, MarkerContent } from "@/components/ui/map"
 
 export default function ReviewSubmitPage() {
   const navigate = useNavigate()
@@ -296,18 +257,16 @@ export default function ReviewSubmitPage() {
               <span className="text-zinc-800 text-xs font-bold font-['DM_Sans']">{data.landmark || "Selected Location"}</span>
             </div>
           </div>
-          <div className="h-32 w-full">
-            <MapContainer
-              center={[lat, lng]}
-              zoom={14}
-              className="h-full w-full"
-              zoomControl={false}
-              dragging={false}
-              scrollWheelZoom={false}
+          <div className="h-32 w-full relative">
+            <Map 
+              viewport={{ center: [data.locationCoords?.lng || 125.1667, data.locationCoords?.lat || 6.1167], zoom: 14 }} 
+              className="h-full w-full pointer-events-none"
+              theme="light"
             >
-              <TileLayer attribution="&copy; OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <Marker position={[lat, lng]} />
-            </MapContainer>
+              <MapMarker longitude={data.locationCoords?.lng || 125.1667} latitude={data.locationCoords?.lat || 6.1167}>
+                <MarkerContent />
+              </MapMarker>
+            </Map>
           </div>
         </div>
 

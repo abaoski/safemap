@@ -5,25 +5,23 @@ import rptBackImg from "/src/assets/images/rpt_back.svg"
 import rptImpReminderImg from "/src/assets/images/rpt_imp_reminder.svg"
 import { Button } from "@/components/ui/button"
 import BottomNav from "@/components/BottomNav"
-import { Map, MapMarker, MarkerContent, useMap } from "@/components/ui/map"
+import { Map, MapMarker, useMap, MarkerContent } from "@/components/ui/map"
 
-function MapClickHandler({ onMapClick }) {
-  const { map, isLoaded } = useMap()
+
+function LocationMarker({ setLocation, onMapClick }) {
+  const { map } = useMap()
 
   useEffect(() => {
-    if (!map || !isLoaded) return
-
-    const handleClick = (event) => {
-      onMapClick(event.lngLat)
+    if (!map) return
+    const handleClick = (e) => {
+      onMapClick({ latlng: { lat: e.lngLat.lat, lng: e.lngLat.lng } })
     }
-
     map.on("click", handleClick)
-
     return () => {
       map.off("click", handleClick)
     }
-  }, [map, isLoaded, onMapClick])
-
+  }, [map, onMapClick])
+  
   return null
 }
 
@@ -263,18 +261,21 @@ export default function LocationDetailsPage() {
         </p>
 
         <h3 className="text-neutral-600 text-xs font-bold font-['DM_Sans'] tracking-tight mb-2">Location Details</h3>
-
-        {/* Map */}
+        
         <div className="w-full h-56 rounded-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] overflow-hidden mb-4 relative">
-          <Map center={[125.1667, 6.1167]} zoom={13} minZoom={11} maxZoom={18} className="h-full w-full" theme="light">
-            <MapClickHandler onMapClick={handleMapClick} />
+          <Map 
+            viewport={{ center: [125.1667, 6.1167], zoom: 13 }} 
+            className="h-full w-full"
+            theme="light"
+          >
+            <LocationMarker setLocation={setSelectedLocation} onMapClick={handleMapClick} />
             {selectedLocation && (
               <MapMarker longitude={selectedLocation.lng} latitude={selectedLocation.lat}>
                 <MarkerContent />
               </MapMarker>
             )}
           </Map>
-
+          
           {/* Use My Location Button - Overlay */}
           <button
             onClick={handleUseMyLocation}

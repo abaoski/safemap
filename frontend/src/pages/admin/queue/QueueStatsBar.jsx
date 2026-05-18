@@ -1,34 +1,25 @@
-function QueueStatsBar({ stats, statusFilter, setStatusFilter, setSearchQuery }) {
-  const tabs = [
-    {
-      key: "pending_review",
-      label: "Pending",
-      count: stats.pending,
-      color: "text-amber-500",
-      activeRing: "ring-amber-500",
-    },
-    {
-      key: "in_progress",
-      label: "In Progress",
-      count: stats.inProgress,
-      color: "text-blue-600",
-      activeRing: "ring-blue-600",
-    },
-    {
-      key: "dismissed",
-      label: "Dismissed",
-      count: stats.dismissed,
-      color: "text-red-500",
-      activeRing: "ring-red-500",
-    },
-    {
-      key: "all",
-      label: "All",
-      count: stats.total,
-      color: "text-slate-800",
-      activeRing: "ring-slate-800",
-    },
-  ]
+function QueueStatsBar({ stats, statusFilter, setStatusFilter }) {
+    const tabs = [
+        {
+            key: "pending_review",
+            label: "Pending",
+            count: stats.pending,
+            color: "text-amber-500",
+        },
+        {
+            key: "in_progress",
+            label: "In Progress",
+            count: stats.approved,
+            color: "text-green-500",
+        },
+        {
+            key: "dismissed",
+            label: "Dismissed",
+            count: stats.dismissed,
+            color: "text-red-500",
+        },
+        { key: "", label: "All", count: stats.total, color: "text-[#1e3a8a]" },
+    ]
 
   const handleTabClick = (key) => {
     setStatusFilter(key)

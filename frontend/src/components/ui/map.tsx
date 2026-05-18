@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils"
 
 const defaultStyles = {
   dark: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
-  light: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+  light: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
 }
 
 type Theme = "light" | "dark"
@@ -475,7 +475,15 @@ function MarkerContent({ children, className }: MarkerContentProps) {
 }
 
 function DefaultMarkerIcon() {
-  return <div className="relative h-4 w-4 rounded-full border-2 border-white bg-blue-500 shadow-lg" />
+  return (
+    <div className="relative flex flex-col items-center justify-center -translate-y-3 drop-shadow-md">
+      <div className="w-8 h-8 rounded-full border-[3px] border-white bg-[#1f295b] shadow-lg flex items-center justify-center">
+        <div className="w-2.5 h-2.5 rounded-full bg-blue-100 shadow-sm" />
+      </div>
+      <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-white -mt-1 drop-shadow-sm" />
+      <div className="w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[6px] border-t-[#1f295b] -mt-[8px]" />
+    </div>
+  )
 }
 
 type MarkerPopupProps = {

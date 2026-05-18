@@ -621,10 +621,9 @@ def get_report_stats():
         'public_visible': public_count,
         'pnp_verified': verified_count,
         'pending_review': Report.query.filter_by(status='pending_review').count(),
-        'urgent': urgent_count,
-        'by_status': {k if k is not None else 'unassigned': v for k, v in by_status},
-        'by_category': {k if k is not None else 'unassigned': v for k, v in by_category},
-        'by_severity': {k if k is not None else 'unassigned': v for k, v in by_severity}
+        'by_status': {str(k) if k is not None else 'unknown': v for k, v in by_status},
+        'by_category': {str(k) if k is not None else 'unknown': v for k, v in by_category},
+        'by_severity': {str(k) if k is not None else 'unknown': v for k, v in by_severity}
     }), 200
 
 
