@@ -20,6 +20,14 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///samapph.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False
+    # Connection pool settings — prevent pool exhaustion
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,       # test connections before use, drops stale ones
+        'pool_recycle': 280,         # recycle connections every ~4.5 min (before MySQL/SQLite timeout)
+        'pool_size': 10,             # raise from default 5
+        'max_overflow': 20,          # raise from default 10
+        'pool_timeout': 30,
+    }
 
     # CORS settings
     # In production set CORS_ORIGINS to a comma-separated list of allowed origins,

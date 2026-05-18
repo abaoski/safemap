@@ -27,7 +27,7 @@ class LedgerReportHeader(db.Model):
     
     # Current Status (derived from ledger or cached here for performance)
     status = db.Column(db.String(30), default='pending_review', index=True)
-    severity = db.Column(db.String(20), default='medium')
+    severity = db.Column(db.String(20))
     
     # Location
     latitude = db.Column(db.Float, nullable=False)
@@ -41,6 +41,10 @@ class LedgerReportHeader(db.Model):
     is_anonymous = db.Column(db.Boolean, default=True)
     user_ip = db.Column(db.String(45))
     user_agent = db.Column(db.String(256))
+
+    # Urgent flag + contact phone (set when reporter marks as urgent)
+    is_urgent = db.Column(db.Boolean, default=False, index=True)
+    contact_phone = db.Column(db.String(30))
     
     # PNP verification (final state info)
     is_pnp_verified = db.Column(db.Boolean, default=False)
@@ -115,6 +119,8 @@ class LedgerReportHeader(db.Model):
             'status': self.status,
             'reference_code': self.reference_code,
             'is_anonymous': self.is_anonymous,
+            'is_urgent': self.is_urgent or False,
+            'contact_phone': self.contact_phone,
             'user_ip': self.user_ip,
             'is_pnp_verified': self.is_pnp_verified,
             'pnp_case_number': self.pnp_case_number,
