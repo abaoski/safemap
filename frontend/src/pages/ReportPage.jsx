@@ -5,7 +5,7 @@ import rptBackImg from '/src/assets/images/rpt_back.svg'
 import rptSafetyImg from '/src/assets/images/rpt_safety.svg'
 import rptImpReminderImg from '/src/assets/images/rpt_imp_reminder.svg'
 import { Checkbox } from "@/components/ui/checkbox"
-import { MapContainer, TileLayer } from 'react-leaflet'
+import { Map } from "@/components/ui/map"
 
 export default function ReportPage() {
   const navigate = useNavigate()
@@ -85,23 +85,12 @@ export default function ReportPage() {
       {/* Map Section - Static Map of General Santos City */}
       <div className="w-full max-w-md mx-auto mt-8 shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)]">
         <div className="w-full h-56 rounded-t-xl overflow-hidden">
-          <MapContainer 
-            center={[6.1167, 125.1667]} 
-            zoom={12} 
-            className="h-full w-full"
-            zoomControl={false}
-            dragging={false}
-            scrollWheelZoom={false}
-            doubleClickZoom={false}
-            boxZoom={false}
-            keyboard={false}
-            tap={false}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-          </MapContainer>
+          <Map 
+            viewport={{ center: [125.1667, 6.1167], zoom: 12 }} 
+            className="h-full w-full pointer-events-none"
+            theme="light"
+            interactive={false}
+          />
         </div>
         <div className="w-full h-10 bg-white flex items-center px-4">
           <div className="flex items-center gap-2">

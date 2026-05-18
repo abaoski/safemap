@@ -59,7 +59,6 @@ def create_app(config_class=None):
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
-        app.logger.error(f"404 Not Found: {request.method} {request.path} from {request.remote_addr}")
         return jsonify({'error': 'Resource not found'}), 404
 
     @app.errorhandler(500)

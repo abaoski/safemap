@@ -24,7 +24,6 @@ export default defineConfig(({ mode }) => {
         "/api": {
           target: backendTarget,
           changeOrigin: true,
-          rewrite: (requestPath) => requestPath.replace(/^\/api/, ""),
         },
         "/health": {
           target: backendTarget,

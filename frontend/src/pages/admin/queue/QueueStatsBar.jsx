@@ -1,6 +1,5 @@
 function QueueStatsBar({ stats, statusFilter, setStatusFilter }) {
     const tabs = [
-        { key: "", label: "All", count: stats.total, color: "text-[#1e3a8a]" },
         {
             key: "pending_review",
             label: "Pending",
@@ -19,6 +18,7 @@ function QueueStatsBar({ stats, statusFilter, setStatusFilter }) {
             count: stats.dismissed,
             color: "text-red-500",
         },
+        { key: "", label: "All", count: stats.total, color: "text-[#1e3a8a]" },
     ]
 
     return (

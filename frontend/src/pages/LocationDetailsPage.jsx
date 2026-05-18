@@ -5,15 +5,23 @@ import rptBackImg from '/src/assets/images/rpt_back.svg'
 import rptImpReminderImg from '/src/assets/images/rpt_imp_reminder.svg'
 import { Button } from "@/components/ui/button"
 import BottomNav from "@/components/BottomNav"
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
-import 'leaflet/dist/leaflet.css'
+import { Map, MapMarker, useMap, MarkerContent } from "@/components/ui/map"
 
-// Component to handle map clicks
+
 function LocationMarker({ setLocation, onMapClick }) {
-  useMapEvents({
-    click: onMapClick,
-  })
+  const { map } = useMap()
 
+  useEffect(() => {
+    if (!map) return
+    const handleClick = (e) => {
+      onMapClick({ latlng: { lat: e.lngLat.lat, lng: e.lngLat.lng } })
+    }
+    map.on("click", handleClick)
+    return () => {
+      map.off("click", handleClick)
+    }
+  }, [map, onMapClick])
+  
   return null
 }
 
@@ -233,21 +241,19 @@ export default function LocationDetailsPage() {
 
         <h3 className="text-neutral-600 text-xs font-bold font-['DM_Sans'] tracking-tight mb-2">Location Details</h3>
         
-        {/* Map */}
         <div className="w-full h-56 rounded-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] overflow-hidden mb-4 relative">
-          <MapContainer 
-            center={[6.1167, 125.1667]} 
-            zoom={13} 
+          <Map 
+            viewport={{ center: [125.1667, 6.1167], zoom: 13 }} 
             className="h-full w-full"
-            zoomControl={true}
+            theme="light"
           >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
             <LocationMarker setLocation={setSelectedLocation} onMapClick={handleMapClick} />
-            {selectedLocation && <Marker position={selectedLocation} />}
-          </MapContainer>
+            {selectedLocation && (
+              <MapMarker longitude={selectedLocation.lng} latitude={selectedLocation.lat}>
+                <MarkerContent />
+              </MapMarker>
+            )}
+          </Map>
           
           {/* Use My Location Button - Overlay */}
           <button 

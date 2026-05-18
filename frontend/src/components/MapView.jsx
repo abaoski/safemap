@@ -197,11 +197,43 @@ const SERVICE_CONFIG = {
     Icon: Hospital,
     label: "Hospital",
   },
+  // backend alias for hospital
+  medical: {
+    color: "#0EA5E9",
+    glow: "rgba(14,165,233,0.55)",
+    Icon: Hospital,
+    label: "Medical",
+  },
   police: {
     color: "#6366F1",
     glow: "rgba(99,102,241,0.55)",
     Icon: Siren,
     label: "Police",
+  },
+  // backend alias for police
+  pnp: {
+    color: "#6366F1",
+    glow: "rgba(99,102,241,0.55)",
+    Icon: Siren,
+    label: "PNP",
+  },
+  wcpd: {
+    color: "#8B5CF6",
+    glow: "rgba(139,92,246,0.55)",
+    Icon: Siren,
+    label: "WCPD",
+  },
+  vawc: {
+    color: "#EC4899",
+    glow: "rgba(236,72,153,0.55)",
+    Icon: AlertTriangle,
+    label: "VAWC",
+  },
+  dswd: {
+    color: "#14B8A6",
+    glow: "rgba(20,184,166,0.55)",
+    Icon: Ambulance,
+    label: "DSWD",
   },
   fire: {
     color: "#F97316",
@@ -214,6 +246,25 @@ const SERVICE_CONFIG = {
     glow: "rgba(16,185,129,0.55)",
     Icon: Ambulance,
     label: "Rescue",
+  },
+  emergency: {
+    color: "#EF4444",
+    glow: "rgba(239,68,68,0.55)",
+    Icon: AlertTriangle,
+    label: "Emergency",
+  },
+  disaster: {
+    color: "#F59E0B",
+    glow: "rgba(245,158,11,0.55)",
+    Icon: AlertTriangle,
+    label: "Disaster",
+  },
+  // fallback for unknown types
+  other: {
+    color: "#64748B",
+    glow: "rgba(100,116,139,0.55)",
+    Icon: AlertTriangle,
+    label: "Other",
   },
 }
 
@@ -290,7 +341,7 @@ function ServicePin({ type }) {
 
 function IncidentPin({ severity, status }) {
   const isResolved = status === "verified" || status === "verified_pnp"
-  const cfg = isResolved ? SEVERITY_CONFIG.low : SEVERITY_CONFIG[severity] || SEVERITY_CONFIG.unassigned
+  const cfg = isResolved ? SEVERITY_CONFIG.low : SEVERITY_CONFIG[severity] || SEVERITY_CONFIG.medium
   return (
     <div
       style={{
@@ -431,7 +482,7 @@ function MapView({ activeFilter }) {
       })
   }, [])
 
-  const SERVICE_TYPES = ["hospital", "police", "fire", "rescue"]
+  const SERVICE_TYPES = Object.keys(SERVICE_CONFIG)
   const SEVERITY_TYPES = ["critical", "high", "medium", "low"]
 
   const isServiceFilter = SERVICE_TYPES.includes(activeFilter)
@@ -440,7 +491,19 @@ function MapView({ activeFilter }) {
   const filteredLocations = emergencyLocations.filter((f) => {
     if (!activeFilter) return true
     if (isSeverityFilter) return false
-    return f.properties.type === activeFilter
+    // match exact type OR the canonical group (e.g. filter "hospital" shows "medical" too)
+    const type = f.properties.type
+    if (type === activeFilter) return true
+    // group aliases
+    const HOSPITAL_TYPES = ["hospital", "medical"]
+    const POLICE_TYPES = ["police", "pnp", "wcpd"]
+    const FIRE_TYPES = ["fire"]
+    const RESCUE_TYPES = ["rescue", "dswd", "disaster", "emergency", "vawc"]
+    if (HOSPITAL_TYPES.includes(activeFilter)) return HOSPITAL_TYPES.includes(type)
+    if (POLICE_TYPES.includes(activeFilter)) return POLICE_TYPES.includes(type)
+    if (FIRE_TYPES.includes(activeFilter)) return FIRE_TYPES.includes(type)
+    if (RESCUE_TYPES.includes(activeFilter)) return RESCUE_TYPES.includes(type)
+    return false
   })
 
   const filteredReports = reports.filter((r) => {
@@ -460,7 +523,7 @@ function MapView({ activeFilter }) {
       theme="light"
       className="h-full w-full"
       styles={{
-        light: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+        light: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
         dark: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
       }}
     >
@@ -478,16 +541,8 @@ function MapView({ activeFilter }) {
             <PopupCard
               title={f.properties.name}
               subtitle={`📞 ${f.properties.contact}`}
-              badge={f.properties.type}
-              badgeBg={
-                f.properties.type === "hospital"
-                  ? "bg-[#0EA5E9]"
-                  : f.properties.type === "police"
-                    ? "bg-[#6366F1]"
-                    : f.properties.type === "fire"
-                      ? "bg-[#F97316]"
-                      : "bg-[#10B981]"
-              }
+              badge={(SERVICE_CONFIG[f.properties.type] || SERVICE_CONFIG.other).label}
+              badgeBg={`bg-[${(SERVICE_CONFIG[f.properties.type] || SERVICE_CONFIG.other).color}]`}
             />
           </MarkerPopup>
         </MapMarker>

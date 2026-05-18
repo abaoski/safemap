@@ -1,12 +1,12 @@
-import { useNavigate, useLocation } from 'react-router-dom'
-import { useState, useEffect } from 'react'
-import logoImg from '/src/assets/images/Logo.svg'
+import { useNavigate, useLocation } from "react-router-dom"
+import { useState, useEffect } from "react"
+import logoImg from "/src/assets/images/Logo.svg"
 import { Button } from "@/components/ui/button"
 
 export default function ReportSuccessPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const [referenceCode, setReferenceCode] = useState('')
+  const [referenceCode, setReferenceCode] = useState("")
   const [showCopyHint, setShowCopyHint] = useState(false)
 
   // Get reference code from previous page
@@ -23,16 +23,18 @@ export default function ReportSuccessPage() {
         await navigator.clipboard.writeText(referenceCode)
         setShowCopyHint(true)
         setTimeout(() => setShowCopyHint(false), 2000)
-      } catch (err) { /* ignore */ }
+      } catch (err) {
+        /* ignore */
+      }
     }
   }
 
   const handleTrackStatus = () => {
-    navigate('/track')
+    navigate("/track")
   }
 
   const handleBackToHome = () => {
-    navigate('/')
+    navigate("/map")
   }
 
   return (
@@ -49,8 +51,14 @@ export default function ReportSuccessPage() {
           <div className="w-10 h-10 relative overflow-hidden">
             {/* Checkmark icon */}
             <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="20" cy="20" r="18" fill="#1A3A8F"/>
-              <path d="M12 20L18 26L28 14" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="20" cy="20" r="18" fill="#1A3A8F" />
+              <path
+                d="M12 20L18 26L28 14"
+                stroke="white"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </div>
         </div>
@@ -71,32 +79,30 @@ export default function ReportSuccessPage() {
           <div className="text-center text-gray-400 text-base font-bold font-['DM_Sans'] tracking-tight">
             REPORT REFERENCE CODE
           </div>
-          <div 
+          <div
             className="w-full h-14 px-6 bg-blue-50 rounded-2xl shadow-[0px_4px_16px_0px_rgba(59,91,219,0.35)] flex items-center justify-center cursor-pointer select-none"
             onClick={handleLongPress}
             onTouchStart={handleLongPress}
             title="Hold to copy"
           >
             <div className="text-center text-blue-900 text-2xl font-extrabold font-['DM_Sans'] tracking-tight">
-              {referenceCode || 'Generating...'}
+              {referenceCode || "Generating..."}
             </div>
           </div>
-          {showCopyHint && (
-            <div className="text-green-600 text-sm font-medium">Copied to clipboard!</div>
-          )}
+          {showCopyHint && <div className="text-green-600 text-sm font-medium">Copied to clipboard!</div>}
         </div>
       </div>
 
       {/* Buttons - Constrained on desktop */}
       <div className="w-full max-w-md mt-8 flex flex-col gap-4">
-        <Button 
+        <Button
           onClick={handleTrackStatus}
           className="w-full h-14 bg-blue-900 rounded-2xl shadow-[0px_4px_16px_0px_rgba(59,91,219,0.35)]"
         >
           <span className="text-white text-base font-semibold font-['DM_Sans'] tracking-tight">Track Status</span>
         </Button>
-        
-        <Button 
+
+        <Button
           onClick={handleBackToHome}
           variant="outline"
           className="w-full h-14 bg-white rounded-2xl shadow-[0px_4px_16px_0px_rgba(59,91,219,0.35)] border-2 border-blue-600"
@@ -108,7 +114,8 @@ export default function ReportSuccessPage() {
       {/* Privacy Notice */}
       <div className="w-full max-w-md mt-8">
         <p className="text-center text-gray-400 text-xs font-normal font-['DM_Sans'] tracking-tight">
-          SAFEMAP PH ensures your personal data is handled according to Data Privacy Act of 2012 (RA 10173). Your identity is protected.
+          SAFEMAP PH ensures your personal data is handled according to Data Privacy Act of 2012 (RA 10173). Your
+          identity is protected.
         </p>
       </div>
     </div>

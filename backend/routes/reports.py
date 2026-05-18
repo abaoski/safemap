@@ -592,9 +592,9 @@ def get_report_stats():
         'public_visible': public_count,
         'pnp_verified': verified_count,
         'pending_review': Report.query.filter_by(status='pending_review').count(),
-        'by_status': dict(by_status),
-        'by_category': dict(by_category),
-        'by_severity': dict(by_severity)
+        'by_status': {str(k) if k is not None else 'unknown': v for k, v in by_status},
+        'by_category': {str(k) if k is not None else 'unknown': v for k, v in by_category},
+        'by_severity': {str(k) if k is not None else 'unknown': v for k, v in by_severity}
     }), 200
 
 
