@@ -1,6 +1,71 @@
 import { Search, Shield, Mail, Edit2, AlertCircle } from "lucide-react"
+import { useMemo, useState } from "react"
 
 function StaffManagement({ staffList }) {
+  const sortedStaff = useMemo(() => {
+    const list = Array.isArray(staffList) ? staffList.slice() : []
+
+    const getKey = (s) =>
+      s?.created_at ??
+      s?.createdAt ??
+      s?.joined_at ??
+      s?.joinedAt ??
+      s?.hireDate ??
+      s?.hired_at ??
+      s?.id ??
+      s?.empId ??
+      null
+
+    const parseVal = (v) => {
+      if (v == null) return null
+      if (typeof v === "number") return v
+      if (typeof v === "string") {
+        const t = Date.parse(v)
+        if (!isNaN(t)) return t
+        const n = Number(v)
+        if (!isNaN(n)) return n
+        const digits = Number(v.replace(/\D/g, ""))
+        return isNaN(digits) ? null : digits
+      }
+      return null
+    }
+
+    return list.sort((a, b) => {
+      const va = parseVal(getKey(a))
+      const vb = parseVal(getKey(b))
+      if (va == null && vb == null) return 0
+      if (va == null) return 1
+      if (vb == null) return -1
+      return vb - va // descending: newest first
+    })
+  }, [staffList])
+
+  const [query, setQuery] = useState("")
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [roleFilter, setRoleFilter] = useState("all")
+
+  const availableRoles = useMemo(() => {
+    const roles = new Set()(Array.isArray(staffList) ? staffList : []).forEach((s) => s?.role && roles.add(s.role))
+    return Array.from(roles)
+  }, [staffList])
+
+  const filteredStaff = useMemo(() => {
+    return sortedStaff.filter((s) => {
+      if (statusFilter !== "all" && (s.status || "").toUpperCase() !== statusFilter) return false
+      if (roleFilter !== "all" && (s.role || "") !== roleFilter) return false
+      if (!query) return true
+      const q = query.toLowerCase()
+      return (
+        (s.name || "").toLowerCase().includes(q) ||
+        (s.email || "").toLowerCase().includes(q) ||
+        String(s.empId || s.id || "")
+          .toLowerCase()
+          .includes(q) ||
+        (s.role || "").toLowerCase().includes(q)
+      )
+    })
+  }, [sortedStaff, query, statusFilter, roleFilter])
+
   return (
     <div className="w-full max-w-sm px-4 mt-10">
       {/* Header & Add Button */}
@@ -12,26 +77,68 @@ function StaffManagement({ staffList }) {
       </div>
 
       {/* Search Bar */}
-      <div className="w-full h-10 bg-white rounded-xl border border-gray-100 flex items-center px-4 mb-4 shadow-[0px_2px_8px_rgba(0,0,0,0.02)]">
-        <Search className="w-3.5 h-3.5 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search staff members..."
-          className="flex-1 bg-transparent border-none outline-none ml-2 text-zinc-800 text-[11px] font-normal font-['DM_Sans'] placeholder-gray-400"
-        />
+      <div className="flex flex-col gap-2 mb-4">
+        <div className="flex gap-2 items-center">
+          <div className="flex-1 h-10 bg-white rounded-xl border border-gray-100 flex items-center px-4 shadow-[0px_2px_8px_rgba(0,0,0,0.02)]">
+            <Search className="w-3.5 h-3.5 text-gray-400" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              type="text"
+              placeholder="Search by name, email, role or ID..."
+              className="flex-1 bg-transparent border-none outline-none ml-2 text-zinc-800 text-[11px] font-normal font-['DM_Sans'] placeholder-gray-400"
+            />
+          </div>
+          <button
+            onClick={() => {
+              setQuery("")
+              setStatusFilter("all")
+              setRoleFilter("all")
+            }}
+            className="h-10 px-3 bg-white border border-gray-100 rounded-xl text-sm font-medium text-gray-600"
+          >
+            Clear
+          </button>
+        </div>
+
+        <div className="flex gap-2">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="h-9 px-3 bg-white rounded-xl border border-gray-100 text-sm text-gray-700"
+          >
+            <option value="all">All Statuses</option>
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+          </select>
+
+          <select
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+            className="h-9 px-3 bg-white rounded-xl border border-gray-100 text-sm text-gray-700"
+          >
+            <option value="all">All Roles</option>
+            {availableRoles.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Staff List */}
       <div className="space-y-4">
-        {staffList.map((staff, idx) => (
+        {filteredStaff.map((staff, idx) => (
           <div
-            key={idx}
+            key={staff.id ?? staff.empId ?? idx}
             className="w-full bg-white rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border-l-4 border-[#1e3a8a] p-4 flex flex-col pt-3 relative"
           >
             {/* ID & Status */}
             <div className="flex justify-between items-center mb-1">
               <span className="text-gray-400 text-[9px] font-bold font-['DM_Sans'] uppercase tracking-wider">
-                {staff.empId}
+                ID: {filteredStaff.length - idx}
+                {staff.empId ? ` • ${staff.empId}` : ""}
               </span>
               <span
                 className={`px-2 py-0.5 rounded text-[8px] font-bold font-['DM_Sans'] uppercase tracking-widest ${staff.status === "ACTIVE" ? "bg-blue-50 text-[#1e3a8a]" : "bg-gray-100 text-gray-500"}`}

@@ -22,6 +22,33 @@ function AdminManagementPage() {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   })
 
+  const getLocationText = (directory) => {
+    if (typeof directory?.location === "string") return directory.location
+    if (typeof directory?.address === "string") return directory.address
+    if (directory?.location && typeof directory.location === "object") {
+      if (typeof directory.location.address === "string") return directory.location.address
+      if (typeof directory.location.display_name === "string") return directory.location.display_name
+      if (Number.isFinite(directory.location.latitude) && Number.isFinite(directory.location.longitude)) {
+        return `${directory.location.latitude.toFixed(6)}, ${directory.location.longitude.toFixed(6)}`
+      }
+    }
+    return "No address provided"
+  }
+
+  const getCoordinates = (directory) => {
+    const lat = Number(
+      directory?.latitude ?? directory?.location?.latitude ?? directory?.coords?.latitude ?? directory?.coords?.lat
+    )
+    const lng = Number(
+      directory?.longitude ?? directory?.location?.longitude ?? directory?.coords?.longitude ?? directory?.coords?.lng
+    )
+
+    return {
+      latitude: Number.isFinite(lat) ? lat : null,
+      longitude: Number.isFinite(lng) ? lng : null,
+    }
+  }
+
   const handleDeleteDirectory = async (id) => {
     if (!confirm("Are you sure you want to delete this contact?")) return
     try {
@@ -99,7 +126,7 @@ function AdminManagementPage() {
     if (!name) return
     const phone = prompt("Edit phone number:", dir.phone)
     if (!phone) return
-    const location = prompt("Edit location address:", dir.location)
+    const location = prompt("Edit location address:", getLocationText(dir))
     if (!location) return
 
     try {
@@ -365,10 +392,11 @@ function AdminManagementPage() {
                 directories
                   .filter((d) => {
                     const search = dirSearch.toLowerCase()
+                    const locationText = getLocationText(d).toLowerCase()
                     return (
                       (d.name?.toLowerCase() || "").includes(search) ||
                       (d.phone || "").toString().includes(search) ||
-                      (d.location?.toLowerCase() || "").includes(search)
+                      locationText.includes(search)
                     )
                   })
                   .map((dir) => (
@@ -376,54 +404,64 @@ function AdminManagementPage() {
                       key={`dir-${dir.id || Math.random()}`}
                       className="bg-white rounded-2xl p-4 shadow-[0px_8px_24px_rgba(149,157,165,0.1)] border border-slate-100 flex flex-col relative"
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-slate-400 text-[10px] font-bold font-['DM_Sans'] uppercase tracking-wider">
-                          ID: {dir.id}
-                        </span>
-                        <span
-                          className={`px-2 py-0.5 text-[9px] font-bold rounded uppercase ${
-                            dir.type === "hospital"
-                              ? "bg-emerald-50 text-emerald-600"
-                              : dir.type === "police"
-                                ? "bg-blue-50 text-blue-600"
-                                : dir.type === "fire"
-                                  ? "bg-orange-50 text-orange-600"
-                                  : "bg-purple-50 text-purple-600"
-                          }`}
-                        >
-                          {dir.type}
-                        </span>
-                      </div>
-                      <h3 className="text-base font-bold font-['DM_Sans'] text-[#1f295b] mb-1">{dir.name}</h3>
-                      <p className="text-base font-bold font-['DM_Sans'] mb-3 text-blue-600">{dir.phone}</p>
-                      <div className="mb-4">
-                        <p className="text-slate-400 text-[9px] font-medium font-['DM_Sans'] mb-1">Location Data</p>
-                        <div className="flex items-start gap-1">
-                          <Map className="w-3 h-3 text-[#1f295b] shrink-0 mt-0.5" />
-                          <div>
-                            <p className="text-[11px] font-bold font-['DM_Sans'] leading-tight text-slate-800">
-                              {dir.location}
-                            </p>
-                            <p className="text-slate-400 text-[9px] font-medium mt-0.5 uppercase tracking-tighter">
-                              LAT: {dir.latitude} | LONG: {dir.longitude}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex justify-end gap-2 mt-auto">
-                        <button
-                          onClick={() => handleDeleteDirectory(dir.id)}
-                          className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleEditDirectory(dir)}
-                          className="px-5 py-2 bg-[#1f295b] text-white rounded-lg text-xs font-bold font-['DM_Sans'] hover:bg-[#151c3d] transition-colors"
-                        >
-                          Edit
-                        </button>
-                      </div>
+                      {(() => {
+                        const locationText = getLocationText(dir)
+                        const coords = getCoordinates(dir)
+                        return (
+                          <>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-slate-400 text-[10px] font-bold font-['DM_Sans'] uppercase tracking-wider">
+                                ID: {dir.id}
+                              </span>
+                              <span
+                                className={`px-2 py-0.5 text-[9px] font-bold rounded uppercase ${
+                                  dir.type === "hospital"
+                                    ? "bg-emerald-50 text-emerald-600"
+                                    : dir.type === "police"
+                                      ? "bg-blue-50 text-blue-600"
+                                      : dir.type === "fire"
+                                        ? "bg-orange-50 text-orange-600"
+                                        : "bg-purple-50 text-purple-600"
+                                }`}
+                              >
+                                {dir.type}
+                              </span>
+                            </div>
+                            <h3 className="text-base font-bold font-['DM_Sans'] text-[#1f295b] mb-1">{dir.name}</h3>
+                            <p className="text-base font-bold font-['DM_Sans'] mb-3 text-blue-600">{dir.phone}</p>
+                            <div className="mb-4">
+                              <p className="text-slate-400 text-[9px] font-medium font-['DM_Sans'] mb-1">
+                                Location Data
+                              </p>
+                              <div className="flex items-start gap-1">
+                                <Map className="w-3 h-3 text-[#1f295b] shrink-0 mt-0.5" />
+                                <div>
+                                  <p className="text-[11px] font-bold font-['DM_Sans'] leading-tight text-slate-800">
+                                    {locationText}
+                                  </p>
+                                  <p className="text-slate-400 text-[9px] font-medium mt-0.5 uppercase tracking-tighter">
+                                    LAT: {coords.latitude ?? "N/A"} | LONG: {coords.longitude ?? "N/A"}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex justify-end gap-2 mt-auto">
+                              <button
+                                onClick={() => handleDeleteDirectory(dir.id)}
+                                className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                              <button
+                                onClick={() => handleEditDirectory(dir)}
+                                className="px-5 py-2 bg-[#1f295b] text-white rounded-lg text-xs font-bold font-['DM_Sans'] hover:bg-[#151c3d] transition-colors"
+                              >
+                                Edit
+                              </button>
+                            </div>
+                          </>
+                        )
+                      })()}
                     </div>
                   ))
               )}

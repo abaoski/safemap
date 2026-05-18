@@ -296,9 +296,7 @@ function ServicePin({ type }) {
 
 function IncidentPin({ severity, status }) {
   const isResolved = status === "verified" || status === "verified_pnp"
-  const cfg = isResolved
-    ? SEVERITY_CONFIG.low
-    : SEVERITY_CONFIG[severity] || SEVERITY_CONFIG.unassigned
+  const cfg = isResolved ? SEVERITY_CONFIG.low : SEVERITY_CONFIG[severity] || SEVERITY_CONFIG.unassigned
   return (
     <div
       style={{
@@ -390,13 +388,52 @@ function PopupCard({ title, subtitle, badge, badgeBg, status, extra }) {
 
 function MapView({ activeFilter }) {
   const [reports, setReports] = useState([])
+  const [emergencyLocations, setEmergencyLocations] = useState(EMERGENCY_LOCATIONS.features)
 
   useEffect(() => {
+    // Fetch reports
     fetch(`${API_BASE}/reports/public`)
       .then((r) => (r.ok ? r.json() : { reports: [] }))
       .then((d) => setReports(d.reports || []))
       .catch(() => {
         /* ignore */
+      })
+  }, [])
+
+  useEffect(() => {
+    // Fetch emergency contacts from API and merge with defaults
+    fetch(`${API_BASE}/help/contacts`)
+      .then((r) => (r.ok ? r.json() : { contacts: [] }))
+      .then((d) => {
+        const contacts = d.contacts || []
+        const apiLocations = contacts
+          .filter((c) => c.location?.latitude && c.location?.longitude)
+          .map((c) => ({
+            properties: {
+              id: c.id,
+              name: c.name,
+              type: c.category || "other",
+              contact: c.phone || c.phone_alt || "No contact",
+              lat: c.location.latitude,
+              lng: c.location.longitude,
+            },
+          }))
+
+        // Merge API locations with defaults (API takes precedence by id matching)
+        const merged = [...EMERGENCY_LOCATIONS.features]
+        apiLocations.forEach((apiLoc) => {
+          const existingIndex = merged.findIndex((f) => f.properties.name === apiLoc.properties.name)
+          if (existingIndex >= 0) {
+            merged[existingIndex] = apiLoc
+          } else {
+            merged.push(apiLoc)
+          }
+        })
+
+        setEmergencyLocations(merged)
+      })
+      .catch(() => {
+        /* use defaults */
       })
   }, [])
 
@@ -406,7 +443,7 @@ function MapView({ activeFilter }) {
   const isServiceFilter = SERVICE_TYPES.includes(activeFilter)
   const isSeverityFilter = SEVERITY_TYPES.includes(activeFilter)
 
-  const filteredLocations = EMERGENCY_LOCATIONS.features.filter((f) => {
+  const filteredLocations = emergencyLocations.filter((f) => {
     if (!activeFilter) return true
     if (isSeverityFilter) return false
     return f.properties.type === activeFilter
