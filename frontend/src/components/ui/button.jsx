@@ -34,13 +34,7 @@ const buttonVariants = cva(
 const Button = React.forwardRef(({ className, variant, size, asChild = false, ...props }, ref) => {
   // Using Slot from Radix
   const Comp = "button"
-  return (
-    <Comp
-      className={cn(buttonVariants({ variant, size, className }))}
-      ref={ref}
-      {...props}
-    />
-  )
+  return <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />
 })
 Button.displayName = "Button"
 

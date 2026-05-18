@@ -37,6 +37,7 @@
 ## Reporting Safety Incidents
 
 You can report safety incidents anonymously through the SafeMap app:
+
 1. Tap "Report Incident" on the main screen.
 2. Fill in the details (what happened, when, where).
 3. Submit the report — you will receive a reference code.
