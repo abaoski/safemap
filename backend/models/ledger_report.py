@@ -27,7 +27,7 @@ class LedgerReportHeader(db.Model):
     
     # Current Status (derived from ledger or cached here for performance)
     status = db.Column(db.String(30), default='pending_review', index=True)
-    severity = db.Column(db.String(20))
+    severity = db.Column(db.String(20), default='medium')
     
     # Location
     latitude = db.Column(db.Float, nullable=False)

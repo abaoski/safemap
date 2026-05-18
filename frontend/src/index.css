@@ -235,6 +235,34 @@
   }
 }
 
+/* Custom styles for Leaflet map */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 0;
+}
+
+/* Hotspot marker colors */
+.marker-critical {
+  background-color: #ef4444;
+  border-color: #b91c1c;
+}
+
+.marker-high {
+  background-color: #f97316;
+  border-color: #c2410c;
+}
+
+.marker-medium {
+  background-color: #eab308;
+  border-color: #a16207;
+}
+
+.marker-low {
+  background-color: #3b82f6;
+  border-color: #1d4ed8;
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;

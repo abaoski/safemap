@@ -5,7 +5,6 @@
 This refactor restructures the SafeMap-PH Flask backend from a flat `routes/` layout into a feature-module architecture. Each of the six domains (auth, users, reports, locations, help, chatbot) becomes a self-contained module under `backend/modules/`, with its own Blueprint, service layer, and DTOs. Shared utilities move from `backend/utils/` to `backend/core/utils.py`. All existing API contracts are preserved.
 
 The primary goals are:
-
 - Separation of concerns: routes handle HTTP, services handle business logic, DTOs define data shapes
 - Testability: service functions can be unit-tested without Flask context
 - Discoverability: all domain logic lives in one place per domain
@@ -460,47 +459,47 @@ All module imports change from `from utils import ...` to `from core.utils impor
 
 ## Correctness Properties
 
-_A property is a characteristic or behavior that should hold true across all valid executions of a system — essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees._
+*A property is a characteristic or behavior that should hold true across all valid executions of a system — essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
 
 ### Property 1: DTO round-trip fidelity
 
-_For any_ valid request dict that satisfies a Request DTO's required fields, calling `from_request(data)` should produce a DTO whose field values match the input dict, and calling `to_dict()` on a Response DTO constructed from that data should return a JSON-serializable dict (i.e., `json.dumps()` succeeds without error).
+*For any* valid request dict that satisfies a Request DTO's required fields, calling `from_request(data)` should produce a DTO whose field values match the input dict, and calling `to_dict()` on a Response DTO constructed from that data should return a JSON-serializable dict (i.e., `json.dumps()` succeeds without error).
 
 **Validates: Requirements 5.2, 5.4**
 
 ### Property 2: Missing required field raises
 
-_For any_ Request DTO and _for any_ required field in that DTO, if that field is absent or empty in the input dict, `from_request()` shall raise `ValueError` or `KeyError` — never silently produce a DTO with a `None` value for a required field.
+*For any* Request DTO and *for any* required field in that DTO, if that field is absent or empty in the input dict, `from_request()` shall raise `ValueError` or `KeyError` — never silently produce a DTO with a `None` value for a required field.
 
 **Validates: Requirements 5.3**
 
 ### Property 3: Service functions are Flask-context-free and return plain values
 
-_For any_ service function called with valid DTO or plain-value arguments outside a Flask application context, the function shall complete without raising a `RuntimeError` (no implicit `current_app` access) and shall return a value whose type is `dict`, `list`, or a SQLAlchemy model instance — never a Flask `Response` object.
+*For any* service function called with valid DTO or plain-value arguments outside a Flask application context, the function shall complete without raising a `RuntimeError` (no implicit `current_app` access) and shall return a value whose type is `dict`, `list`, or a SQLAlchemy model instance — never a Flask `Response` object.
 
 **Validates: Requirements 4.2, 4.3**
 
 ### Property 4: Service raises exception on business rule violation
 
-_For any_ service function called with inputs that violate a business rule (e.g., duplicate username, invalid report category, wrong password), the function shall raise a Python exception — never return a Flask `Response` object or call `jsonify`.
+*For any* service function called with inputs that violate a business rule (e.g., duplicate username, invalid report category, wrong password), the function shall raise a Python exception — never return a Flask `Response` object or call `jsonify`.
 
 **Validates: Requirements 4.4**
 
 ### Property 5: HTTP status code preservation for valid requests
 
-_For any_ HTTP request that returned a 2xx status code against the original flat-routes backend, the same request sent to the refactored modular backend shall return the same HTTP status code.
+*For any* HTTP request that returned a 2xx status code against the original flat-routes backend, the same request sent to the refactored modular backend shall return the same HTTP status code.
 
 **Validates: Requirements 7.4**
 
 ### Property 6: Auth and authorization rule preservation
 
-_For any_ protected endpoint and _for any_ combination of (missing token, invalid token, expired token, valid token for inactive user, valid token for active user with insufficient role), the HTTP status code returned by the refactored backend shall be identical to the status code returned by the original backend.
+*For any* protected endpoint and *for any* combination of (missing token, invalid token, expired token, valid token for inactive user, valid token for active user with insufficient role), the HTTP status code returned by the refactored backend shall be identical to the status code returned by the original backend.
 
 **Validates: Requirements 6.4, 7.5**
 
 ### Property 7: Response JSON shape preservation
 
-_For any_ request (valid or invalid) sent to any endpoint, the set of top-level JSON keys in the response body from the refactored backend shall be identical to the set of top-level JSON keys from the original backend for the same request.
+*For any* request (valid or invalid) sent to any endpoint, the set of top-level JSON keys in the response body from the refactored backend shall be identical to the set of top-level JSON keys from the original backend for the same request.
 
 **Validates: Requirements 7.2, 7.3**
 
@@ -512,13 +511,13 @@ _For any_ request (valid or invalid) sent to any endpoint, the set of top-level 
 
 Services raise typed exceptions instead of returning HTTP responses. Route handlers catch these and map them to status codes:
 
-| Exception               | HTTP Status | Example                  |
-| ----------------------- | ----------- | ------------------------ |
-| `ValueError` (from DTO) | 400         | Missing required field   |
-| `AuthenticationError`   | 401         | Invalid credentials      |
-| `AuthorizationError`    | 403         | Insufficient role        |
-| `NotFoundError`         | 404         | Resource not found       |
-| `ConflictError`         | 409         | Duplicate username/email |
+| Exception | HTTP Status | Example |
+|---|---|---|
+| `ValueError` (from DTO) | 400 | Missing required field |
+| `AuthenticationError` | 401 | Invalid credentials |
+| `AuthorizationError` | 403 | Insufficient role |
+| `NotFoundError` | 404 | Resource not found |
+| `ConflictError` | 409 | Duplicate username/email |
 
 Route handlers use a consistent catch pattern:
 
@@ -550,14 +549,12 @@ def login():
 ### Dual Testing Approach
 
 Both unit tests and property-based tests are required. They are complementary:
-
 - Unit tests verify specific examples, integration points, and error conditions
 - Property tests verify universal correctness across randomized inputs
 
 ### Unit Tests
 
 Focus areas:
-
 - Each service function called with a valid DTO returns the expected dict shape
 - Each service function called with an invalid state raises the correct exception
 - Route handlers return correct status codes for success and error cases
@@ -584,14 +581,14 @@ def test_login_dto_roundtrip(data):
 
 **Property test mapping:**
 
-| Design Property | Test Description                                                                        |
-| --------------- | --------------------------------------------------------------------------------------- |
-| Property 1      | DTO round-trip: `from_request` preserves input fields; `to_dict()` is JSON-serializable |
-| Property 2      | Missing required field always raises `ValueError`/`KeyError`                            |
-| Property 3      | Service functions callable without Flask context; never return `Response`               |
-| Property 4      | Service functions raise exceptions (not `Response`) on business rule violations         |
-| Property 5      | HTTP status codes match original handlers for all valid inputs                          |
-| Property 6      | Auth/authz status codes identical to original for all token states                      |
-| Property 7      | Response JSON top-level keys identical to original for all request outcomes             |
+| Design Property | Test Description |
+|---|---|
+| Property 1 | DTO round-trip: `from_request` preserves input fields; `to_dict()` is JSON-serializable |
+| Property 2 | Missing required field always raises `ValueError`/`KeyError` |
+| Property 3 | Service functions callable without Flask context; never return `Response` |
+| Property 4 | Service functions raise exceptions (not `Response`) on business rule violations |
+| Property 5 | HTTP status codes match original handlers for all valid inputs |
+| Property 6 | Auth/authz status codes identical to original for all token states |
+| Property 7 | Response JSON top-level keys identical to original for all request outcomes |
 
 Each correctness property is implemented by a single property-based test. Unit tests cover specific examples and edge cases that complement the property tests.
