@@ -178,7 +178,7 @@ export default function MapPage() {
 
       {/* Search Results Dropdown - Overlays on map */}
       {searchQuery.length > 0 && !selectedLocation && searchLocations(searchQuery).length > 0 && (
-        <div className="absolute left-4 right-4 top-[110px] max-w-md mx-auto bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-[1001]">
+        <div className="absolute left-4 right-4 top-27.5 max-w-md mx-auto bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-1001">
           {searchLocations(searchQuery).map((loc, index) => (
             <button
               key={index}
@@ -204,7 +204,7 @@ export default function MapPage() {
 
       {/* Show selected location indicator */}
       {selectedLocation && (
-        <div className="absolute left-4 right-4 top-[110px] max-w-md mx-auto bg-white rounded-lg shadow-lg border border-gray-200 p-3 z-[1000]">
+        <div className="absolute left-4 right-4 top-27.5 max-w-md mx-auto bg-white rounded-lg shadow-lg border border-gray-200 p-3 z-1000">
           <div className="flex items-center gap-2">
             <span className="text-lg">
               {selectedLocation.type === "hospital"

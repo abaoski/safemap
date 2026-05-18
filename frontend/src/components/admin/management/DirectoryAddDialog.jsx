@@ -1,5 +1,31 @@
-import { useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { X, MapPin, Phone, Building2 } from "lucide-react"
+import { Map, MapMarker, MarkerContent, MapControls, useMap } from "@/components/ui/map"
+import { createPortal } from "react-dom"
+
+const DEFAULT_COORDS = {
+  lat: 6.1167,
+  lng: 125.1667,
+}
+
+function MapClickCapture({ onPick }) {
+  const { map, isLoaded } = useMap()
+
+  useEffect(() => {
+    if (!map || !isLoaded) return
+
+    const handleClick = (event) => {
+      onPick(event.lngLat.lat, event.lngLat.lng)
+    }
+
+    map.on("click", handleClick)
+    return () => {
+      map.off("click", handleClick)
+    }
+  }, [map, isLoaded, onPick])
+
+  return null
+}
 
 export default function DirectoryAddDialog({ isOpen, onClose, onAdd }) {
   const [formData, setFormData] = useState({
