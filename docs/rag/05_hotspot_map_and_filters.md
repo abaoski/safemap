@@ -7,7 +7,6 @@ The SafeMap-PH main screen shows an interactive map centered on General Santos C
 ### Heatmap Layer (Approved Reports)
 
 Reports that have been approved for awareness (but not yet PNP-verified) appear as a heatmap overlay. This shows areas of higher incident density using color gradients:
-
 - Blue areas: Low incident density.
 - Amber/Yellow areas: Medium incident density.
 - Red areas: High incident density (hotspots).
@@ -17,7 +16,6 @@ The heatmap aggregates multiple reports together, so you see general areas of co
 ### Verified Markers Layer (PNP Confirmed Reports)
 
 Reports that have been verified by PNP appear as individual marker pins on the map. You can click on a marker to see:
-
 - The incident type.
 - The date it occurred.
 - A description of what happened.

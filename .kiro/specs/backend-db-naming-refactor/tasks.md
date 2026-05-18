@@ -128,28 +128,28 @@ Rename model files, class names, `__tablename__` values, FK references, relation
     - _Requirements: 1.1–1.3, 2.1–2.4, 3.1–3.3, 4.1–4.3, 5.1–5.2, 6.1–6.3, 7.1–7.2, 8.1–8.3, 9.1–9.3, 11.1–11.7_
 
 - [ ] 16. Write property-based tests for the four correctness properties
-  - [ ]\* 16.1 Write property test for Property 1 — no old class names in any backend Python source file
+  - [ ]* 16.1 Write property test for Property 1 — no old class names in any backend Python source file
     - Use `hypothesis` `@given(filepath=st.sampled_from(...))` over all `backend/**/*.py` files
     - Strip comments/docstrings before scanning; assert none of `SysUser`, `SysReportCategory`, `SysLocation`, `SysHelpCategory`, `SysHelpContact`, `TransReportHeader`, `TransReportLedger` appear
     - Tag: `# Feature: backend-db-naming-refactor, Property 1: No old class names remain in any backend Python source file`
     - **Property 1: No old class names remain in any backend Python source file**
     - **Validates: Requirements 1.2, 2.2, 3.2, 4.2, 5.1, 6.2, 7.1, 10.1–10.6, 12.1**
 
-  - [ ]\* 16.2 Write property test for Property 2 — no old `__tablename__` values in any model class
+  - [ ]* 16.2 Write property test for Property 2 — no old `__tablename__` values in any model class
     - Use `hypothesis` `@given(model_class=st.sampled_from(all_model_classes()))` where `all_model_classes()` imports all classes from `models`
     - Assert `model_class.__tablename__` is not in the set of old table names
     - Tag: `# Feature: backend-db-naming-refactor, Property 2: No old __tablename__ values exist in any model class`
     - **Property 2: No old `__tablename__` values exist in any model class**
     - **Validates: Requirements 1.3, 2.3, 3.3, 4.3, 5.2, 6.3, 7.2, 12.2**
 
-  - [ ]\* 16.3 Write property test for Property 3 — no old FK strings in any model file
+  - [ ]* 16.3 Write property test for Property 3 — no old FK strings in any model file
     - Use `hypothesis` `@given(filepath=st.sampled_from(...))` over all `backend/models/*.py` files
     - Assert none of `'sys_user.id'`, `'sys_help_category.id'`, `'trans_report_header.id'`, `'sys_location.id'` appear in file text
     - Tag: `# Feature: backend-db-naming-refactor, Property 3: No old foreign key reference strings remain in any model file`
     - **Property 3: No old foreign key reference strings remain in any model file**
     - **Validates: Requirements 1.4, 3.4, 5.3, 5.4, 6.4, 7.3, 7.4, 8.4, 12.3**
 
-  - [ ]\* 16.4 Write property test for Property 4 — no old `target_table` strings in any route file
+  - [ ]* 16.4 Write property test for Property 4 — no old `target_table` strings in any route file
     - Use `hypothesis` `@given(filepath=st.sampled_from(...))` over all `backend/routes/*.py` files
     - Assert none of `'sys_user'`, `'sys_location'`, `'sys_help_contact'`, `'trans_report_header'` appear in file text
     - Tag: `# Feature: backend-db-naming-refactor, Property 4: No old target_table strings remain in any route file`

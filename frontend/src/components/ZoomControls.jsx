@@ -1,5 +1,5 @@
-import { Plus, Minus, Locate, Home } from "lucide-react"
-import { useMap } from "@/components/ui/map"
+import { Plus, Minus, Locate, Home } from 'lucide-react'
+import { useMap } from '@/components/ui/map'
 
 function ZoomControls() {
   const { map } = useMap()
@@ -17,12 +17,11 @@ function ZoomControls() {
       ({ coords }) => {
         map?.flyTo({ center: [coords.longitude, coords.latitude], zoom: 15, duration: 1000 })
       },
-      () => alert("Unable to get your location. Please enable location services.")
+      () => alert('Unable to get your location. Please enable location services.')
     )
   }
 
-  const btn =
-    "w-12 h-12 rounded-[10px] bg-white shadow-md flex items-center justify-center hover:bg-slate-50 active:scale-95 transition-all"
+  const btn = "w-12 h-12 rounded-[10px] bg-white shadow-md flex items-center justify-center hover:bg-slate-50 active:scale-95 transition-all"
 
   return (
     <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
@@ -35,11 +34,7 @@ function ZoomControls() {
       <button className={btn} onClick={handleZoomOut} title="Zoom Out">
         <Minus className="w-5 h-5 text-black" />
       </button>
-      <button
-        className="w-12 h-12 rounded-[10px] bg-blue-600 shadow-md flex items-center justify-center hover:bg-blue-700 active:scale-95 transition-all"
-        onClick={handleLocation}
-        title="My Location"
-      >
+      <button className="w-12 h-12 rounded-[10px] bg-blue-600 shadow-md flex items-center justify-center hover:bg-blue-700 active:scale-95 transition-all" onClick={handleLocation} title="My Location">
         <Locate className="w-5 h-5 text-white" />
       </button>
     </div>

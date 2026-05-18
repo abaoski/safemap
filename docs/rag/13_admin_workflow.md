@@ -16,13 +16,11 @@ Admin officers log in using their username and password through the admin login 
 4. Decide the status of the report:
 
 ### Option A: Approve for Awareness
-
 - The report will appear on the public heatmap as aggregated heat.
 - Personal details (reporter name, contact) are automatically removed.
 - The report is marked as "Approved for Awareness."
 
 ### Option B: Verify / PNP Confirmed
-
 - The report will appear as an individual verified marker on the map.
 - It will be included in official dashboards and statistics.
 - A PNP case number can be attached.
@@ -30,7 +28,6 @@ Admin officers log in using their username and password through the admin login 
 - The report is marked as "Verified."
 
 ### Option C: Dismiss
-
 - The report is removed from public view.
 - Used for spam, duplicates, or invalid reports.
 - Personal details are automatically removed.
@@ -47,7 +44,6 @@ Admin officers log in using their username and password through the admin login 
 ## Help Directory Management
 
 Admin officers can:
-
 - Add new emergency contacts (name, category, phone, address, coordinates, operating hours).
 - Update existing emergency contacts.
 - Delete contacts that are no longer valid.

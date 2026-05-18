@@ -8,12 +8,12 @@ The refactor is purely mechanical — no business logic changes, no schema colum
 
 ### Naming Convention
 
-| Prefix    | Semantic Role               | Tables affected                                         |
-| --------- | --------------------------- | ------------------------------------------------------- |
+| Prefix    | Semantic Role              | Tables affected                                      |
+|-----------|----------------------------|------------------------------------------------------|
 | `setup_`  | Master / configuration data | `setup_user`, `setup_report_category`, `setup_location` |
-| `ref_`    | Reference / lookup tables   | `ref_help_category`, `ref_help_contact`                 |
-| `ledger_` | Transactional / ledger data | `ledger_report_header`, `ledger_report_entry`           |
-| `sys_`    | System-level infrastructure | `sys_audit_log` (unchanged)                             |
+| `ref_`    | Reference / lookup tables  | `ref_help_category`, `ref_help_contact`              |
+| `ledger_` | Transactional / ledger data | `ledger_report_header`, `ledger_report_entry`        |
+| `sys_`    | System-level infrastructure | `sys_audit_log` (unchanged)                          |
 
 ---
 
@@ -69,105 +69,105 @@ graph TD
 
 Each model file rename is a one-to-one mapping:
 
-| Old file                        | New file                          |
-| ------------------------------- | --------------------------------- |
-| `models/sys_user.py`            | `models/setup_user.py`            |
+| Old file                      | New file                        |
+|-------------------------------|---------------------------------|
+| `models/sys_user.py`          | `models/setup_user.py`          |
 | `models/sys_report_category.py` | `models/setup_report_category.py` |
-| `models/sys_location.py`        | `models/setup_location.py`        |
-| `models/sys_emergency.py`       | `models/ref_emergency.py`         |
-| `models/trans_report.py`        | `models/ledger_report.py`         |
-| `models/sys_audit.py`           | `models/sys_audit.py` (unchanged) |
+| `models/sys_location.py`      | `models/setup_location.py`      |
+| `models/sys_emergency.py`     | `models/ref_emergency.py`       |
+| `models/trans_report.py`      | `models/ledger_report.py`       |
+| `models/sys_audit.py`         | `models/sys_audit.py` (unchanged) |
 
 ### Class Renames
 
-| Old class           | New class             | File                       |
-| ------------------- | --------------------- | -------------------------- |
-| `SysUser`           | `SetupUser`           | `setup_user.py`            |
-| `SysReportCategory` | `SetupReportCategory` | `setup_report_category.py` |
-| `SysLocation`       | `SetupLocation`       | `setup_location.py`        |
-| `SysHelpCategory`   | `RefHelpCategory`     | `ref_emergency.py`         |
-| `SysHelpContact`    | `RefHelpContact`      | `ref_emergency.py`         |
-| `TransReportHeader` | `LedgerReportHeader`  | `ledger_report.py`         |
-| `TransReportLedger` | `LedgerReportEntry`   | `ledger_report.py`         |
-| `SysAuditLog`       | `SysAuditLog`         | `sys_audit.py` (unchanged) |
+| Old class            | New class             | File                        |
+|----------------------|-----------------------|-----------------------------|
+| `SysUser`            | `SetupUser`           | `setup_user.py`             |
+| `SysReportCategory`  | `SetupReportCategory` | `setup_report_category.py`  |
+| `SysLocation`        | `SetupLocation`       | `setup_location.py`         |
+| `SysHelpCategory`    | `RefHelpCategory`     | `ref_emergency.py`          |
+| `SysHelpContact`     | `RefHelpContact`      | `ref_emergency.py`          |
+| `TransReportHeader`  | `LedgerReportHeader`  | `ledger_report.py`          |
+| `TransReportLedger`  | `LedgerReportEntry`   | `ledger_report.py`          |
+| `SysAuditLog`        | `SysAuditLog`         | `sys_audit.py` (unchanged)  |
 
 ### `__tablename__` Changes
 
-| Old value             | New value                   |
-| --------------------- | --------------------------- |
-| `sys_user`            | `setup_user`                |
-| `sys_report_category` | `setup_report_category`     |
-| `sys_location`        | `setup_location`            |
-| `sys_help_category`   | `ref_help_category`         |
-| `sys_help_contact`    | `ref_help_contact`          |
-| `trans_report_header` | `ledger_report_header`      |
-| `trans_report_ledger` | `ledger_report_entry`       |
-| `sys_audit_log`       | `sys_audit_log` (unchanged) |
+| Old value               | New value                |
+|-------------------------|--------------------------|
+| `sys_user`              | `setup_user`             |
+| `sys_report_category`   | `setup_report_category`  |
+| `sys_location`          | `setup_location`         |
+| `sys_help_category`     | `ref_help_category`      |
+| `sys_help_contact`      | `ref_help_contact`       |
+| `trans_report_header`   | `ledger_report_header`   |
+| `trans_report_ledger`   | `ledger_report_entry`    |
+| `sys_audit_log`         | `sys_audit_log` (unchanged) |
 
 ### Foreign Key Reference Updates
 
 All `db.ForeignKey(...)` string arguments that reference old table names must be updated:
 
-| Location                                  | Column             | Old FK string              | New FK string               |
-| ----------------------------------------- | ------------------ | -------------------------- | --------------------------- |
-| `sys_audit.py` → `SysAuditLog`            | `actor_id`         | `'sys_user.id'`            | `'setup_user.id'`           |
-| `ref_emergency.py` → `RefHelpContact`     | `category_id`      | `'sys_help_category.id'`   | `'ref_help_category.id'`    |
-| `ref_emergency.py` → `RefHelpContact`     | `created_by`       | `'sys_user.id'`            | `'setup_user.id'`           |
-| `setup_location.py` → `SetupLocation`     | `verified_by`      | `'sys_user.id'`            | `'setup_user.id'`           |
-| `ledger_report.py` → `LedgerReportHeader` | `created_by`       | `'sys_user.id'`            | `'setup_user.id'`           |
-| `ledger_report.py` → `LedgerReportEntry`  | `report_header_id` | `'trans_report_header.id'` | `'ledger_report_header.id'` |
-| `ledger_report.py` → `LedgerReportEntry`  | `actor_id`         | `'sys_user.id'`            | `'setup_user.id'`           |
+| Location                                    | Column          | Old FK string                  | New FK string                   |
+|---------------------------------------------|-----------------|--------------------------------|---------------------------------|
+| `sys_audit.py` → `SysAuditLog`              | `actor_id`      | `'sys_user.id'`                | `'setup_user.id'`               |
+| `ref_emergency.py` → `RefHelpContact`       | `category_id`   | `'sys_help_category.id'`       | `'ref_help_category.id'`        |
+| `ref_emergency.py` → `RefHelpContact`       | `created_by`    | `'sys_user.id'`                | `'setup_user.id'`               |
+| `setup_location.py` → `SetupLocation`       | `verified_by`   | `'sys_user.id'`                | `'setup_user.id'`               |
+| `ledger_report.py` → `LedgerReportHeader`   | `created_by`    | `'sys_user.id'`                | `'setup_user.id'`               |
+| `ledger_report.py` → `LedgerReportEntry`    | `report_header_id` | `'trans_report_header.id'`  | `'ledger_report_header.id'`     |
+| `ledger_report.py` → `LedgerReportEntry`    | `actor_id`      | `'sys_user.id'`                | `'setup_user.id'`               |
 
 ### Relationship String Updates
 
 SQLAlchemy relationships that reference model class names by string must be updated:
 
-| File               | Class                | Attribute        | Old target string     | New target string      |
-| ------------------ | -------------------- | ---------------- | --------------------- | ---------------------- |
-| `setup_user.py`    | `SetupUser`          | `reports`        | `'TransReportHeader'` | `'LedgerReportHeader'` |
-| `setup_user.py`    | `SetupUser`          | `actions`        | `'TransReportLedger'` | `'LedgerReportEntry'`  |
-| `ref_emergency.py` | `RefHelpCategory`    | `contacts`       | `'SysHelpContact'`    | `'RefHelpContact'`     |
-| `ledger_report.py` | `LedgerReportHeader` | `ledger_entries` | `'TransReportLedger'` | `'LedgerReportEntry'`  |
+| File                  | Class                 | Attribute         | Old target string      | New target string      |
+|-----------------------|-----------------------|-------------------|------------------------|------------------------|
+| `setup_user.py`       | `SetupUser`           | `reports`         | `'TransReportHeader'`  | `'LedgerReportHeader'` |
+| `setup_user.py`       | `SetupUser`           | `actions`         | `'TransReportLedger'`  | `'LedgerReportEntry'`  |
+| `ref_emergency.py`    | `RefHelpCategory`     | `contacts`        | `'SysHelpContact'`     | `'RefHelpContact'`     |
+| `ledger_report.py`    | `LedgerReportHeader`  | `ledger_entries`  | `'TransReportLedger'`  | `'LedgerReportEntry'`  |
 
 ### Route File Import Updates
 
 Each route file imports model classes from `models`. The import aliases (e.g., `as User`) are preserved so that internal route logic requires no further changes.
 
-| Route file            | Old import                                                                                                | New import                                                                                                   |
-| --------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `routes/auth.py`      | `SysUser as User`                                                                                         | `SetupUser as User`                                                                                          |
-| `routes/users.py`     | `SysUser as User`, `TransReportHeader`                                                                    | `SetupUser as User`, `LedgerReportHeader`                                                                    |
-| `routes/reports.py`   | `TransReportHeader as Report`, `SysReportCategory as ReportCategory`, `TransReportLedger as ReportLedger` | `LedgerReportHeader as Report`, `SetupReportCategory as ReportCategory`, `LedgerReportEntry as ReportLedger` |
-| `routes/locations.py` | `SysLocation as Location`                                                                                 | `SetupLocation as Location`                                                                                  |
-| `routes/help.py`      | `SysHelpCategory as HelpCategory`, `SysHelpContact as HelpContact`                                        | `RefHelpCategory as HelpCategory`, `RefHelpContact as HelpContact`                                           |
+| Route file          | Old import                                      | New import                                       |
+|---------------------|-------------------------------------------------|--------------------------------------------------|
+| `routes/auth.py`    | `SysUser as User`                               | `SetupUser as User`                              |
+| `routes/users.py`   | `SysUser as User`, `TransReportHeader`          | `SetupUser as User`, `LedgerReportHeader`        |
+| `routes/reports.py` | `TransReportHeader as Report`, `SysReportCategory as ReportCategory`, `TransReportLedger as ReportLedger` | `LedgerReportHeader as Report`, `SetupReportCategory as ReportCategory`, `LedgerReportEntry as ReportLedger` |
+| `routes/locations.py` | `SysLocation as Location`                     | `SetupLocation as Location`                      |
+| `routes/help.py`    | `SysHelpCategory as HelpCategory`, `SysHelpContact as HelpContact` | `RefHelpCategory as HelpCategory`, `RefHelpContact as HelpContact` |
 
 ### `target_table` Audit Log String Updates
 
 `SysAuditLog.log(target_table=...)` calls pass the affected table name as a plain string. These must be updated in route files:
 
-| Route file            | Old string              | New string               |
-| --------------------- | ----------------------- | ------------------------ |
-| `routes/auth.py`      | `'sys_user'`            | `'setup_user'`           |
-| `routes/users.py`     | `'sys_user'`            | `'setup_user'`           |
-| `routes/reports.py`   | `'trans_report_header'` | `'ledger_report_header'` |
-| `routes/locations.py` | `'sys_location'`        | `'setup_location'`       |
-| `routes/help.py`      | `'sys_help_contact'`    | `'ref_help_contact'`     |
+| Route file          | Old string              | New string               |
+|---------------------|-------------------------|--------------------------|
+| `routes/auth.py`    | `'sys_user'`            | `'setup_user'`           |
+| `routes/users.py`   | `'sys_user'`            | `'setup_user'`           |
+| `routes/reports.py` | `'trans_report_header'` | `'ledger_report_header'` |
+| `routes/locations.py` | `'sys_location'`      | `'setup_location'`       |
+| `routes/help.py`    | `'sys_help_contact'`    | `'ref_help_contact'`     |
 
 ### Setup Script Renames and Internal Updates
 
-| Old filename                   | New filename                  |
-| ------------------------------ | ----------------------------- |
-| `set_up_database.py`           | `setup_database.py`           |
-| `set_up_emergency_contacts.py` | `setup_emergency_contacts.py` |
-| `set_up_risk_status.py`        | `setup_risk_status.py`        |
+| Old filename                      | New filename                     |
+|-----------------------------------|----------------------------------|
+| `set_up_database.py`              | `setup_database.py`              |
+| `set_up_emergency_contacts.py`    | `setup_emergency_contacts.py`    |
+| `set_up_risk_status.py`           | `setup_risk_status.py`           |
 
 Internal class references within each script:
 
-| Script                        | Old class(es)                       | New class(es)                       |
-| ----------------------------- | ----------------------------------- | ----------------------------------- |
-| `setup_database.py`           | `SysUser`                           | `SetupUser`                         |
-| `setup_emergency_contacts.py` | `SysHelpCategory`, `SysHelpContact` | `RefHelpCategory`, `RefHelpContact` |
-| `setup_risk_status.py`        | `SysReportCategory`                 | `SetupReportCategory`               |
+| Script                         | Old class(es)                          | New class(es)                            |
+|--------------------------------|----------------------------------------|------------------------------------------|
+| `setup_database.py`            | `SysUser`                              | `SetupUser`                              |
+| `setup_emergency_contacts.py`  | `SysHelpCategory`, `SysHelpContact`    | `RefHelpCategory`, `RefHelpContact`      |
+| `setup_risk_status.py`         | `SysReportCategory`                    | `SetupReportCategory`                    |
 
 `setup_database.py` also prints next-step instructions that reference the old script names; these strings must be updated to `setup_emergency_contacts.py` and `setup_risk_status.py`.
 
@@ -223,11 +223,11 @@ For each rename on PostgreSQL, the migration must also update any FK constraints
 
 ## Correctness Properties
 
-_A property is a characteristic or behavior that should hold true across all valid executions of a system — essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees._
+*A property is a characteristic or behavior that should hold true across all valid executions of a system — essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
 
 ### Property 1: No old class names remain in any backend Python source file
 
-_For any_ Python source file under `backend/` (excluding comments and docstrings), the file's text must not contain any of the strings `SysUser`, `SysReportCategory`, `SysLocation`, `SysHelpCategory`, `SysHelpContact`, `TransReportHeader`, or `TransReportLedger`.
+*For any* Python source file under `backend/` (excluding comments and docstrings), the file's text must not contain any of the strings `SysUser`, `SysReportCategory`, `SysLocation`, `SysHelpCategory`, `SysHelpContact`, `TransReportHeader`, or `TransReportLedger`.
 
 **Validates: Requirements 1.2, 2.2, 3.2, 4.2, 5.1, 6.2, 7.1, 10.1–10.6, 12.1**
 
@@ -235,7 +235,7 @@ _For any_ Python source file under `backend/` (excluding comments and docstrings
 
 ### Property 2: No old `__tablename__` values exist in any model class
 
-_For any_ SQLAlchemy model class importable from `backend/models`, its `__tablename__` attribute must not be one of `sys_user`, `sys_report_category`, `sys_location`, `sys_help_category`, `sys_help_contact`, `trans_report_header`, or `trans_report_ledger`.
+*For any* SQLAlchemy model class importable from `backend/models`, its `__tablename__` attribute must not be one of `sys_user`, `sys_report_category`, `sys_location`, `sys_help_category`, `sys_help_contact`, `trans_report_header`, or `trans_report_ledger`.
 
 **Validates: Requirements 1.3, 2.3, 3.3, 4.3, 5.2, 6.3, 7.2, 12.2**
 
@@ -243,7 +243,7 @@ _For any_ SQLAlchemy model class importable from `backend/models`, its `__tablen
 
 ### Property 3: No old foreign key reference strings remain in any model file
 
-_For any_ Python source file under `backend/models/`, the file's text must not contain any of the FK strings `'sys_user.id'`, `'sys_help_category.id'`, `'trans_report_header.id'`, or `'sys_location.id'` as a `db.ForeignKey(...)` argument.
+*For any* Python source file under `backend/models/`, the file's text must not contain any of the FK strings `'sys_user.id'`, `'sys_help_category.id'`, `'trans_report_header.id'`, or `'sys_location.id'` as a `db.ForeignKey(...)` argument.
 
 **Validates: Requirements 1.4, 3.4, 5.3, 5.4, 6.4, 7.3, 7.4, 8.4, 12.3**
 
@@ -251,7 +251,7 @@ _For any_ Python source file under `backend/models/`, the file's text must not c
 
 ### Property 4: No old `target_table` strings remain in any route file
 
-_For any_ Python source file under `backend/routes/`, the file's text must not contain any of the strings `'sys_user'`, `'sys_location'`, `'sys_help_contact'`, or `'trans_report_header'` as a `target_table=` argument in a `SysAuditLog.log(...)` call.
+*For any* Python source file under `backend/routes/`, the file's text must not contain any of the strings `'sys_user'`, `'sys_location'`, `'sys_help_contact'`, or `'trans_report_header'` as a `target_table=` argument in a `SysAuditLog.log(...)` call.
 
 **Validates: Requirements 1.5, 3.5, 5.5, 6.6, 12.4**
 
@@ -282,7 +282,6 @@ Both unit tests and property-based tests are required. Unit tests verify specifi
 These tests verify specific, concrete post-conditions of the refactor. Each test corresponds to a single acceptance criterion.
 
 **File existence checks:**
-
 - `setup_user.py` exists; `sys_user.py` does not
 - `setup_report_category.py` exists; `sys_report_category.py` does not
 - `setup_location.py` exists; `sys_location.py` does not
@@ -294,7 +293,6 @@ These tests verify specific, concrete post-conditions of the refactor. Each test
 - `setup_risk_status.py` exists; `set_up_risk_status.py` does not
 
 **`__tablename__` checks (import each class and assert):**
-
 - `SetupUser.__tablename__ == 'setup_user'`
 - `SetupReportCategory.__tablename__ == 'setup_report_category'`
 - `SetupLocation.__tablename__ == 'setup_location'`
@@ -305,12 +303,10 @@ These tests verify specific, concrete post-conditions of the refactor. Each test
 - `SysAuditLog.__tablename__ == 'sys_audit_log'`
 
 **`models/__init__.py` exports:**
-
 - All of `SetupUser`, `SetupReportCategory`, `SetupLocation`, `RefHelpCategory`, `RefHelpContact`, `LedgerReportHeader`, `LedgerReportEntry`, `SysAuditLog` are importable from `models`
 - `__all__` contains exactly these names (plus `db`)
 
 **Relationship and method checks:**
-
 - `RefHelpCategory.contacts` relationship targets `RefHelpContact`
 - `LedgerReportHeader.ledger_entries` relationship targets `LedgerReportEntry`
 - `SetupUser.reports` relationship targets `LedgerReportHeader`
@@ -319,7 +315,6 @@ These tests verify specific, concrete post-conditions of the refactor. Each test
 - `SetupReportCategory.get_report_count()` executes without error (queries `ledger_report_header`)
 
 **Setup script checks:**
-
 - `setup_database.py` source text contains `'setup_emergency_contacts.py'` and `'setup_risk_status.py'` in its print statements
 - `setup_emergency_contacts.py` imports `RefHelpCategory` and `RefHelpContact`
 - `setup_risk_status.py` imports `SetupReportCategory`
