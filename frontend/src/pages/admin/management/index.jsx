@@ -22,6 +22,44 @@ function AdminManagementPage() {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   })
 
+  const getDirectoryLocationText = (dir) => {
+    if (!dir) return ""
+
+    if (typeof dir.location === "string") {
+      return dir.location
+    }
+
+    if (dir.address) {
+      return dir.address
+    }
+
+    if (dir.location && typeof dir.location === "object") {
+      return dir.location.address || ""
+    }
+
+    return ""
+  }
+
+  const getDirectoryCoordinatesText = (dir) => {
+    if (!dir) return ""
+
+    const latitude = dir.latitude ?? dir.location?.latitude
+    const longitude = dir.longitude ?? dir.location?.longitude
+
+    if (latitude == null || longitude == null) {
+      return ""
+    }
+
+    return `LAT: ${latitude} | LONG: ${longitude}`
+  }
+
+  const getDirectorySearchText = (dir) => {
+    return [dir?.name, dir?.phone, getDirectoryLocationText(dir), getDirectoryCoordinatesText(dir)]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+  }
+
   const handleDeleteDirectory = async (id) => {
     if (!confirm("Are you sure you want to delete this contact?")) return
     try {
@@ -99,7 +137,7 @@ function AdminManagementPage() {
     if (!name) return
     const phone = prompt("Edit phone number:", dir.phone)
     if (!phone) return
-    const location = prompt("Edit location address:", dir.location)
+    const location = prompt("Edit location address:", getDirectoryLocationText(dir))
     if (!location) return
 
     try {
@@ -365,11 +403,7 @@ function AdminManagementPage() {
                 directories
                   .filter((d) => {
                     const search = dirSearch.toLowerCase()
-                    return (
-                      (d.name?.toLowerCase() || "").includes(search) ||
-                      (d.phone || "").toString().includes(search) ||
-                      (d.location?.toLowerCase() || "").includes(search)
-                    )
+                    return getDirectorySearchText(d).includes(search)
                   })
                   .map((dir) => (
                     <div
@@ -402,10 +436,10 @@ function AdminManagementPage() {
                           <Map className="w-3 h-3 text-[#1f295b] shrink-0 mt-0.5" />
                           <div>
                             <p className="text-[11px] font-bold font-['DM_Sans'] leading-tight text-slate-800">
-                              {dir.location}
+                              {getDirectoryLocationText(dir) || "No location provided"}
                             </p>
                             <p className="text-slate-400 text-[9px] font-medium mt-0.5 uppercase tracking-tighter">
-                              LAT: {dir.latitude} | LONG: {dir.longitude}
+                              {getDirectoryCoordinatesText(dir) || "Coordinates unavailable"}
                             </p>
                           </div>
                         </div>
