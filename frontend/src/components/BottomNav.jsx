@@ -1,8 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom"
 import { useState, useEffect } from "react"
-import { Home, Map, AlertTriangle, HelpCircle, Shield } from "lucide-react"
+import { Home, Map, AlertTriangle, ClipboardList, Shield } from "lucide-react"
 
-function BottomNav({ onHelpClick, onChatClick }) {
+function BottomNav({ onChatClick }) {
     const navigate = useNavigate()
     const location = useLocation()
     const [activeTab, setActiveTab] = useState("home")
@@ -14,8 +14,8 @@ function BottomNav({ onHelpClick, onChatClick }) {
         // Otherwise, we match specific routes.
         if (path === "/map") {
             setActiveTab("map")
-        } else if (path === "/help") {
-            setActiveTab("help")
+        } else if (path === "/track") {
+            setActiveTab("track")
         } else if (path === "/admin") {
             setActiveTab("admin")
         }
@@ -75,10 +75,9 @@ function BottomNav({ onHelpClick, onChatClick }) {
             {/* CTA Button: Always highlighted & prominent */}
             {renderCTA(AlertTriangle, "Report", () => navigate("/report"))}
 
-            {renderTab(HelpCircle, "Help", "help", activeTab === "help", () => {
-                navigate("/help")
-                if (onHelpClick) onHelpClick()
-            })}
+            {renderTab(ClipboardList, "Track", "track", activeTab === "track", () =>
+                navigate("/track"),
+            )}
             {renderTab(Shield, "Admin", "admin", activeTab === "admin", () =>
                 navigate("/admin"),
             )}

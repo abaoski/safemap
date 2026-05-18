@@ -83,7 +83,7 @@ function FilterChip({ active, activeBg, onClick, children }) {
 }
 
 function RiskLegend({ onFilterChange, activeFilter }) {
-    const [open, setOpen] = useState(true)
+    const [open, setOpen] = useState(false)
 
     const toggle = type => onFilterChange(activeFilter === type ? null : type)
 
