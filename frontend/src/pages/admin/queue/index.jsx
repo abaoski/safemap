@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { createPortal } from "react-dom"
 import { useLocation } from "react-router-dom"
 import { API_BASE } from "@/lib/api-base"
-import { Search, Filter, Clock, ChevronDown, X, MapPin, Calendar, Tag, AlertCircle } from "lucide-react"
+import { Search, Filter, Clock, ChevronDown, X, MapPin, Calendar, Tag, AlertCircle, Phone } from "lucide-react"
 import AdminLayout from "../../../components/admin/AdminLayout"
 import QueueStatsBar from "./QueueStatsBar"
 import QueueReportCard from "./QueueReportCard"
@@ -20,6 +20,7 @@ function AdminQueuePage() {
     inProgress: 0,
     dismissed: 0,
     total: 0,
+    urgent: 0,
   })
   const [selectedReport, setSelectedReport] = useState(null)
   const [selectedSeverity, setSelectedSeverity] = useState("")
@@ -54,6 +55,7 @@ function AdminQueuePage() {
           inProgress: data.by_status?.in_progress || 0,
           dismissed: data.by_status?.dismissed || 0,
           total: data.total || 0,
+          urgent: data.urgent || 0,
         })
       }
     } catch (err) { /* ignore */ }
@@ -189,18 +191,25 @@ function AdminQueuePage() {
   }
 
   // Also search by raw numeric ID so deep-link from dashboard (?id=N) works
-  const filteredReports = allReports.filter((r) => {
-    if (!searchQuery) return true
-    const q = searchQuery.toLowerCase().trim()
-    return (
-      String(r.id) === q ||
-      (r.reference_code || "").toLowerCase().includes(q) ||
-      (r.title || "").toLowerCase().includes(q) ||
-      (r.category || "").toLowerCase().includes(q) ||
-      (r.location?.barangay || "").toLowerCase().includes(q) ||
-      (r.description || "").toLowerCase().includes(q)
-    )
-  })
+  const filteredReports = allReports
+    .filter((r) => {
+      if (!searchQuery) return true
+      const q = searchQuery.toLowerCase().trim()
+      return (
+        String(r.id) === q ||
+        (r.reference_code || "").toLowerCase().includes(q) ||
+        (r.title || "").toLowerCase().includes(q) ||
+        (r.category || "").toLowerCase().includes(q) ||
+        (r.location?.barangay || "").toLowerCase().includes(q) ||
+        (r.description || "").toLowerCase().includes(q)
+      )
+    })
+    // Urgent reports always float to the top
+    .sort((a, b) => {
+      if (a.is_urgent && !b.is_urgent) return -1
+      if (!a.is_urgent && b.is_urgent) return 1
+      return 0
+    })
 
   const CATEGORIES = [
     "",
@@ -246,9 +255,17 @@ function AdminQueuePage() {
             <p className="text-slate-400 text-[10px] font-bold font-['DM_Sans'] uppercase tracking-widest mb-0.5">
               {selectedReport.reference_code || `SF-${selectedReport.id}`}
             </p>
-            <h3 className="text-[#1f295b] text-base font-extrabold font-['DM_Sans'] leading-tight pr-6">
-              {selectedReport.title || "Untitled Report"}
-            </h3>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-[#1f295b] text-base font-extrabold font-['DM_Sans'] leading-tight pr-6">
+                {selectedReport.title || "Untitled Report"}
+              </h3>
+              {selectedReport.is_urgent && (
+                <span className="flex items-center gap-1 px-2 py-0.5 bg-red-100 border border-red-300 rounded-full text-red-600 text-[9px] font-extrabold uppercase tracking-widest shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                  Urgent
+                </span>
+              )}
+            </div>
           </div>
           <button
             onClick={() => setSelectedReport(null)}
@@ -321,6 +338,30 @@ function AdminQueuePage() {
                 &ldquo;{selectedReport.description}&rdquo;
               </div>
             </div>
+
+            {/* Contact Phone — only shown for urgent reports */}
+            {selectedReport.is_urgent && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-red-400">
+                  <Phone className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-bold uppercase text-red-500">Reporter Contact</span>
+                </div>
+                <div className="bg-red-50 p-4 rounded-xl border border-red-200 flex items-center gap-3">
+                  <Phone className="w-4 h-4 text-red-500 shrink-0" />
+                  <span className="text-red-700 font-bold text-sm">
+                    {selectedReport.contact_phone || "—"}
+                  </span>
+                  {selectedReport.contact_phone && (
+                    <a
+                      href={`tel:${selectedReport.contact_phone}`}
+                      className="ml-auto px-3 py-1 bg-red-600 text-white text-[10px] font-bold rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      Call
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Location */}
             <div className="space-y-2">

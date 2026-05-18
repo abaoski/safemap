@@ -32,7 +32,7 @@ function QueueStatsBar({ stats, statusFilter, setStatusFilter, setSearchQuery })
 
   const handleTabClick = (key) => {
     setStatusFilter(key)
-    if (setSearchQuery) setSearchQuery("") // Clear the search field so the user sees actual counts for that tab
+    if (setSearchQuery) setSearchQuery("")
   }
 
   return (
@@ -66,6 +66,16 @@ function QueueStatsBar({ stats, statusFilter, setStatusFilter, setSearchQuery })
           )
         })}
       </div>
+
+      {/* Urgent indicator — shown only when there are urgent reports */}
+      {stats.urgent > 0 && (
+        <div className="mx-4 mt-3 flex items-center gap-2 px-3 py-2 bg-red-50 border border-red-200 rounded-xl">
+          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shrink-0" />
+          <span className="text-red-600 text-[11px] font-extrabold font-['DM_Sans'] uppercase tracking-wide">
+            {stats.urgent} Urgent {stats.urgent === 1 ? "Report" : "Reports"} — Requires Immediate Attention
+          </span>
+        </div>
+      )}
     </div>
   )
 }

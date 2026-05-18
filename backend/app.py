@@ -31,6 +31,11 @@ def create_app(config_class=None):
         from models import ReportQueue
         ReportQueue.__table__.create(bind=db.engine, checkfirst=True)
 
+    # Always return DB connections to the pool after each request
+    @app.teardown_appcontext
+    def shutdown_session(exception=None):
+        db.session.remove()
+
     # Register blueprints
     from routes import api_bp
     app.register_blueprint(api_bp, url_prefix='/api')

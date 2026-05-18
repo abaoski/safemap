@@ -129,7 +129,7 @@ The SafeMap-PH backend currently uses inconsistent database naming prefixes (`sy
 
 ---
 
-### Requirement 9: Update Init_Module imports and **all**
+### Requirement 9: Update Init_Module imports and __all__
 
 **User Story:** As a backend developer, I want `backend/models/__init__.py` to reflect all renamed classes and files, so that all route and script imports resolve correctly without modification.
 
