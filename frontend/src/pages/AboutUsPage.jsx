@@ -32,12 +32,12 @@ const FacebookIcon = ({ className }) => (
 );
 
 const TEAM = [
-  { name: 'Manada, Jannah',   role: 'Full-Stack Developer', image: 'Manada',   initials: 'JM', dept: 'Engineering' },
-  { name: 'Soler, Germarie',  role: 'Project Manager',      image: 'Soler',    initials: 'GS', dept: 'Management'  },
-  { name: 'Ayala, Filjin',    role: 'QA Tester',            image: 'Ayala',    initials: 'FA', dept: 'Quality'     },
-  { name: 'Inguillo, Carlos', role: 'Product Manager',      image: 'Inguillo', initials: 'CI', dept: 'Product'     },
-  { name: 'Gregorio, Zane',   role: 'Backend Engineer',     image: 'Gregorio', initials: 'ZG', dept: 'Engineering' },
-  { name: 'Amodia, Josh',     role: 'Data Analyst',         image: 'Amodia',   initials: 'JA', dept: 'Analytics'   },
+  { name: 'Manada, Jannah',   role: 'Full-Stack Developer', image: 'https://res.cloudinary.com/djc0ndwqf/image/upload/v1779100597/f1930c5b-5655-427d-8874-9436a58e2270media_editing.tmp_dao6xr.webp',   initials: 'JM', dept: 'Engineering' },
+  { name: 'Soler, Germarie',  role: 'Project Manager',      image: 'https://res.cloudinary.com/djc0ndwqf/image/upload/v1779100598/received_956917833977406_htvrke.jpg',    initials: 'GS', dept: 'Management'  },
+  { name: 'Ayala, Filjin',    role: 'QA Tester',            image: 'https://res.cloudinary.com/djc0ndwqf/image/upload/v1779100604/received_26239101922377527_gy8fdk.jpg',    initials: 'FA', dept: 'Quality'     },
+  { name: 'Inguillo, Carlos', role: 'Product Manager',      image: 'https://res.cloudinary.com/djc0ndwqf/image/upload/v1779100598/received_1798452577448352_uphmdg.jpg', initials: 'CI', dept: 'Product'     },
+  { name: 'Gregorio, Zane',   role: 'Backend Engineer',     image: 'https://res.cloudinary.com/djc0ndwqf/image/upload/v1779100598/received_1404290571381648_cpiok5.jpg', initials: 'ZG', dept: 'Engineering' },
+  { name: 'Amodia, Josh',     role: 'Data Analyst',         image: 'https://res.cloudinary.com/djc0ndwqf/image/upload/v1779100597/received_853662264013633_mpiqc1.jpg',   initials: 'JA', dept: 'Analytics'   },
 ];
 
 /* ---------- Main component ---------- */
@@ -347,7 +347,7 @@ const AboutUsPage = () => {
                 className="w-36 h-36 rounded-full border-4 border-[#1A2A6C] bg-[#E8ECFF] flex items-center justify-center overflow-hidden shadow-md mb-5"
               >
                 <img
-                  src={`/src/assets/images/${member.image}.jpg`}
+                  src={member.image}
                   alt={member.name}
                   className="w-full h-full object-cover"
                   onError={(e) => {
