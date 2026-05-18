@@ -237,7 +237,7 @@ def submit_anonymous_report():
         latitude=data['latitude'],
         longitude=data['longitude'],
         category=data['category'],
-        severity=data.get('severity', 'medium'),
+        severity=data.get('severity'),
         city=data.get('city'),
         barangay=data.get('barangay'),
         address=sanitized_address if sanitized_address else None,
@@ -369,6 +369,24 @@ def verify_report_pnp(report_id):
     data = request.get_json() or {}
     case_number = data.get('case_number')
     notes = data.get('notes', '')
+
+    if report.status in ['verified', 'verified_pnp']:
+        return jsonify({
+            'message': 'Report is already verified',
+            'report': report.to_dict()
+        }), 200
+
+    if report.status == 'pending_review':
+        return jsonify({
+            'error': 'Invalid status transition',
+            'message': 'Approve the report before verification.'
+        }), 400
+
+    if report.status in ['dismissed', 'spam', 'false_report']:
+        return jsonify({
+            'error': 'Invalid status transition',
+            'message': 'Cannot verify a dismissed or flagged report.'
+        }), 400
     
     # Update header
     report.is_pnp_verified = True
@@ -592,9 +610,9 @@ def get_report_stats():
         'public_visible': public_count,
         'pnp_verified': verified_count,
         'pending_review': Report.query.filter_by(status='pending_review').count(),
-        'by_status': dict(by_status),
-        'by_category': dict(by_category),
-        'by_severity': dict(by_severity)
+        'by_status': {k if k is not None else 'unassigned': v for k, v in by_status},
+        'by_category': {k if k is not None else 'unassigned': v for k, v in by_category},
+        'by_severity': {k if k is not None else 'unassigned': v for k, v in by_severity}
     }), 200
 
 
