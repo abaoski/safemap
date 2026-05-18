@@ -243,6 +243,12 @@ const SEVERITY_CONFIG = {
     aura: "rgba(48,209,88,0.22)",
     label: "Low",
   },
+  unassigned: {
+    color: "#9CA3AF",
+    glow: "rgba(156,163,175,0.5)",
+    aura: "rgba(156,163,175,0.2)",
+    label: "Unassigned",
+  },
 }
 
 // ── Pin components ───────────────────────────────────────────────────────────
@@ -290,7 +296,9 @@ function ServicePin({ type }) {
 
 function IncidentPin({ severity, status }) {
   const isResolved = status === "verified" || status === "verified_pnp"
-  const cfg = isResolved ? SEVERITY_CONFIG.low : SEVERITY_CONFIG[severity] || SEVERITY_CONFIG.unassigned
+  const cfg = isResolved
+    ? SEVERITY_CONFIG.low
+    : SEVERITY_CONFIG[severity] || SEVERITY_CONFIG.unassigned
   return (
     <div
       style={{
@@ -382,52 +390,13 @@ function PopupCard({ title, subtitle, badge, badgeBg, status, extra }) {
 
 function MapView({ activeFilter }) {
   const [reports, setReports] = useState([])
-  const [emergencyLocations, setEmergencyLocations] = useState(EMERGENCY_LOCATIONS.features)
 
   useEffect(() => {
-    // Fetch reports
     fetch(`${API_BASE}/reports/public`)
       .then((r) => (r.ok ? r.json() : { reports: [] }))
       .then((d) => setReports(d.reports || []))
       .catch(() => {
         /* ignore */
-      })
-  }, [])
-
-  useEffect(() => {
-    // Fetch emergency contacts from API and merge with defaults
-    fetch(`${API_BASE}/help/contacts`)
-      .then((r) => (r.ok ? r.json() : { contacts: [] }))
-      .then((d) => {
-        const contacts = d.contacts || []
-        const apiLocations = contacts
-          .filter((c) => c.location?.latitude && c.location?.longitude)
-          .map((c) => ({
-            properties: {
-              id: c.id,
-              name: c.name,
-              type: c.category || "other",
-              contact: c.phone || c.phone_alt || "No contact",
-              lat: c.location.latitude,
-              lng: c.location.longitude,
-            },
-          }))
-
-        // Merge API locations with defaults (API takes precedence by id matching)
-        const merged = [...EMERGENCY_LOCATIONS.features]
-        apiLocations.forEach((apiLoc) => {
-          const existingIndex = merged.findIndex((f) => f.properties.name === apiLoc.properties.name)
-          if (existingIndex >= 0) {
-            merged[existingIndex] = apiLoc
-          } else {
-            merged.push(apiLoc)
-          }
-        })
-
-        setEmergencyLocations(merged)
-      })
-      .catch(() => {
-        /* use defaults */
       })
   }, [])
 
@@ -437,7 +406,7 @@ function MapView({ activeFilter }) {
   const isServiceFilter = SERVICE_TYPES.includes(activeFilter)
   const isSeverityFilter = SEVERITY_TYPES.includes(activeFilter)
 
-  const filteredLocations = emergencyLocations.filter((f) => {
+  const filteredLocations = EMERGENCY_LOCATIONS.features.filter((f) => {
     if (!activeFilter) return true
     if (isSeverityFilter) return false
     return f.properties.type === activeFilter
@@ -493,34 +462,39 @@ function MapView({ activeFilter }) {
         </MapMarker>
       ))}
 
-      {filteredReports.map((report) => (
-        <MapMarker key={`rpt-${report.id}`} longitude={report.location.longitude} latitude={report.location.latitude}>
-          <MarkerContent>
-            <IncidentPin severity={report.severity} status={report.status} />
-          </MarkerContent>
-          <MarkerTooltip>
-            <span className="font-semibold">{report.title}</span>
-          </MarkerTooltip>
-          <MarkerPopup closeButton>
-            <PopupCard
-              title={report.title}
-              subtitle={report.description ? report.description : "N/A"}
-              badge={report.severity}
-              badgeBg={
-                report.severity === "critical"
-                  ? "bg-red-600"
-                  : report.severity === "high"
-                    ? "bg-orange-500"
-                    : report.severity === "medium"
-                      ? "bg-amber-400"
-                      : "bg-green-500"
-              }
-              status={report.status}
-              extra={new Date(report.created_at).toLocaleDateString()}
-            />
-          </MarkerPopup>
-        </MapMarker>
-      ))}
+      {filteredReports.map((report) => {
+        const displaySeverity = report.status === "pending_review" ? null : report.severity
+        return (
+          <MapMarker key={`rpt-${report.id}`} longitude={report.location.longitude} latitude={report.location.latitude}>
+            <MarkerContent>
+              <IncidentPin severity={displaySeverity} status={report.status} />
+            </MarkerContent>
+            <MarkerTooltip>
+              <span className="font-semibold">{report.title}</span>
+            </MarkerTooltip>
+            <MarkerPopup closeButton>
+              <PopupCard
+                title={report.title}
+                subtitle={report.description ? report.description : "N/A"}
+                badge={displaySeverity || "unassigned"}
+                badgeBg={
+                  displaySeverity === "critical"
+                    ? "bg-red-600"
+                    : displaySeverity === "high"
+                      ? "bg-orange-500"
+                      : displaySeverity === "medium"
+                        ? "bg-amber-400"
+                        : displaySeverity === "low"
+                          ? "bg-green-500"
+                          : "bg-gray-500"
+                }
+                status={report.status}
+                extra={new Date(report.created_at).toLocaleDateString()}
+              />
+            </MarkerPopup>
+          </MapMarker>
+        )
+      })}
     </Map>
   )
 }

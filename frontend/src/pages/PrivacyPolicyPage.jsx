@@ -1,16 +1,16 @@
-import { useNavigate, useLocation } from 'react-router-dom'
-import logoImg from '/src/assets/images/Logo.svg'
-import rptBackImg from '/src/assets/images/rpt_back.svg'
-import BottomNav from '@/components/BottomNav'
+import { useNavigate, useLocation } from "react-router-dom"
+import logoImg from "/src/assets/images/Logo.svg"
+import rptBackImg from "/src/assets/images/rpt_back.svg"
+import BottomNav from "@/components/BottomNav"
 
 export default function PrivacyPolicyPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  
+
   const handleBack = () => {
     // Check if we came from review-submit page
-    if (location.state?.from === 'review-submit') {
-      navigate('/review-submit', { state: location.state?.data })
+    if (location.state?.from === "review-submit") {
+      navigate("/review-submit", { state: location.state?.data })
     } else {
       navigate(-1) // Go back in history
     }
@@ -20,13 +20,10 @@ export default function PrivacyPolicyPage() {
     <div className="w-full min-h-screen bg-slate-50 pb-24">
       {/* Header */}
       <div className="relative w-full h-auto p-4">
-        <button 
-          onClick={handleBack}
-          className="absolute left-2 top-4 p-2 hover:bg-gray-100 z-10"
-        >
+        <button onClick={handleBack} className="absolute left-2 top-4 p-2 hover:bg-gray-100 z-10">
           <img src={rptBackImg} alt="Back" className="w-6 h-6" />
         </button>
-        
+
         <div className="flex flex-col items-center pt-8">
           <img src={logoImg} alt="SafeMap" className="h-11 mb-4" />
         </div>
@@ -35,15 +32,23 @@ export default function PrivacyPolicyPage() {
       {/* Content */}
       <div className="w-full max-w-3xl mx-auto px-6 py-8">
         <h1 className="text-2xl font-bold text-indigo-950 mb-6">Privacy Policy</h1>
-        
+
         <div className="space-y-6 text-gray-700">
           <section>
             <h2 className="text-lg font-semibold text-indigo-950 mb-3">1. Information We Collect</h2>
             <p className="mb-2">SafeMap-PH is designed with your privacy in mind. We collect minimal information:</p>
             <ul className="list-disc pl-6 space-y-1">
-              <li><strong>Anonymous Reports:</strong> Location coordinates, incident category, description (encrypted), and timestamp</li>
-              <li><strong>Technical Data:</strong> IP address and browser information for security purposes only</li>
-              <li><strong>No Personal Information:</strong> We do not collect names, contact details, or identifying information unless you voluntarily provide them</li>
+              <li>
+                <strong>Anonymous Reports:</strong> Location coordinates, incident category, description (encrypted),
+                and timestamp
+              </li>
+              <li>
+                <strong>Technical Data:</strong> IP address and browser information for security purposes only
+              </li>
+              <li>
+                <strong>No Personal Information:</strong> We do not collect names, contact details, or identifying
+                information unless you voluntarily provide them
+              </li>
             </ul>
           </section>
 
@@ -100,20 +105,28 @@ export default function PrivacyPolicyPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-indigo-950 mb-3">7. Children's Privacy</h2>
-            <p>SafeMap-PH is intended for users of all ages. We do not knowingly collect personal information from children under 13 without parental consent.</p>
+            <p>
+              SafeMap-PH is intended for users of all ages. We do not knowingly collect personal information from
+              children under 13 without parental consent.
+            </p>
           </section>
 
           <section>
             <h2 className="text-lg font-semibold text-indigo-950 mb-3">8. Changes to This Policy</h2>
-            <p>We may update this privacy policy from time to time. Changes will be posted on this page with an updated revision date.</p>
+            <p>
+              We may update this privacy policy from time to time. Changes will be posted on this page with an updated
+              revision date.
+            </p>
           </section>
 
           <section>
             <h2 className="text-lg font-semibold text-indigo-950 mb-3">9. Contact Us</h2>
             <p>If you have questions about this privacy policy, please contact:</p>
             <p className="mt-2">
-              <strong>SafeMap-PH Team</strong><br />
-              Email: privacy@safemap.ph<br />
+              <strong>SafeMap-PH Team</strong>
+              <br />
+              Email: privacy@safemap.ph
+              <br />
               General Santos City, Philippines
             </p>
           </section>
@@ -122,9 +135,11 @@ export default function PrivacyPolicyPage() {
         </div>
       </div>
 
-      <BottomNav 
-        onHelpClick={() => navigate('/help')} 
-        onChatClick={() => { /* ignore */ }} 
+      <BottomNav
+        onHelpClick={() => navigate("/help")}
+        onChatClick={() => {
+          /* ignore */
+        }}
       />
     </div>
   )
