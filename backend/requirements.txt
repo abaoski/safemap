@@ -33,3 +33,6 @@ Flask-Limiter==3.5.0
 
 # Input sanitization
 bleach==6.1.0
+
+# HTTP client (used by OTP route to call dbuddyz WhatsApp OTP service)
+requests==2.31.0

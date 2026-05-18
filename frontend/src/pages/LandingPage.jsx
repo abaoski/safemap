@@ -107,7 +107,7 @@ const LandingPage = () => {
           {/* Full-bleed background image */}
           <div className="absolute inset-0 z-0">
             <img
-              src={"https://res.cloudinary.com/djc0ndwqf/image/upload/v1779092398/691084559_3471095136379671_3729025007564393409_n_zxevwj.jpg"}
+              src={"https://res.cloudinary.com/djc0ndwqf/image/upload/v1779094125/landing_gjkii4.jpg"}
               alt="Hero Background"
               className="w-full h-full object-cover"
             />

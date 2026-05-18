@@ -224,7 +224,7 @@ export default function MapPage() {
       )}
 
       {/* Main Content - Map */}
-      <main className="flex-1 relative pb-18">
+      <main className="flex-1 relative pb-[72px]">
         <MapView activeFilter={activeFilter} searchQuery={selectedLocation ? selectedLocation.name : ""} />
         <RiskLegend onFilterChange={setActiveFilter} activeFilter={activeFilter} />
 
