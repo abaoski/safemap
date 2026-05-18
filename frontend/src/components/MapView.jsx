@@ -439,6 +439,7 @@ function PopupCard({ title, subtitle, badge, badgeBg, status, extra }) {
 
 function MapView({ activeFilter }) {
   const [reports, setReports] = useState([])
+  const [emergencyLocations, setEmergencyLocations] = useState(EMERGENCY_LOCATIONS.features)
 
   useEffect(() => {
     fetch(`${API_BASE}/reports/public`)
@@ -492,7 +493,7 @@ function MapView({ activeFilter }) {
   const isServiceFilter = SERVICE_TYPES.includes(activeFilter)
   const isSeverityFilter = SEVERITY_TYPES.includes(activeFilter)
 
-  const filteredLocations = EMERGENCY_LOCATIONS.features.filter((f) => {
+  const filteredLocations = emergencyLocations.filter((f) => {
     if (!activeFilter) return true
     if (isSeverityFilter) return false
     // match exact type OR the canonical group (e.g. filter "hospital" shows "medical" too)

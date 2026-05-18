@@ -6,7 +6,6 @@ import rptSafetyImg from "/src/assets/images/rpt_safety.svg"
 import rptImpReminderImg from "/src/assets/images/rpt_imp_reminder.svg"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Map } from "@/components/ui/map"
-import { Map } from "@/components/ui/map"
 
 export default function ReportPage() {
   const navigate = useNavigate()
