@@ -16,21 +16,21 @@ const person4Img = 'https://i.pravatar.cc/150?img=4';
 /* ─── Scroll-reveal hook ─────────────────────────────────── */
 function useScrollReveal() {
   useEffect(() => {
-    const els = document.querySelectorAll('.reveal');
+    const els = document.querySelectorAll(".reveal")
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('reveal-visible');
-            observer.unobserve(entry.target);
+            entry.target.classList.add("reveal-visible")
+            observer.unobserve(entry.target)
           }
-        });
+        })
       },
       { threshold: 0.12 }
-    );
-    els.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
+    )
+    els.forEach((el) => observer.observe(el))
+    return () => observer.disconnect()
+  }, [])
 }
 
 /* ─── Inline Facebook SVG (lucide-react doesn't export it) ── */
@@ -38,21 +38,18 @@ const FacebookIcon = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
     <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
   </svg>
-);
+)
 
 /* ─── Reveal wrapper ─────────────────────────────────────── */
-const Reveal = ({ children, className = '', delay = 0 }) => (
-  <div
-    className={`reveal ${className}`}
-    style={{ transitionDelay: `${delay}ms` }}
-  >
+const Reveal = ({ children, className = "", delay = 0 }) => (
+  <div className={`reveal ${className}`} style={{ transitionDelay: `${delay}ms` }}>
     {children}
   </div>
-);
+)
 
 const LandingPage = () => {
-  const navigate = useNavigate();
-  useScrollReveal();
+  const navigate = useNavigate()
+  useScrollReveal()
 
   return (
     <>
@@ -70,22 +67,34 @@ const LandingPage = () => {
         }
       `}</style>
 
-      <div className="min-h-screen bg-background text-foreground selection:bg-primary/20" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-
+      <div
+        className="min-h-screen bg-background text-foreground selection:bg-primary/20"
+        style={{ fontFamily: "'DM Sans', sans-serif" }}
+      >
         {/* ── Navbar ─────────────────────────────────────────── */}
         <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-gray-100">
           <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <div
+              className="flex items-center gap-3 cursor-pointer"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            >
               <img src={logoImg} alt="SafeMap PH" className="h-16 w-auto" />
             </div>
 
             <div className="hidden md:flex items-center gap-8">
-              <button onClick={() => navigate('/about')} className="text-sm font-medium hover:text-primary transition-colors cursor-pointer">About Us</button>
-              <a href="#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">How it Works</a>
               <button
-                onClick={() => navigate('/map')}
+                onClick={() => navigate("/about")}
+                className="text-sm font-medium hover:text-primary transition-colors cursor-pointer"
+              >
+                About Us
+              </button>
+              <a href="#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
+                How it Works
+              </a>
+              <button
+                onClick={() => navigate("/map")}
                 className="px-6 py-2.5 text-white rounded-full text-sm font-semibold hover:shadow-xl transition-all active:scale-95"
-                style={{ backgroundColor: '#1A2A6C' }}
+                style={{ backgroundColor: "#1A2A6C" }}
               >
                 View Live Map
               </button>
@@ -117,24 +126,25 @@ const LandingPage = () => {
             </Reveal>
 
             <Reveal delay={100}>
-              <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] mb-6" style={{ color: '#1A3A8F' }}>
+              <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] mb-6" style={{ color: "#1A3A8F" }}>
                 Vigilant Support. <br />
-                <span style={{ color: '#1A3A8F' }}>Secure Anonymity.</span>
+                <span style={{ color: "#1A3A8F" }}>Secure Anonymity.</span>
               </h1>
             </Reveal>
 
             <Reveal delay={200}>
-              <p className="text-lg md:text-xl max-w-xl leading-relaxed mb-8" style={{ color: '#1A3A8F' }}>
-                Empowering communities with real-time incident reporting and AI-driven safety analytics. Your safety is our mission, your identity is our secret.
+              <p className="text-lg md:text-xl max-w-xl leading-relaxed mb-8" style={{ color: "#1A3A8F" }}>
+                Empowering communities with real-time incident reporting and AI-driven safety analytics. Your safety is
+                our mission, your identity is our secret.
               </p>
             </Reveal>
 
             <Reveal delay={300}>
               <div className="flex flex-wrap gap-4 mb-10">
                 <button
-                  onClick={() => navigate('/map')}
+                  onClick={() => navigate("/map")}
                   className="px-8 py-4 text-white rounded-2xl font-bold flex items-center gap-2 hover:shadow-2xl transition-all active:scale-95 group"
-                  style={{ backgroundColor: '#1A2A6C' }}
+                  style={{ backgroundColor: "#1A2A6C" }}
                 >
                   Get Started
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -157,7 +167,7 @@ const LandingPage = () => {
                     />
                   ))}
                 </div>
-                <p className="text-sm font-medium" style={{ color: '#1A3A8F' }}>
+                <p className="text-sm font-medium" style={{ color: "#1A3A8F" }}>
                   Joined by <span className="font-bold">1,000+</span> citizens
                 </p>
               </div>
@@ -166,13 +176,13 @@ const LandingPage = () => {
         </section>
 
         {/* ── Stats Section ───────────────────────────────────── */}
-        <section style={{ backgroundColor: '#1A2A6C' }} className="py-20">
+        <section style={{ backgroundColor: "#1A2A6C" }} className="py-20">
           <div className="container mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12 text-center text-white">
             {[
-              { value: '100%', label: 'Anonymous Reporting' },
-              { value: '<8 min', label: 'Avg. Police Response Time' },
-              { value: '2', label: 'Partner Units (LGU & PNP)' },
-              { value: '1,240+', label: 'Reports Resolved' },
+              { value: "100%", label: "Anonymous Reporting" },
+              { value: "<8 min", label: "Avg. Police Response Time" },
+              { value: "2", label: "Partner Units (LGU & PNP)" },
+              { value: "1,240+", label: "Reports Resolved" },
             ].map((stat, i) => (
               <Reveal key={i} delay={i * 100}>
                 <div className="space-y-2">
@@ -189,7 +199,7 @@ const LandingPage = () => {
           <div className="container mx-auto px-6">
             <div className="grid md:grid-cols-2 gap-16 items-center">
               <Reveal className="order-2 md:order-1">
-                <div className="aspect-[4/3] bg-slate-50 rounded-3xl border border-slate-200 overflow-hidden shadow-lg">
+                <div className="aspect-4/3 bg-slate-50 rounded-3xl border border-slate-200 overflow-hidden shadow-lg">
                   <img
                     src="https://placehold.co/800x600?text=About+Us+Image"
                     alt="About Us Illustration"
@@ -204,10 +214,30 @@ const LandingPage = () => {
                 </Reveal>
                 <div className="space-y-6 mt-8">
                   {[
-                    { icon: <AlertTriangle className="w-6 h-6 text-red-500" />, bg: 'bg-red-50', title: 'The Problem', text: 'Fear and inadequate reporting channels often prevent incidents of abuse and harassment from reaching authorities.' },
-                    { icon: <CheckCircle className="w-6 h-6 text-green-600" />, bg: 'bg-green-50', title: 'Our Solution', text: 'A secure, user-friendly, and anonymous web-based system that empowers witnesses and victims to report safely.' },
-                    { icon: <Lock className="w-6 h-6 text-primary" />, bg: 'bg-primary/5', title: 'Speak Up Safely', text: 'We provide a platform where individuals can voice their concerns without the fear of exposure.' },
-                    { icon: <BarChart className="w-6 h-6 text-blue-600" />, bg: 'bg-blue-50', title: 'Data Driven Peace of Mind', text: 'Our system supports decision-making by local government units (LGU) and the Philippine National Police (PNP) through verified data.' },
+                    {
+                      icon: <AlertTriangle className="w-6 h-6 text-red-500" />,
+                      bg: "bg-red-50",
+                      title: "The Problem",
+                      text: "Fear and inadequate reporting channels often prevent incidents of abuse and harassment from reaching authorities.",
+                    },
+                    {
+                      icon: <CheckCircle className="w-6 h-6 text-green-600" />,
+                      bg: "bg-green-50",
+                      title: "Our Solution",
+                      text: "A secure, user-friendly, and anonymous web-based system that empowers witnesses and victims to report safely.",
+                    },
+                    {
+                      icon: <Lock className="w-6 h-6 text-primary" />,
+                      bg: "bg-primary/5",
+                      title: "Speak Up Safely",
+                      text: "We provide a platform where individuals can voice their concerns without the fear of exposure.",
+                    },
+                    {
+                      icon: <BarChart className="w-6 h-6 text-blue-600" />,
+                      bg: "bg-blue-50",
+                      title: "Data Driven Peace of Mind",
+                      text: "Our system supports decision-making by local government units (LGU) and the Philippine National Police (PNP) through verified data.",
+                    },
                   ].map((item, i) => (
                     <Reveal key={i} delay={i * 100}>
                       <div className="flex gap-4">
@@ -228,7 +258,7 @@ const LandingPage = () => {
         </section>
 
         {/* ── Core Pillars Section ────────────────────────────── */}
-        <section className="py-24 bg-white" style={{ color: '#2d2d2d' }}>
+        <section className="py-24 bg-white" style={{ color: "#2d2d2d" }}>
           <div className="container mx-auto px-6">
             <Reveal className="text-center max-w-2xl mx-auto mb-20 space-y-4">
               <h2 className="text-4xl font-bold text-[#1A3A8F]">Our Core Pillars</h2>
@@ -237,9 +267,21 @@ const LandingPage = () => {
 
             <div className="grid md:grid-cols-3 gap-8">
               {[
-                { icon: <EyeOff className="w-8 h-8 text-[#1A3A8F]" />, title: 'Anonymous Reporting', text: 'Encryption ensures your report reaches authorities without exposing your identity.' },
-                { icon: <MapPin className="w-8 h-8 text-[#1A3A8F]" />, title: 'Interactive Heatmap', text: 'Real-time visual data on community safety. Identify high-risk areas and plan your routes safely.' },
-                { icon: <Bot className="w-8 h-8 text-[#1A3A8F]" />, title: 'AI Assistant', text: 'Instant guidance and emergency protocols handled by Artificial Intelligence.' },
+                {
+                  icon: <EyeOff className="w-8 h-8 text-[#1A3A8F]" />,
+                  title: "Anonymous Reporting",
+                  text: "Encryption ensures your report reaches authorities without exposing your identity.",
+                },
+                {
+                  icon: <MapPin className="w-8 h-8 text-[#1A3A8F]" />,
+                  title: "Interactive Heatmap",
+                  text: "Real-time visual data on community safety. Identify high-risk areas and plan your routes safely.",
+                },
+                {
+                  icon: <Bot className="w-8 h-8 text-[#1A3A8F]" />,
+                  title: "AI Assistant",
+                  text: "Instant guidance and emergency protocols handled by Artificial Intelligence.",
+                },
               ].map((card, i) => (
                 <Reveal key={i} delay={i * 120}>
                   <div className="bg-slate-50 p-10 rounded-3xl border border-slate-100 hover:shadow-xl transition-all h-full">
@@ -374,7 +416,7 @@ const LandingPage = () => {
                   </p>
                   <div className="flex flex-col md:flex-row items-center justify-center gap-4">
                     <button
-                      onClick={() => navigate('/map')}
+                      onClick={() => navigate("/map")}
                       className="w-full md:w-auto px-10 py-5 bg-white text-[#1A2A6C] rounded-2xl font-bold text-lg hover:shadow-2xl transition-all active:scale-95"
                     >
                       Open the Map Now
@@ -403,18 +445,42 @@ const LandingPage = () => {
               <div>
                 <h5 className="font-bold mb-6">Product</h5>
                 <ul className="space-y-4 text-sm text-slate-500">
-                  <li><button onClick={() => navigate('/map')} className="hover:text-primary transition-colors">Safety Map</button></li>
-                  <li><button onClick={() => navigate('/report')} className="hover:text-primary transition-colors">Report Incident</button></li>
-                  <li><button onClick={() => navigate('/track')} className="hover:text-primary transition-colors">Track Report</button></li>
+                  <li>
+                    <button onClick={() => navigate("/map")} className="hover:text-primary transition-colors">
+                      Safety Map
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => navigate("/report")} className="hover:text-primary transition-colors">
+                      Report Incident
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => navigate("/track")} className="hover:text-primary transition-colors">
+                      Track Report
+                    </button>
+                  </li>
                 </ul>
               </div>
 
               <div>
                 <h5 className="font-bold mb-6">Resources</h5>
                 <ul className="space-y-4 text-sm text-slate-500">
-                  <li><button onClick={() => navigate('/help')} className="hover:text-primary transition-colors">Help Center</button></li>
-                  <li><button onClick={() => navigate('/emergency')} className="hover:text-primary transition-colors">Emergency Contacts</button></li>
-                  <li><button onClick={() => navigate('/privacy')} className="hover:text-primary transition-colors">Privacy Policy</button></li>
+                  <li>
+                    <button onClick={() => navigate("/help")} className="hover:text-primary transition-colors">
+                      Help Center
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => navigate("/emergency")} className="hover:text-primary transition-colors">
+                      Emergency Contacts
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => navigate("/privacy")} className="hover:text-primary transition-colors">
+                      Privacy Policy
+                    </button>
+                  </li>
                 </ul>
               </div>
 
@@ -452,7 +518,7 @@ const LandingPage = () => {
         </footer>
       </div>
     </>
-  );
-};
+  )
+}
 
 export default LandingPage;
