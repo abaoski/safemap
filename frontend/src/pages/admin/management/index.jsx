@@ -39,11 +39,7 @@ function AdminManagementPage() {
         </div>
       </div>
 
-      <DirectoryAddDialog
-        isOpen={isAddDirOpen}
-        onClose={() => setIsAddDirOpen(false)}
-        onAdd={handleAddDirectory}
-      />
+      <DirectoryAddDialog isOpen={isAddDirOpen} onClose={() => setIsAddDirOpen(false)} onAdd={handleAddDirectory} />
     </AdminLayout>
   )
 }
