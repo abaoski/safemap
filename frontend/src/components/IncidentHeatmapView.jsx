@@ -81,7 +81,30 @@ function HeatLayer({ points }) {
       if (map.getLayer(layerId)) map.removeLayer(layerId)
       if (map.getSource(sourceId)) map.removeSource(sourceId)
     }
-  }, [points, map])
+  }, [map, isLoaded, layerId, sourceId])
+
+  useEffect(() => {
+    if (!map || !isLoaded) return
+
+    const source = map.getSource(sourceId)
+    if (!source) return
+
+    const features = (points || []).map((point) => ({
+      type: "Feature",
+      properties: {
+        intensity: point.intensity ?? 1,
+      },
+      geometry: {
+        type: "Point",
+        coordinates: [point.lng, point.lat],
+      },
+    }))
+
+    source.setData({
+      type: "FeatureCollection",
+      features,
+    })
+  }, [points, map, isLoaded, sourceId])
 
   return null
 }

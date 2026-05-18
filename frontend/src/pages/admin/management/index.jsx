@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { Search, Map, Edit2, Trash2, Filter, Plus, Send, X, Settings2, Download, AlertTriangle, Activity, Users, Tag } from "lucide-react"
 import { API_BASE } from "@/lib/api-base"
+import { Search, Map, Trash2, Filter, Plus, Send, Settings2, Activity, Tag, Shield } from "lucide-react"
 import AdminLayout from "../../../components/admin/AdminLayout"
 import DirectoryAddDialog from "../../../components/admin/management/DirectoryAddDialog"
 import DirectoryMapDialog from "../../../components/admin/management/DirectoryMapDialog"
