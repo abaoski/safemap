@@ -66,11 +66,11 @@ A public (unauthenticated) user can perform the following actions without loggin
 
 - Tap **"Report Incident"** (the floating report button) on the main map screen.
 - The user is taken through a multi-step flow:
-    1. **Safety First** page — read emergency protocol and privacy rules, check both boxes.
-    2. **Incident Details** — select incident type, date/time, and description.
-    3. **Location Details** — pick location on an interactive map (drop a pin) or enter an address.
-    4. **Review & Submit** — review all details, then submit.
-    5. **Report Success** — receive a reference code and safety notice.
+  1. **Safety First** page — read emergency protocol and privacy rules, check both boxes.
+  2. **Incident Details** — select incident type, date/time, and description.
+  3. **Location Details** — pick location on an interactive map (drop a pin) or enter an address.
+  4. **Review & Submit** — review all details, then submit.
+  5. **Report Success** — receive a reference code and safety notice.
 - Full details of the submission workflow are in Section 4.
 
 ### 2.3 View the Hotspot Map
@@ -85,10 +85,10 @@ A public (unauthenticated) user can perform the following actions without loggin
 
 - Tap the **shield icon** ("Help") on the bottom navigation bar.
 - The Help Page shows:
-    - VAWC Support information with the Women and Children Protection Center card.
-    - Emergency hotline numbers (VAWC, PNP, WCPD, Emergency).
-    - "What to expect when you call" guidance.
-    - "Find Nearest WCPD Desk" button for geolocation-based lookup.
+  - VAWC Support information with the Women and Children Protection Center card.
+  - Emergency hotline numbers (VAWC, PNP, WCPD, Emergency).
+  - "What to expect when you call" guidance.
+  - "Find Nearest WCPD Desk" button for geolocation-based lookup.
 
 ### 2.5 Track a Previously Submitted Report
 
@@ -128,11 +128,11 @@ To filter the hotspot map:
 
 1. Click the "Filter" button on the map controls.
 2. Select incident types you want to see:
-    - Theft/Robbery (🔴 Red)
-    - Assault (🟠 Orange)
-    - Fraud (🔵 Blue)
-    - Harassment (🟣 Purple)
-    - Accidents (🟡 Yellow)
+   - Theft/Robbery (🔴 Red)
+   - Assault (🟠 Orange)
+   - Fraud (🔵 Blue)
+   - Harassment (🟣 Purple)
+   - Accidents (🟡 Yellow)
 3. Toggle date range to see recent incidents.
 4. You can combine multiple filters at once.
 
@@ -415,20 +415,20 @@ User taps "Report Incident"
 ### 4.4 What Happens After Submission
 
 1. **Validation:** System checks all required fields are present and valid.
-    - If fields are missing → returns error with list of missing fields.
-    - If category is invalid → returns error with valid categories list.
+   - If fields are missing → returns error with list of missing fields.
+   - If category is invalid → returns error with valid categories list.
 2. **Safety Check:** The system runs basic safety checks:
-    - Description must be at least 10 characters.
-    - Coordinates must be within the Philippines (Lat: 4.5–21.0, Lng: 116.0–127.0).
+   - Description must be at least 10 characters.
+   - Coordinates must be within the Philippines (Lat: 4.5–21.0, Lng: 116.0–127.0).
 3. **Save:** Report is saved to the anonymous database with:
-    - Status: `pending_review` (Unverified & Pending Review)
-    - `is_anonymous: true`
+   - Status: `pending_review` (Unverified & Pending Review)
+   - `is_anonymous: true`
 4. **Reference Code:** A unique reference code is generated in format `SMPH-XXXXXX` (e.g., `SMPH-A1B2C3`).
 5. **Response to User:**
-    - Reference code for tracking
-    - Status: `pending_review`
-    - Safety check result: `passed` or `needs_review`
-    - Safety notice: _"Your report has been submitted and is pending review. Do not confront any suspects directly. In case of emergency, dial 911. Save your reference code for tracking."_
+   - Reference code for tracking
+   - Status: `pending_review`
+   - Safety check result: `passed` or `needs_review`
+   - Safety notice: _"Your report has been submitted and is pending review. Do not confront any suspects directly. In case of emergency, dial 911. Save your reference code for tracking."_
 
 ### 4.5 API Endpoint
 
