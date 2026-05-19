@@ -52,7 +52,7 @@ function AdminDashboardPage() {
         </div>
       </div>
 
-      <DashboardStats stats={stats} />
+      <DashboardStats stats={stats} loading={loading} />
       <NeedReviewSection reports={reports} loading={loading} />
       <SystemAnnouncement
         title="Internal Announcement"

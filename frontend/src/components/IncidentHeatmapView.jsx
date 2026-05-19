@@ -12,7 +12,6 @@ const SEVERITY_COLORS = {
 }
 
 const CATEGORY_LABELS = {
-  all: "All Categories",
   police: "Police / PNP",
   pnp: "Police / PNP",
   wcpd: "WCPD Station",
@@ -21,6 +20,15 @@ const CATEGORY_LABELS = {
   fire: "Fire Station",
   rescue: "Rescue / CDRRMO",
   other: "Other Incident",
+}
+
+const formatCategoryLabel = (value) => {
+  if (!value) return "Unassigned"
+  if (CATEGORY_LABELS[value]) return CATEGORY_LABELS[value]
+  return value
+    .toString()
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (match) => match.toUpperCase())
 }
 
 // Local Popup Card Component for individual pin details
@@ -57,12 +65,14 @@ function IncidentPopupCard({ title, category, severity, status, barangay, city, 
         <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase text-white ${severityBg}`}>
           {severity || "unassigned"}
         </span>
-        <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase text-white ${statusColors[status] || "bg-gray-500"}`}>
+        <span
+          className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase text-white ${statusColors[status] || "bg-gray-500"}`}
+        >
           {statusLabels[status] || status}
         </span>
       </div>
       <div className="flex justify-between items-center text-[8px] text-gray-400 mt-1 border-t border-gray-100 pt-1">
-        <span>{CATEGORY_LABELS[category] || category}</span>
+        <span>{formatCategoryLabel(category)}</span>
         {date && <span>{new Date(date).toLocaleDateString()}</span>}
       </div>
     </div>
@@ -232,6 +242,16 @@ function IncidentHeatmapView({ heatPoints = [] }) {
 
   const activeFiltersCount = (selectedSeverity !== "all" ? 1 : 0) + (selectedCategory !== "all" ? 1 : 0)
 
+  const categoryOptions = useMemo(() => {
+    const values = new Set()
+    heatPoints.forEach((point) => {
+      if (point.category) values.add(point.category)
+    })
+    return Array.from(values)
+      .sort((a, b) => a.localeCompare(b))
+      .map((value) => ({ value, label: formatCategoryLabel(value) }))
+  }, [heatPoints])
+
   return (
     <div className="relative w-full h-full">
       <Map
@@ -245,9 +265,7 @@ function IncidentHeatmapView({ heatPoints = [] }) {
         maxBoundsViscosity={1.0}
         onViewportChange={(vp) => setZoom(vp.zoom)}
       >
-        {showHeatmap && (
-          <HeatLayer points={filteredPoints} radius={radius} intensity={intensity} opacity={opacity} />
-        )}
+        {showHeatmap && <HeatLayer points={filteredPoints} radius={radius} intensity={intensity} opacity={opacity} />}
 
         {showMarkers &&
           filteredPoints.map((point, index) => {
@@ -256,7 +274,9 @@ function IncidentHeatmapView({ heatPoints = [] }) {
               <MapMarker key={`heat-pin-${index}`} longitude={point.lng} latitude={point.lat}>
                 <MarkerContent>
                   <div className="relative flex items-center justify-center -translate-y-2 drop-shadow-md group">
-                    <div className={`w-5 h-5 rounded-full border-2 border-white shadow-lg flex items-center justify-center transition-transform group-hover:scale-125 duration-200 ${pinColor}`}>
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 border-white shadow-lg flex items-center justify-center transition-transform group-hover:scale-125 duration-200 ${pinColor}`}
+                    >
                       <div className="w-1.5 h-1.5 rounded-full bg-white shadow-sm" />
                     </div>
                   </div>
@@ -266,7 +286,7 @@ function IncidentHeatmapView({ heatPoints = [] }) {
                 </MarkerTooltip>
                 <MarkerPopup closeButton>
                   <IncidentPopupCard
-                    title={point.category?.toUpperCase() || "Incident Report"}
+                    title={formatCategoryLabel(point.category) || "Incident Report"}
                     category={point.category}
                     severity={point.severity}
                     status={point.status}
@@ -348,9 +368,7 @@ function IncidentHeatmapView({ heatPoints = [] }) {
                     key={mode}
                     onClick={() => setViewMode(mode)}
                     className={`flex-1 text-[9px] font-bold py-1.5 rounded-md transition-all uppercase ${
-                      viewMode === mode
-                        ? "bg-white text-[#1e3a8a] shadow-sm"
-                        : "text-slate-500 hover:text-slate-800"
+                      viewMode === mode ? "bg-white text-[#1e3a8a] shadow-sm" : "text-slate-500 hover:text-slate-800"
                     }`}
                   >
                     {mode === "both" ? "Combined" : mode}
@@ -389,11 +407,11 @@ function IncidentHeatmapView({ heatPoints = [] }) {
                 </SelectTrigger>
                 <SelectContent className="w-full">
                   <SelectItem value="all">🔍 All Categories</SelectItem>
-                  <SelectItem value="police">Police / PNP</SelectItem>
-                  <SelectItem value="medical">Medical / Hospital</SelectItem>
-                  <SelectItem value="fire">Fire Stations</SelectItem>
-                  <SelectItem value="rescue">Rescue Stations</SelectItem>
-                  <SelectItem value="other">Other Incidents</SelectItem>
+                  {categoryOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

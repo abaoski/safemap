@@ -1,4 +1,5 @@
 import { CheckCircle, XCircle, Edit2, LogIn, Shield, AlertTriangle, FileText, Clock } from "lucide-react"
+import Skeleton from "@/components/ui/Skeleton"
 
 export const AUDIT_TYPES = {
   submitted: {
@@ -74,7 +75,38 @@ function formatTime(dateStr) {
 
 function AuditTimeline({ groupedEntries, loading }) {
   if (loading) {
-    return <div className="text-center py-12 text-gray-400 text-sm font-['DM_Sans']">Loading audit logs...</div>
+    return (
+      <div className="w-full max-w-sm px-4 mt-5 space-y-5">
+        {[1, 2].map((group) => (
+          <div key={`audit-skel-${group}`}>
+            <div className="flex items-center gap-3 mb-3">
+              <Skeleton className="h-3 w-20" />
+              <div className="flex-1 h-[1px] bg-gray-200" />
+            </div>
+            <div className="w-full bg-white rounded-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-offset-[-1px] outline-gray-100 p-5">
+              <div className="relative pl-7 border-l-[2px] border-gray-200 space-y-6">
+                {[1, 2, 3].map((row) => (
+                  <div key={`audit-row-${group}-${row}`} className="relative">
+                    <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center absolute -left-[43px] -top-1 border-[4px] border-white">
+                      <Skeleton className="h-4 w-4 rounded" />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <Skeleton className="h-3 w-4/5" />
+                      <Skeleton className="h-3 w-2/3" />
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-3 w-10" />
+                        <Skeleton className="h-4 w-16 rounded-full" />
+                        <Skeleton className="h-3 w-16" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
   }
 
   if (Object.keys(groupedEntries).length === 0) {

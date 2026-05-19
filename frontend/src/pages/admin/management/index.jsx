@@ -68,10 +68,12 @@ function AdminManagementPage() {
   // Category State
   const [categories, setCategories] = useState([])
   const [catSearch, setCatSearch] = useState("")
+  const [catPriorityFilter, setCatPriorityFilter] = useState("")
   const [isCatDialogOpen, setIsCatDialogOpen] = useState(false)
   const [editCategory, setEditCategory] = useState(null)
   const [confirmDelete, setConfirmDelete] = useState({ open: false, cat: null })
   const [alertModal, setAlertModal] = useState({ open: false, message: "" })
+  const [tagFilter, setTagFilter] = useState("")
 
   const refreshCategories = useCallback(async () => {
     try {
@@ -181,7 +183,7 @@ function AdminManagementPage() {
         name: "Emotional Distress",
         desc: "Incidents involving severe psychological impact or trauma responses requiring...",
         incidents: 42,
-        priority: "HIGH PRIORITY",
+        priority: "HIGH",
         prioColor: "bg-red-100 text-red-600",
         borderColor: "border-red-500",
       },
@@ -191,7 +193,7 @@ function AdminManagementPage() {
         name: "Harassment",
         desc: "Reports of targeted exclusionary behavior, verbal abuse, or persistent unwanted...",
         incidents: 28,
-        priority: "MEDIUM PRIORITY",
+        priority: "MEDIUM",
         prioColor: "bg-amber-100 text-amber-600",
         borderColor: "border-amber-400",
       },
@@ -201,7 +203,7 @@ function AdminManagementPage() {
         name: "Physical Safety",
         desc: "Threats or actual incidents concerning physical infrastructure, environment, or...",
         incidents: 15,
-        priority: "LOW PRIORITY",
+        priority: "LOW",
         prioColor: "bg-green-100 text-green-600",
         borderColor: "border-[#1f295b]", // Mockup shows dark blue line for physical safety
       },
@@ -262,7 +264,7 @@ function AdminManagementPage() {
                 rawName: c.name,
                 desc: c.description || c.name,
                 incidents: c.report_count || 0,
-                priority: (c.priority || "medium").toUpperCase() + " PRIORITY",
+                priority: (c.priority || "medium").toUpperCase(),
                 prioColor: priorityColor(c.priority),
                 borderColor: priorityBorder(c.priority),
                 raw: c,
@@ -337,6 +339,23 @@ function AdminManagementPage() {
     return counts
   }, [directories])
 
+  const PRIORITY_LEVELS = [
+    { key: "", label: "All" },
+    { key: "critical", label: "Critical" },
+    { key: "high", label: "High" },
+    { key: "medium", label: "Medium" },
+    { key: "low", label: "Low" },
+  ]
+
+  const GLOBAL_TAGS = [
+    { key: "urgent", label: "Urgent" },
+    { key: "first-response", label: "First-Response" },
+    { key: "escalated", label: "Escalated" },
+    { key: "night-shift", label: "Night-Shift" },
+    { key: "legal-review", label: "Legal-Review" },
+    { key: "verified", label: "Verified" },
+  ]
+
   return (
     <AdminLayout activeTab="management">
       {/* Header Area */}
@@ -379,11 +398,11 @@ function AdminManagementPage() {
                   }}
                   className="w-full bg-[#1f295b] text-white py-3 rounded-xl font-bold text-sm font-['DM_Sans'] shadow-sm hover:bg-[#151c3d] transition-colors"
                 >
-                  New Entry
+                  + New Directory
                 </button>
-                <button className="w-full bg-white text-[#1f295b] py-3 rounded-xl font-bold text-sm font-['DM_Sans'] border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
+                {/* <button className="w-full bg-white text-[#1f295b] py-3 rounded-xl font-bold text-sm font-['DM_Sans'] border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
                   Export CSV
-                </button>
+                </button> */}
               </div>
             </div>
 
@@ -448,7 +467,21 @@ function AdminManagementPage() {
                     return t === dirFilter.toLowerCase()
                   })()
 
-                  return matchSearch && matchFilter
+                  const matchTag = (() => {
+                    if (!tagFilter) return true
+                    const rawTags = dir.raw?.tags || dir.raw?.tag || []
+                    if (Array.isArray(rawTags))
+                      return rawTags.map((x) => (x || "").toLowerCase()).includes(tagFilter.toLowerCase())
+                    if (typeof rawTags === "string")
+                      return rawTags
+                        .toLowerCase()
+                        .split(",")
+                        .map((s) => s.trim())
+                        .includes(tagFilter.toLowerCase())
+                    return false
+                  })()
+
+                  return matchSearch && matchFilter && matchTag
                 })
                 .map((dir) => (
                   <div
@@ -526,30 +559,56 @@ function AdminManagementPage() {
 
         {currentTab === "category" && (
           <div className="space-y-4">
-            <button
-              onClick={() => {
-                setEditCategory(null)
-                setIsCatDialogOpen(true)
-              }}
-              className="bg-[#1f295b] text-white px-4 py-2 rounded-full text-[11px] font-bold font-['DM_Sans'] shadow hover:bg-[#151c3d] transition-colors"
-            >
-              + New Category
-            </button>
+            <div className="bg-white rounded-2xl p-4 shadow-[0px_8px_24px_rgba(149,157,165,0.1)] border border-slate-100">
+              <h3 className="text-slate-400 text-xs font-bold font-['DM_Sans'] mb-3">Quick Actions</h3>
+              <div className="space-y-2">
+                <button
+                  onClick={() => {
+                    setEditCategory(null)
+                    setIsCatDialogOpen(true)
+                  }}
+                  className="w-full bg-[#1f295b] text-white py-3 rounded-xl font-bold text-sm font-['DM_Sans'] shadow-sm hover:bg-[#151c3d] transition-colors"
+                >
+                  + New Category
+                </button>
+                {/* <button className="w-full bg-white text-[#1f295b] py-3 rounded-xl font-bold text-sm font-['DM_Sans'] border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
+                  Export CSV
+                </button> */}
+              </div>
+            </div>
 
-            <div className="bg-white rounded-2xl p-4 shadow-[0px_8px_24px_rgba(149,157,165,0.1)] border border-slate-100 flex flex-col gap-3">
+            <div className="space-y-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                 <input
                   type="text"
-                  placeholder="Search by name, number, or location..."
+                  placeholder="Search categories..."
                   value={catSearch}
                   onChange={(e) => setCatSearch(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-xs font-medium font-['DM_Sans'] outline-none focus:border-[#1f295b]"
+                  className="w-full bg-white border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-xs font-medium font-['DM_Sans'] outline-none focus:border-[#1f295b] shadow-[0px_8px_24px_rgba(149,157,165,0.05)]"
                 />
               </div>
+              <div className="flex gap-2 flex-wrap mt-3">
+                {PRIORITY_LEVELS.map((p) => (
+                  <button
+                    key={`priority-${p.key}`}
+                    onClick={() => setCatPriorityFilter(p.key)}
+                    className={`px-3 py-1.5 rounded-full text-[10px] font-bold font-['DM_Sans'] uppercase transition-colors whitespace-nowrap ${
+                      catPriorityFilter === p.key
+                        ? "bg-[#1f295b] text-white shadow-sm"
+                        : "bg-white text-slate-500 border border-slate-200 hover:border-[#1f295b] hover:text-[#1f295b]"
+                    }`}
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <span>{p.label}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+              {/* 
               <button className="w-full bg-blue-50/50 text-[#1f295b] py-3 rounded-xl font-bold text-sm font-['DM_Sans'] border border-blue-50 flex items-center justify-center gap-2 hover:bg-blue-100 transition-colors">
                 <Filter size={16} /> Filter
-              </button>
+              </button> */}
             </div>
 
             {/* List */}
@@ -557,12 +616,21 @@ function AdminManagementPage() {
               {categories
                 .filter((cat) => {
                   const q = catSearch.toLowerCase().trim()
-                  if (!q) return true
-                  return (
+                  const matchesSearch =
+                    !q ||
                     (cat.name || "").toLowerCase().includes(q) ||
                     (cat.desc || "").toLowerCase().includes(q) ||
                     (cat.priority || "").toLowerCase().includes(q)
-                  )
+
+                  if (!matchesSearch) return false
+
+                  // Priority filter for Category tab (separate from directory filters)
+                  if (catPriorityFilter) {
+                    const p = (cat.priority || "").toLowerCase()
+                    if (p !== catPriorityFilter) return false
+                  }
+
+                  return true
                 })
                 .map((cat) => (
                   <div
@@ -635,20 +703,19 @@ function AdminManagementPage() {
               </div>
               <div className="p-4 bg-slate-50/50">
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {[
-                    "Urgent \u00d7",
-                    "First-Response \u00d7",
-                    "Escalated \u00d7",
-                    "Night-Shift \u00d7",
-                    "Legal-Review \u00d7",
-                    "Verified \u00d7",
-                  ].map((tag, i) => (
-                    <span
-                      key={i}
-                      className="px-3 py-1.5 bg-white border border-blue-100 text-[#1f295b] text-xs font-semibold rounded-full shadow-sm cursor-pointer hover:border-blue-300 transition-colors"
+                  {GLOBAL_TAGS.map((tag) => (
+                    <button
+                      key={tag.key}
+                      onClick={() => setTagFilter(tagFilter === tag.key ? "" : tag.key)}
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-full shadow-sm transition-colors ${
+                        tagFilter === tag.key
+                          ? "bg-[#1f295b] text-white"
+                          : "bg-white border border-blue-100 text-[#1f295b] hover:border-blue-300"
+                      }`}
                     >
-                      {tag}
-                    </span>
+                      {tag.label}
+                      {tagFilter === tag.key ? " \u00d7" : ""}
+                    </button>
                   ))}
                 </div>
                 <div className="relative mt-2">

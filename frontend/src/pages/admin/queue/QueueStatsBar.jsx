@@ -1,4 +1,6 @@
-function QueueStatsBar({ stats, statusFilter, setStatusFilter, setSearchQuery }) {
+import Skeleton from "@/components/ui/Skeleton"
+
+function QueueStatsBar({ stats, statusFilter, setStatusFilter, setSearchQuery, loading = false }) {
   const tabs = [
     {
       key: "pending_review",
@@ -53,7 +55,7 @@ function QueueStatsBar({ stats, statusFilter, setStatusFilter, setSearchQuery })
               <div
                 className={`text-2xl font-extrabold font-['DM_Sans'] leading-none mb-1 ${isActive ? t.color : "text-slate-400"}`}
               >
-                {t.count ?? 0}
+                {loading ? <Skeleton className="h-6 w-10 mx-auto" /> : (t.count ?? 0)}
               </div>
               <div
                 className={`text-[9px] font-bold font-['DM_Sans'] uppercase tracking-wide ${
@@ -68,7 +70,7 @@ function QueueStatsBar({ stats, statusFilter, setStatusFilter, setSearchQuery })
       </div>
 
       {/* Urgent indicator — shown only when there are urgent reports */}
-      {stats.urgent > 0 && (
+      {!loading && stats.urgent > 0 && (
         <div className="mx-4 mt-3 flex items-center gap-2 px-3 py-2 bg-red-50 border border-red-200 rounded-xl">
           <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shrink-0" />
           <span className="text-red-600 text-[11px] font-extrabold font-['DM_Sans'] uppercase tracking-wide">
