@@ -492,10 +492,12 @@ function MapView({ activeFilter }) {
 
   const isServiceFilter = SERVICE_TYPES.includes(activeFilter)
   const isSeverityFilter = SEVERITY_TYPES.includes(activeFilter)
+  // Anything that's not a service or severity filter is treated as a category (abuse type) filter
+  const isCategoryFilter = activeFilter && !isServiceFilter && !isSeverityFilter
 
   const filteredLocations = emergencyLocations.filter((f) => {
     if (!activeFilter) return true
-    if (isSeverityFilter) return false
+    if (isSeverityFilter || isCategoryFilter) return false
     // match exact type OR the canonical group (e.g. filter "hospital" shows "medical" too)
     const type = f.properties.type
     if (type === activeFilter) return true
@@ -514,6 +516,7 @@ function MapView({ activeFilter }) {
   const filteredReports = reports.filter((r) => {
     if (!activeFilter) return true
     if (isServiceFilter) return false
+    if (isCategoryFilter) return r.category === activeFilter
     return r.severity === activeFilter
   })
 
