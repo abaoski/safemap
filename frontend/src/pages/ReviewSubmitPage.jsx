@@ -6,8 +6,7 @@ import rptBackImg from "/src/assets/images/rpt_back.svg"
 import rptImpReminderImg from "/src/assets/images/rpt_imp_reminder.svg"
 import { Button } from "@/components/ui/button"
 import BottomNav from "@/components/BottomNav"
-import { MapContainer, TileLayer, Marker } from "react-leaflet"
-import "leaflet/dist/leaflet.css"
+import { Map, MapMarker, MarkerContent } from "@/components/ui/map"
 
 // ── OTP helpers ──────────────────────────────────────────────────────────────
 
@@ -92,7 +91,10 @@ export default function ReviewSubmitPage() {
   const mapCategory = (incidentType) => {
     // Convert display label back to snake_case key for the backend
     // e.g. "Sexual Assault" → "sexual_assault"
-    return incidentType.toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "")
+    return incidentType
+      .toLowerCase()
+      .replace(/\s+/g, "_")
+      .replace(/[^a-z0-9_]/g, "")
   }
 
   // ── Phone validation ────────────────────────────────────────────────────────
@@ -316,17 +318,22 @@ export default function ReviewSubmitPage() {
             </div>
           </div>
           <div className="h-32 w-full">
-            <MapContainer
-              center={[lat, lng]}
+            <Map
+              center={[lng, lat]}
               zoom={14}
               className="h-full w-full"
-              zoomControl={false}
-              dragging={false}
-              scrollWheelZoom={false}
+              theme="light"
+              interactive={false}
+              dragPan={false}
+              scrollZoom={false}
+              doubleClickZoom={false}
+              touchZoomRotate={false}
+              keyboard={false}
             >
-              <TileLayer attribution="&copy; OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <Marker position={[lat, lng]} />
-            </MapContainer>
+              <MapMarker longitude={lng} latitude={lat}>
+                <MarkerContent />
+              </MapMarker>
+            </Map>
           </div>
         </div>
 
