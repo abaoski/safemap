@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { Hospital, Siren, Flame, Ambulance, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@radix-ui/react-collapsible"
 
@@ -36,31 +35,13 @@ const services = [
   },
 ]
 
-const severities = [
-  {
-    key: "critical",
-    color: "#FF2D55",
-    label: "Critical",
-    activeBg: "bg-rose-50 border-rose-200",
-  },
-  {
-    key: "high",
-    color: "#FF9F0A",
-    label: "High",
-    activeBg: "bg-amber-50 border-amber-200",
-  },
-  {
-    key: "medium",
-    color: "#FFD60A",
-    label: "Medium",
-    activeBg: "bg-yellow-50 border-yellow-200",
-  },
-  {
-    key: "low",
-    color: "#30D158",
-    label: "Low",
-    activeBg: "bg-green-50 border-green-200",
-  },
+const abuseTypes = [
+  { key: "sexual_assault",    label: "Sexual Assault" },
+  { key: "physical_abuse",    label: "Physical Abuse" },
+  { key: "domestic_violence", label: "Domestic Violence" },
+  { key: "stalking",          label: "Stalking" },
+  { key: "verbal_abuse",      label: "Verbal Abuse" },
+  { key: "emotional_abuse",   label: "Emotional Abuse" },
 ]
 
 function FilterChip({ active, activeBg, onClick, children }) {
@@ -121,49 +102,18 @@ function RiskLegend({ onFilterChange, activeFilter }) {
               {/* Divider */}
               <div className="border-t border-slate-100" />
 
-              {/* Severity */}
+              {/* Abuse Types */}
               <div>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Severity</p>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Abuse Type</p>
                 <div className="flex flex-col gap-1">
-                  {severities.map(({ key, color, label, activeBg }) => (
-                    <FilterChip key={key} active={activeFilter === key} activeBg={activeBg} onClick={() => toggle(key)}>
-                      {/* neon aura dot */}
-                      <span
-                        style={{
-                          position: "relative",
-                          width: 14,
-                          height: 14,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          flexShrink: 0,
-                        }}
-                      >
-                        <span
-                          style={{
-                            position: "absolute",
-                            width: 14,
-                            height: 14,
-                            borderRadius: "50%",
-                            background: color + "33",
-                            boxShadow: `0 0 6px 2px ${color}44`,
-                          }}
-                        />
-                        <span
-                          style={{
-                            position: "absolute",
-                            width: 8,
-                            height: 8,
-                            borderRadius: "50%",
-                            background: color,
-                            boxShadow: `0 0 6px ${color}`,
-                          }}
-                        />
-                      </span>
+                  {abuseTypes.map(({ key, label }) => (
+                    <FilterChip
+                      key={key}
+                      active={activeFilter === key}
+                      activeBg="bg-slate-100 border-slate-300"
+                      onClick={() => toggle(key)}
+                    >
                       {label}
-                      <Badge variant="secondary" className="ml-auto text-[9px] px-1.5 py-0 h-4 font-bold">
-                        {key === "critical" ? "!!!" : key === "high" ? "!!" : key === "medium" ? "!" : "·"}
-                      </Badge>
                     </FilterChip>
                   ))}
                 </div>
