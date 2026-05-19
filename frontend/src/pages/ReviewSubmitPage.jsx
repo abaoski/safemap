@@ -114,7 +114,10 @@ export default function ReviewSubmitPage() {
 
   async function handleSendOtp() {
     const err = validatePhone(phone)
-    if (err) { setPhoneError(err); return }
+    if (err) {
+      setPhoneError(err)
+      return
+    }
     setPhoneError("")
     setSendingOtp(true)
     const result = await sendOTP(phone)
@@ -163,7 +166,10 @@ export default function ReviewSubmitPage() {
     }
     if (isUrgent) {
       const err = validatePhone(phone)
-      if (err) { setPhoneError(err); return }
+      if (err) {
+        setPhoneError(err)
+        return
+      }
       if (!otpVerified) {
         alert("Please verify your phone number via OTP before submitting an urgent report.")
         return
@@ -277,7 +283,8 @@ export default function ReviewSubmitPage() {
             <div className="flex flex-col gap-1">
               <span className="text-gray-400 text-xs font-normal font-['DM_Sans']">Date & Time</span>
               <span className="text-zinc-800 text-xs font-bold font-['DM_Sans']">
-                {data.date}{data.time ? ` • ${data.time}` : ""}
+                {data.date}
+                {data.time ? ` • ${data.time}` : ""}
               </span>
             </div>
           </div>
@@ -288,12 +295,17 @@ export default function ReviewSubmitPage() {
           <div className="flex items-center gap-3.5 p-3">
             <div className="w-10 h-10 p-2.5 bg-indigo-50 rounded-md flex items-center justify-center">
               <svg className="w-5 h-5" viewBox="0 0 16 16" fill="none">
-                <path d="M8 0C3.6 0 0 3.6 0 8C0 13 8 16 8 16C8 16 16 13 16 8C16 3.6 12.4 0 8 0ZM8 11C6.9 11 6 10.1 6 9C6 7.9 6.9 7 8 7C9.1 7 10 7.9 10 9C10 10.1 9.1 11 8 11Z" fill="#1A3A8F" />
+                <path
+                  d="M8 0C3.6 0 0 3.6 0 8C0 13 8 16 8 16C8 16 16 13 16 8C16 3.6 12.4 0 8 0ZM8 11C6.9 11 6 10.1 6 9C6 7.9 6.9 7 8 7C9.1 7 10 7.9 10 9C10 10.1 9.1 11 8 11Z"
+                  fill="#1A3A8F"
+                />
               </svg>
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-gray-400 text-xs font-normal font-['DM_Sans']">Location</span>
-              <span className="text-zinc-800 text-xs font-bold font-['DM_Sans']">{data.landmark || "Selected Location"}</span>
+              <span className="text-zinc-800 text-xs font-bold font-['DM_Sans']">
+                {data.landmark || "Selected Location"}
+              </span>
             </div>
           </div>
           <div className="h-32 w-full">
@@ -317,13 +329,22 @@ export default function ReviewSubmitPage() {
             <div className="w-10 h-10 p-2.5 bg-indigo-50 rounded-md flex items-center justify-center shrink-0">
               <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none">
                 <circle cx="10" cy="6" r="3" stroke="#1A3A8F" strokeWidth="1.5" />
-                <path d="M4 18C4 14.134 7.134 11 10 11C12.866 11 16 14.134 16 18" stroke="#1A3A8F" strokeWidth="1.5" strokeLinecap="round" />
+                <path
+                  d="M4 18C4 14.134 7.134 11 10 11C12.866 11 16 14.134 16 18"
+                  stroke="#1A3A8F"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
               </svg>
             </div>
             <div className="flex flex-col gap-1.5">
               <span className="text-gray-400 text-xs font-normal font-['DM_Sans']">Victim / Perpetrator Info</span>
-              <span className="text-zinc-800 text-xs font-bold font-['DM_Sans']">{data.gender} • {data.relationship}</span>
-              <span className="text-justify text-gray-500 text-sm font-normal font-['DM_Sans']">{data.description}</span>
+              <span className="text-zinc-800 text-xs font-bold font-['DM_Sans']">
+                {data.gender} • {data.relationship}
+              </span>
+              <span className="text-justify text-gray-500 text-sm font-normal font-['DM_Sans']">
+                {data.description}
+              </span>
             </div>
           </div>
         </div>
@@ -343,11 +364,20 @@ export default function ReviewSubmitPage() {
                 setOtpError("")
                 setPhoneError("")
               }}
-              className={"w-6 h-6 shrink-0 rounded border-2 flex items-center justify-center transition-colors " + (isUrgent ? "bg-red-600 border-red-600" : "border-gray-300 bg-white")}
+              className={
+                "w-6 h-6 shrink-0 rounded border-2 flex items-center justify-center transition-colors " +
+                (isUrgent ? "bg-red-600 border-red-600" : "border-gray-300 bg-white")
+              }
             >
               {isUrgent && (
                 <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5">
-                  <path d="M3 8L6.5 11.5L13 4.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M3 8L6.5 11.5L13 4.5"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               )}
             </button>
@@ -376,17 +406,30 @@ export default function ReviewSubmitPage() {
                   <input
                     type="tel"
                     value={phone}
-                    onChange={(e) => { setPhone(e.target.value); setPhoneError("") }}
+                    onChange={(e) => {
+                      setPhone(e.target.value)
+                      setPhoneError("")
+                    }}
                     placeholder="09171234567"
                     disabled={otpVerified}
-                    className={"flex-1 h-11 bg-white rounded-xl border px-4 text-gray-800 text-sm " + (phoneError ? "border-red-400" : "border-gray-300") + (otpVerified ? " opacity-60" : "")}
+                    className={
+                      "flex-1 h-11 bg-white rounded-xl border px-4 text-gray-800 text-sm " +
+                      (phoneError ? "border-red-400" : "border-gray-300") +
+                      (otpVerified ? " opacity-60" : "")
+                    }
                   />
                   <button
                     onClick={handleSendOtp}
                     disabled={sendingOtp || otpVerified || resendCooldown > 0}
                     className="h-11 px-4 bg-blue-900 text-white text-xs font-semibold rounded-xl disabled:opacity-50 shrink-0"
                   >
-                    {sendingOtp ? "Sending…" : otpSent ? (resendCooldown > 0 ? `Resend (${resendCooldown}s)` : "Resend") : "Send OTP"}
+                    {sendingOtp
+                      ? "Sending…"
+                      : otpSent
+                        ? resendCooldown > 0
+                          ? `Resend (${resendCooldown}s)`
+                          : "Resend"
+                        : "Send OTP"}
                   </button>
                 </div>
                 {phoneError && <p className="text-red-500 text-xs mt-1">{phoneError}</p>}
@@ -404,9 +447,15 @@ export default function ReviewSubmitPage() {
                       inputMode="numeric"
                       maxLength={6}
                       value={otpInput}
-                      onChange={(e) => { setOtpInput(e.target.value.replace(/\D/g, "")); setOtpError("") }}
+                      onChange={(e) => {
+                        setOtpInput(e.target.value.replace(/\D/g, ""))
+                        setOtpError("")
+                      }}
                       placeholder="______"
-                      className={"flex-1 h-11 bg-white rounded-xl border px-4 text-gray-800 text-sm tracking-widest " + (otpError ? "border-red-400" : "border-gray-300")}
+                      className={
+                        "flex-1 h-11 bg-white rounded-xl border px-4 text-gray-800 text-sm tracking-widest " +
+                        (otpError ? "border-red-400" : "border-gray-300")
+                      }
                     />
                     <button
                       onClick={handleVerifyOtp}
@@ -426,9 +475,17 @@ export default function ReviewSubmitPage() {
                 <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-xl">
                   <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4 shrink-0">
                     <circle cx="8" cy="8" r="7" fill="#16a34a" />
-                    <path d="M4.5 8L7 10.5L11.5 5.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path
+                      d="M4.5 8L7 10.5L11.5 5.5"
+                      stroke="white"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
-                  <span className="text-green-700 text-xs font-semibold font-['DM_Sans']">Phone verified — {phone}</span>
+                  <span className="text-green-700 text-xs font-semibold font-['DM_Sans']">
+                    Phone verified — {phone}
+                  </span>
                 </div>
               )}
             </div>
@@ -445,19 +502,33 @@ export default function ReviewSubmitPage() {
           >
             {confirmed && (
               <svg viewBox="0 0 16 16" fill="none">
-                <path d="M3 8L6.5 11.5L13 4.5" stroke="#1A3A8F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path
+                  d="M3 8L6.5 11.5L13 4.5"
+                  stroke="#1A3A8F"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             )}
           </button>
           <span className="text-justify text-gray-500 text-sm font-normal font-['DM_Sans']">
-            I confirm that this report does not contain personal names or identifying information, ensuring full anonymity for all parties. I agree to the{" "}
-            <button onClick={() => navigate("/terms", { state: { from: "review-submit", data: reportData } })} className="text-blue-700 underline hover:text-blue-900">
+            I confirm that this report does not contain personal names or identifying information, ensuring full
+            anonymity for all parties. I agree to the{" "}
+            <button
+              onClick={() => navigate("/terms", { state: { from: "review-submit", data: reportData } })}
+              className="text-blue-700 underline hover:text-blue-900"
+            >
               Terms of Service
             </button>{" "}
             and{" "}
-            <button onClick={() => navigate("/privacy", { state: { from: "review-submit", data: reportData } })} className="text-blue-700 underline hover:text-blue-900">
+            <button
+              onClick={() => navigate("/privacy", { state: { from: "review-submit", data: reportData } })}
+              className="text-blue-700 underline hover:text-blue-900"
+            >
               Privacy Policy
-            </button>.
+            </button>
+            .
           </span>
         </div>
       </div>
@@ -470,7 +541,8 @@ export default function ReviewSubmitPage() {
             <div className="flex flex-col gap-1">
               <span className="text-blue-900 text-xs font-semibold font-['DM_Sans']">Your Privacy is Protected</span>
               <span className="text-justify text-blue-900 text-xs font-normal font-['DM_Sans']">
-                Your report description is encrypted. We collect minimal data (location, category, timestamp) for safety purposes. Your IP address is logged for security only. This report is anonymous by design.
+                Your report description is encrypted. We collect minimal data (location, category, timestamp) for safety
+                purposes. Your IP address is logged for security only. This report is anonymous by design.
               </span>
             </div>
           </div>
@@ -490,7 +562,11 @@ export default function ReviewSubmitPage() {
         </Button>
       </div>
 
-      <BottomNav onChatClick={() => { /* ignore */ }} />
+      <BottomNav
+        onChatClick={() => {
+          /* ignore */
+        }}
+      />
     </div>
   )
 }

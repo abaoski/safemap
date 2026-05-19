@@ -1,8 +1,55 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
+import {
+  Search,
+  Map,
+  Edit2,
+  Trash2,
+  Filter,
+  Plus,
+  Send,
+  X,
+  Settings2,
+  Download,
+  AlertTriangle,
+  Activity,
+  Users,
+  Tag,
+} from "lucide-react"
 import { API_BASE } from "@/lib/api-base"
-import { Search, Map, Trash2, Filter, Plus, Send, Settings2, Activity, Tag, Shield } from "lucide-react"
 import AdminLayout from "../../../components/admin/AdminLayout"
 import DirectoryAddDialog from "../../../components/admin/management/DirectoryAddDialog"
+import DirectoryMapDialog from "../../../components/admin/management/DirectoryMapDialog"
+
+const categoryColor = (cat) => {
+  const map = {
+    hospital: "bg-sky-100 text-sky-600",
+    medical: "bg-sky-100 text-sky-600",
+    police: "bg-indigo-100 text-indigo-600",
+    pnp: "bg-indigo-100 text-indigo-600",
+    wcpd: "bg-violet-100 text-violet-600",
+    vawc: "bg-pink-100 text-pink-600",
+    fire: "bg-orange-100 text-orange-600",
+    rescue: "bg-emerald-100 text-emerald-600",
+    dswd: "bg-teal-100 text-teal-600",
+    emergency: "bg-red-100 text-red-600",
+    disaster: "bg-amber-100 text-amber-600",
+  }
+  return map[cat] || "bg-slate-100 text-slate-500"
+}
+
+const priorityColor = (p) => {
+  if (p === "critical") return "bg-red-100 text-red-600"
+  if (p === "high") return "bg-orange-100 text-orange-600"
+  if (p === "medium") return "bg-amber-100 text-amber-600"
+  return "bg-green-100 text-green-600"
+}
+
+const priorityBorder = (p) => {
+  if (p === "critical") return "border-red-500"
+  if (p === "high") return "border-orange-400"
+  if (p === "medium") return "border-amber-400"
+  return "border-green-400"
+}
 
 function AdminManagementPage() {
   // Top-level tab state
@@ -11,276 +58,198 @@ function AdminManagementPage() {
   // Directory State
   const [directories, setDirectories] = useState([])
   const [dirSearch, setDirSearch] = useState("")
+  const [dirFilter, setDirFilter] = useState("")
   const [isAddDirOpen, setIsAddDirOpen] = useState(false)
+  const [editContact, setEditContact] = useState(null)
+  const [mapContact, setMapContact] = useState(null)
+  const [isMapOpen, setIsMapOpen] = useState(false)
 
   // Category State
   const [categories, setCategories] = useState([])
   const [catSearch, setCatSearch] = useState("")
 
-  const getAuthHeaders = () => ({
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  })
-
-  const getDirectoryLocationText = (dir) => {
-    if (!dir) return ""
-
-    if (typeof dir.location === "string") {
-      return dir.location
-    }
-
-    if (dir.address) {
-      return dir.address
-    }
-
-    if (dir.location && typeof dir.location === "object") {
-      return dir.location.address || ""
-    }
-
-    return ""
-  }
-
-  const getDirectoryCoordinatesText = (dir) => {
-    if (!dir) return ""
-
-    const latitude = dir.latitude ?? dir.location?.latitude
-    const longitude = dir.longitude ?? dir.location?.longitude
-
-    if (latitude == null || longitude == null) {
-      return ""
-    }
-
-    return `LAT: ${latitude} | LONG: ${longitude}`
-  }
-
-  const getDirectorySearchText = (dir) => {
-    return [dir?.name, dir?.phone, getDirectoryLocationText(dir), getDirectoryCoordinatesText(dir)]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase()
-  }
-
-  const handleDeleteDirectory = async (id) => {
-    if (!confirm("Are you sure you want to delete this contact?")) return
-    try {
-      const res = await fetch(`${API_BASE}/help/contacts/${id}`, {
-        method: "DELETE",
-        headers: getAuthHeaders(),
-      })
-      if (res.ok) {
-        setDirectories(directories.filter((d) => d.id !== id))
-      }
-    } catch (err) {
-      /* ignore */
-    }
-  }
-
-  const handleDeleteCategory = async (id) => {
-    if (!confirm("Are you sure you want to delete this category?")) return
-    try {
-      const res = await fetch(`${API_BASE}/reports/categories/${id}`, {
-        method: "DELETE",
-        headers: getAuthHeaders(),
-      })
-      if (res.ok) {
-        setCategories(categories.filter((c) => c.id !== id))
-      }
-    } catch (err) {
-      /* ignore */
-    }
-  }
-
   useEffect(() => {
-    loadData()
-  }, [])
-
-  const handleAddDirectory = async (data) => {
-    try {
-      const res = await fetch(`${API_BASE}/help/contacts`, {
-        method: "POST",
-        headers: getAuthHeaders(),
-        body: JSON.stringify(data),
-      })
-      if (res.ok) {
-        const result = await res.json()
-        setDirectories([result.contact, ...directories])
-        setIsAddDirOpen(false)
-      }
-    } catch (err) {
-      /* ignore */
-    }
-  }
-
-  const handleAddCategory = async () => {
-    const name = prompt("Enter category name (e.g. child_abuse):")
-    if (!name) return
-    const label = prompt("Enter category label (e.g. Child Abuse):")
-    if (!label) return
-
-    try {
-      const res = await fetch(`${API_BASE}/reports/categories`, {
-        method: "POST",
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ name, label, priority: "medium" }),
-      })
-      if (res.ok) {
-        const newCat = await res.json()
-        setCategories([newCat, ...categories])
-      }
-    } catch (err) {
-      /* ignore */
-    }
-  }
-
-  const handleEditDirectory = async (dir) => {
-    const name = prompt("Edit contact name:", dir.name)
-    if (!name) return
-    const phone = prompt("Edit phone number:", dir.phone)
-    if (!phone) return
-    const location = prompt("Edit location address:", getDirectoryLocationText(dir))
-    if (!location) return
-
-    try {
-      const res = await fetch(`${API_BASE}/help/contacts/${dir.id}`, {
-        method: "PUT",
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ name, phone, location }),
-      })
-      if (res.ok) {
-        const result = await res.json()
-        setDirectories(directories.map((d) => (d.id === dir.id ? result.contact : d)))
-      }
-    } catch (err) {
-      /* ignore */
-    }
-  }
-
-  const handleEditCategory = async (cat) => {
-    const label = prompt("Edit category label:", cat.label)
-    if (!label) return
-    const priority = prompt("Edit priority (low, medium, high, critical):", cat.priority)
-    if (!priority) return
-
-    try {
-      const res = await fetch(`${API_BASE}/reports/categories/${cat.id}`, {
-        method: "PUT",
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ label, priority }),
-      })
-      if (res.ok) {
-        const updatedCat = await res.json()
-        setCategories(categories.map((c) => (c.id === cat.id ? updatedCat : c)))
-      }
-    } catch (err) {
-      /* ignore */
-    }
-  }
-
-  const loadData = async () => {
-    // Fallback mock data arrays matching backend structure
+    // Fallback mock data arrays
     const mockDirectories = [
       {
         id: 1,
+        caseId: "#EMG-011",
         name: "Gensan Medical Center",
         phone: "887-9898",
-        type: "hospital",
-        location: "General Santos City",
-        latitude: 6.0828,
-        longitude: 125.1481,
-        is_active: true,
+        location: "National Highway, General Santos City",
+        lat: "6.0828┬░ N",
+        lng: "125.1481┬░ E",
+        type: "CRITICAL",
+        typeColor: "bg-red-100 text-red-600",
       },
       {
         id: 2,
+        caseId: "#REG-712",
+        name: "Bureau of Fire Protection",
+        phone: "+63 43-341-5561",
+        location: "General Santos City, South Cotabato, Philippines",
+        lat: "6.0796┬░ N",
+        lng: "125.1468┬░ E",
+        type: "REGIONAL",
+        typeColor: "bg-blue-100 text-blue-600",
+      },
+      {
+        id: 3,
+        caseId: "#SOC-102",
         name: "GSC Police Office",
-        phone: "552-5573",
-        type: "police",
-        location: "General Santos City",
-        latitude: 6.1103,
-        longitude: 125.1668,
-        is_active: true,
+        phone: "+63 98-598-7207",
+        location: "Camp Fermin G. Lira Jr., Brgy. Dadiangas West...",
+        lat: "6.11┬░ N",
+        lng: "125.16┬░ E",
+        type: "SOCIAL CARE",
+        typeColor: "bg-emerald-100 text-emerald-600",
+      },
+      {
+        id: 4,
+        caseId: "#DRF-004",
+        name: "Police Station 7",
+        phone: "NOT ASSIGNED",
+        location: "Pending Coordinates City, PH",
+        lat: "-",
+        lng: "-",
+        type: "DRAFT",
+        typeColor: "bg-slate-100 text-slate-500",
       },
     ]
 
     const mockCategories = [
       {
         id: 1,
-        name: "sexual_assault",
-        label: "Sexual Assault",
-        priority: "critical",
-        is_active: true,
-        report_count: 0,
+        catId: "8821-E",
+        name: "Emotional Distress",
+        desc: "Incidents involving severe psychological impact or trauma responses requiring...",
+        incidents: 42,
+        priority: "HIGH PRIORITY",
+        prioColor: "bg-red-100 text-red-600",
+        borderColor: "border-red-500",
       },
       {
         id: 2,
-        name: "physical_abuse",
-        label: "Physical Abuse",
-        priority: "critical",
-        is_active: true,
-        report_count: 0,
+        catId: "4410-H",
+        name: "Harassment",
+        desc: "Reports of targeted exclusionary behavior, verbal abuse, or persistent unwanted...",
+        incidents: 28,
+        priority: "MEDIUM PRIORITY",
+        prioColor: "bg-amber-100 text-amber-600",
+        borderColor: "border-amber-400",
       },
       {
         id: 3,
-        name: "domestic_violence",
-        label: "Domestic Violence",
-        priority: "critical",
-        is_active: true,
-        report_count: 0,
+        catId: "1102-P",
+        name: "Physical Safety",
+        desc: "Threats or actual incidents concerning physical infrastructure, environment, or...",
+        incidents: 15,
+        priority: "LOW PRIORITY",
+        prioColor: "bg-green-100 text-green-600",
+        borderColor: "border-[#1f295b]", // Mockup shows dark blue line for physical safety
       },
       {
         id: 4,
-        name: "stalking",
-        label: "Stalking",
-        priority: "high",
-        is_active: true,
-        report_count: 0,
-      },
-      {
-        id: 5,
-        name: "verbal_abuse",
-        label: "Verbal Abuse",
-        priority: "medium",
-        is_active: true,
-        report_count: 0,
-      },
-      {
-        id: 6,
-        name: "emotional_abuse",
-        label: "Emotional Abuse",
-        priority: "medium",
-        is_active: true,
-        report_count: 0,
-      },
-      {
-        id: 7,
-        name: "other",
-        label: "Other",
-        priority: "low",
-        is_active: true,
-        report_count: 0,
+        catId: "9002-B",
+        name: "Policy Breach",
+        desc: "Violations of internal guidelines or administrative protocols not classified...",
+        incidents: 92,
+        priority: "ROUTINE",
+        prioColor: "bg-slate-100 text-slate-600",
+        borderColor: "border-slate-300",
       },
     ]
 
-    const token = localStorage.getItem("token")
-    const headers = { Authorization: `Bearer ${token}` }
-    try {
-      // Attempt to fetch from backend
-      const dirRes = await fetch(`${API_BASE}/help/contacts`, { headers })
-      const catRes = await fetch(`${API_BASE}/reports/categories`, { headers })
+    const loadData = async () => {
+      try {
+        const token = localStorage.getItem("token")
+        const headers = token ? { Authorization: `Bearer ${token}` } : {}
 
-      if (dirRes.ok && catRes.ok) {
-        const dirData = await dirRes.json()
-        const catData = await catRes.json()
+        // Load directories from help/contacts
+        const dirRes = await fetch(`${API_BASE}/help/contacts`, { headers })
+        const catRes = await fetch(`${API_BASE}/reports/categories`)
 
-        setDirectories(dirData.contacts || mockDirectories)
-        setCategories(catData.categories || mockCategories)
-        return
+        if (dirRes.ok) {
+          const dbDir = await dirRes.json()
+          const contacts = dbDir.contacts || []
+          if (contacts.length > 0) {
+            const shaped = contacts.map((c, i) => ({
+              id: c.id || i,
+              caseId: `#${(c.category || "dir").toUpperCase().slice(0, 3)}-${String(c.id || i).padStart(3, "0")}`,
+              name: c.name,
+              phone: c.phone || c.phone_alt || "NOT ASSIGNED",
+              location: c.address || "—",
+              lat: c.location?.latitude != null ? `${c.location.latitude.toFixed(4)}° N` : "—",
+              lng: c.location?.longitude != null ? `${c.location.longitude.toFixed(4)}° E` : "—",
+              type: (c.category || "other").toUpperCase(),
+              typeColor: categoryColor(c.category),
+              raw: c,
+            }))
+            setDirectories(shaped)
+          } else {
+            setDirectories(mockDirectories)
+          }
+        } else {
+          setDirectories(mockDirectories)
+        }
+
+        if (catRes.ok) {
+          const dbCat = await catRes.json()
+          const cats = dbCat.categories || []
+          if (cats.length > 0) {
+            setCategories(
+              cats.map((c, i) => ({
+                id: c.id || i,
+                catId: String(c.id || i).padStart(4, "0") + "-C",
+                name: c.label || c.name,
+                desc: c.description || c.name,
+                incidents: 0,
+                priority: (c.priority || "medium").toUpperCase() + " PRIORITY",
+                prioColor: priorityColor(c.priority),
+                borderColor: priorityBorder(c.priority),
+              }))
+            )
+          } else {
+            setCategories(mockCategories)
+          }
+        } else {
+          setCategories(mockCategories)
+        }
+      } catch (error) {
+        setDirectories(mockDirectories)
+        setCategories(mockCategories)
       }
-    } catch (error) {
+    }
+
+    loadData()
+  }, [])
+
+  const refreshDirectories = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token")
+      const headers = token ? { Authorization: `Bearer ${token}` } : {}
+      const res = await fetch(`${API_BASE}/help/contacts`, { headers })
+      if (!res.ok) return
+      const data = await res.json()
+      const contacts = data.contacts || []
+      setDirectories(
+        contacts.map((c, i) => ({
+          id: c.id || i,
+          caseId: `#${(c.category || "dir").toUpperCase().slice(0, 3)}-${String(c.id || i).padStart(3, "0")}`,
+          name: c.name,
+          phone: c.phone || c.phone_alt || "NOT ASSIGNED",
+          location: c.address || "—",
+          lat: c.location?.latitude != null ? `${c.location.latitude.toFixed(4)}° N` : "—",
+          lng: c.location?.longitude != null ? `${c.location.longitude.toFixed(4)}° E` : "—",
+          type: (c.category || "other").toUpperCase(),
+          typeColor: categoryColor(c.category),
+          raw: c,
+        }))
+      )
+    } catch {
       /* ignore */
     }
-    setDirectories(mockDirectories)
-    setCategories(mockCategories)
-  }
+  }, [])
 
   return (
     <AdminLayout activeTab="management">
@@ -318,7 +287,10 @@ function AdminManagementPage() {
               <h3 className="text-slate-400 text-xs font-bold font-['DM_Sans'] mb-3">Quick Actions</h3>
               <div className="space-y-2">
                 <button
-                  onClick={() => setIsAddDirOpen(true)}
+                  onClick={() => {
+                    setEditContact(null)
+                    setIsAddDirOpen(true)
+                  }}
                   className="w-full bg-[#1f295b] text-white py-3 rounded-xl font-bold text-sm font-['DM_Sans'] shadow-sm hover:bg-[#151c3d] transition-colors"
                 >
                   New Entry
@@ -329,137 +301,192 @@ function AdminManagementPage() {
               </div>
             </div>
 
-            {/* Stats Overview */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white rounded-2xl p-4 shadow-[0px_8px_24px_rgba(149,157,165,0.05)] border border-slate-100">
-                <div className="text-slate-400 text-[9px] font-bold font-['DM_Sans'] uppercase tracking-wider mb-1">
-                  Total Contacts
-                </div>
-                <div className="text-[#1f295b] text-xl font-extrabold font-['DM_Sans']">{directories.length}</div>
-              </div>
-              <div className="bg-white rounded-2xl p-4 shadow-[0px_8px_24px_rgba(149,157,165,0.05)] border border-slate-100">
-                <div className="text-slate-400 text-[9px] font-bold font-['DM_Sans'] uppercase tracking-wider mb-1">
-                  Active Categories
-                </div>
-                <div className="text-[#1f295b] text-xl font-extrabold font-['DM_Sans']">{categories.length}</div>
-              </div>
-            </div>
-
             {/* Categories Box */}
             <div className="bg-white rounded-2xl shadow-[0px_8px_24px_rgba(149,157,165,0.1)] border border-slate-100 overflow-hidden">
               <div className="p-4 border-b border-slate-100">
-                <h3 className="text-slate-400 text-xs font-bold font-['DM_Sans']">Service Categories</h3>
+                <h3 className="text-slate-400 text-xs font-bold font-['DM_Sans']">Categories</h3>
               </div>
               <div className="divide-y divide-slate-100">
-                <div className="p-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                <div
+                  onClick={() => setDirFilter("emergency")}
+                  className={`p-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${dirFilter === "emergency" ? "bg-slate-50 font-bold" : ""}`}
+                >
                   <div className="flex items-center gap-3">
                     <div className="p-1.5 bg-blue-50 rounded-md text-[#1f295b]">
-                      <Shield size={16} />
+                      <AlertTriangle size={16} />
                     </div>
                     <span className="text-[#1f295b] font-bold text-sm font-['DM_Sans']">Emergency</span>
                   </div>
-                  <span className="px-2 py-1 bg-[#1f295b] text-white text-[10px] font-bold rounded-full">12</span>
+                  <span className="px-2 py-1 bg-[#1f295b] text-white text-[10px] font-bold rounded-full">
+                    {directories.filter((d) => d.type === "EMERGENCY").length}
+                  </span>
                 </div>
-                <div className="p-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                <div
+                  onClick={() => setDirFilter("medical")}
+                  className={`p-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${dirFilter === "medical" ? "bg-slate-50 font-bold" : ""}`}
+                >
                   <div className="flex items-center gap-3">
                     <div className="p-1.5 bg-slate-50 rounded-md text-[#1f295b]">
                       <Activity size={16} />
                     </div>
-                    <span className="text-[#1f295b] font-bold text-sm font-['DM_Sans']">Medical</span>
+                    <span className="text-[#1f295b] font-bold text-sm font-['DM_Sans']">Medical / Hospital</span>
                   </div>
-                  <span className="text-slate-500 text-xs font-medium">08</span>
+                  <span className="text-slate-500 text-xs font-medium">
+                    {directories.filter((d) => d.type === "MEDICAL" || d.type === "HOSPITAL").length}
+                  </span>
                 </div>
-                <div className="p-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                <div
+                  onClick={() => setDirFilter("pnp")}
+                  className={`p-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${dirFilter === "pnp" ? "bg-slate-50 font-bold" : ""}`}
+                >
                   <div className="flex items-center gap-3">
                     <div className="p-1.5 bg-slate-50 rounded-md text-[#1f295b]">
                       <Settings2 size={16} />
                     </div>
-                    <span className="text-[#1f295b] font-bold text-sm font-['DM_Sans']">Social Svcs</span>
+                    <span className="text-[#1f295b] font-bold text-sm font-['DM_Sans']">Police / PNP</span>
                   </div>
-                  <span className="text-slate-500 text-xs font-medium">24</span>
+                  <span className="text-slate-500 text-xs font-medium">
+                    {directories.filter((d) => d.type === "POLICE" || d.type === "PNP").length}
+                  </span>
+                </div>
+                <div
+                  onClick={() => setDirFilter("")}
+                  className="p-3.5 flex items-center gap-3 hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  <div className="p-1.5 bg-slate-50 rounded-md text-[#1f295b]">
+                    <Tag size={16} />
+                  </div>
+                  <span className="text-[#1f295b] font-bold text-sm font-['DM_Sans']">Show All Labels</span>
                 </div>
               </div>
             </div>
 
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-              <input
-                type="text"
-                placeholder="Search by name, number, or location..."
-                value={dirSearch}
-                onChange={(e) => setDirSearch(e.target.value)}
-                className="w-full bg-white border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-xs font-medium font-['DM_Sans'] outline-none focus:border-[#1f295b] shadow-[0px_8px_24px_rgba(149,157,165,0.05)]"
-              />
+            {/* Search + Filters */}
+            <div className="space-y-3">
+              <div className="relative">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                <input
+                  type="text"
+                  placeholder="Search by name, number, or location..."
+                  value={dirSearch}
+                  onChange={(e) => setDirSearch(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-xs font-medium font-['DM_Sans'] outline-none focus:border-[#1f295b] shadow-[0px_8px_24px_rgba(149,157,165,0.05)]"
+                />
+              </div>
+              {/* Category filter chips */}
+              <div className="flex gap-2 flex-wrap">
+                {[
+                  { key: "", label: "All" },
+                  { key: "hospital", label: "Hospital" },
+                  { key: "medical", label: "Medical" },
+                  { key: "police", label: "Police" },
+                  { key: "pnp", label: "PNP" },
+                  { key: "wcpd", label: "WCPD" },
+                  { key: "fire", label: "Fire" },
+                  { key: "rescue", label: "Rescue" },
+                  { key: "dswd", label: "DSWD" },
+                  { key: "vawc", label: "VAWC" },
+                  { key: "emergency", label: "Emergency" },
+                  { key: "disaster", label: "Disaster" },
+                ].map((f) => (
+                  <button
+                    key={f.key}
+                    onClick={() => setDirFilter(f.key)}
+                    className={`px-3 py-1.5 rounded-full text-[10px] font-bold font-['DM_Sans'] uppercase transition-colors whitespace-nowrap ${
+                      dirFilter === f.key
+                        ? "bg-[#1f295b] text-white shadow-sm"
+                        : "bg-white text-slate-500 border border-slate-200 hover:border-[#1f295b] hover:text-[#1f295b]"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* List */}
+            {/* List — sorted newest first, filtered */}
             <div className="space-y-4">
-              {directories.length === 0 ? (
-                <div className="text-center py-10 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                  <p className="text-slate-400 text-xs font-bold font-['DM_Sans']">No contacts found</p>
-                </div>
-              ) : (
-                directories
-                  .filter((d) => {
-                    const search = dirSearch.toLowerCase()
-                    return getDirectorySearchText(d).includes(search)
-                  })
-                  .map((dir) => (
-                    <div
-                      key={`dir-${dir.id || Math.random()}`}
-                      className="bg-white rounded-2xl p-4 shadow-[0px_8px_24px_rgba(149,157,165,0.1)] border border-slate-100 flex flex-col relative"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-slate-400 text-[10px] font-bold font-['DM_Sans'] uppercase tracking-wider">
-                          ID: {dir.id}
-                        </span>
-                        <span
-                          className={`px-2 py-0.5 text-[9px] font-bold rounded uppercase ${
-                            dir.type === "hospital"
-                              ? "bg-emerald-50 text-emerald-600"
-                              : dir.type === "police"
-                                ? "bg-blue-50 text-blue-600"
-                                : dir.type === "fire"
-                                  ? "bg-orange-50 text-orange-600"
-                                  : "bg-purple-50 text-purple-600"
-                          }`}
-                        >
-                          {dir.type}
-                        </span>
-                      </div>
-                      <h3 className="text-base font-bold font-['DM_Sans'] text-[#1f295b] mb-1">{dir.name}</h3>
-                      <p className="text-base font-bold font-['DM_Sans'] mb-3 text-blue-600">{dir.phone}</p>
-                      <div className="mb-4">
-                        <p className="text-slate-400 text-[9px] font-medium font-['DM_Sans'] mb-1">Location Data</p>
-                        <div className="flex items-start gap-1">
-                          <Map className="w-3 h-3 text-[#1f295b] shrink-0 mt-0.5" />
-                          <div>
-                            <p className="text-[11px] font-bold font-['DM_Sans'] leading-tight text-slate-800">
-                              {getDirectoryLocationText(dir) || "No location provided"}
-                            </p>
-                            <p className="text-slate-400 text-[9px] font-medium mt-0.5 uppercase tracking-tighter">
-                              {getDirectoryCoordinatesText(dir) || "Coordinates unavailable"}
-                            </p>
-                          </div>
+              {[...directories]
+                .sort((a, b) => b.id - a.id)
+                .filter((dir) => {
+                  const q = dirSearch.toLowerCase()
+                  const matchSearch =
+                    !q ||
+                    (dir.name || "").toLowerCase().includes(q) ||
+                    (dir.phone || "").toLowerCase().includes(q) ||
+                    (dir.location || "").toLowerCase().includes(q)
+                  const matchFilter = !dirFilter || (dir.type || "").toLowerCase() === dirFilter.toLowerCase()
+                  return matchSearch && matchFilter
+                })
+                .map((dir) => (
+                  <div
+                    key={dir.id}
+                    className="bg-white rounded-2xl p-4 shadow-[0px_8px_24px_rgba(149,157,165,0.1)] border border-slate-100 flex flex-col relative"
+                  >
+                    {/* Top row */}
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-slate-400 text-[10px] font-bold font-['DM_Sans']">
+                        CASE ID: {dir.caseId}
+                      </span>
+                      <span className={`px-2 py-0.5 text-[9px] font-bold rounded ${dir.typeColor}`}>{dir.type}</span>
+                    </div>
+                    {/* Name & Phone */}
+                    <h3 className="text-base font-bold font-['DM_Sans'] text-[#1f295b] mb-1">{dir.name}</h3>
+                    <p className="text-base font-bold font-['DM_Sans'] mb-3 text-blue-600">{dir.phone}</p>
+
+                    {/* Location */}
+                    <div className="mb-4">
+                      <p className="text-slate-400 text-[9px] font-medium font-['DM_Sans'] mb-1">Location Data</p>
+                      <div className="flex items-start gap-1">
+                        <Map className="w-3 h-3 text-[#1f295b] flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-[11px] font-bold font-['DM_Sans'] leading-tight text-slate-800">
+                            {dir.location}
+                          </p>
+                          <p className="text-slate-400 text-[9px] font-medium mt-0.5">
+                            LAT: {dir.lat} | LONG: {dir.lng}
+                          </p>
                         </div>
                       </div>
-                      <div className="flex justify-end gap-2 mt-auto">
-                        <button
-                          onClick={() => handleDeleteDirectory(dir.id)}
-                          className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleEditDirectory(dir)}
-                          className="px-5 py-2 bg-[#1f295b] text-white rounded-lg text-xs font-bold font-['DM_Sans'] hover:bg-[#151c3d] transition-colors"
-                        >
-                          Edit
-                        </button>
-                      </div>
                     </div>
-                  ))
+
+                    {/* Actions */}
+                    <div className="flex justify-end gap-2 mt-auto">
+                      <button
+                        onClick={() => {
+                          setMapContact(dir.raw || dir)
+                          setIsMapOpen(true)
+                        }}
+                        className="p-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-slate-200 transition-colors"
+                      >
+                        <Map size={16} />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setEditContact(dir.raw || dir)
+                          setIsAddDirOpen(true)
+                        }}
+                        className="px-5 py-2 bg-[#1f295b] text-white rounded-lg text-xs font-bold font-['DM_Sans'] hover:bg-[#151c3d] transition-colors"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              {[...directories].filter((dir) => {
+                const q = dirSearch.toLowerCase()
+                const matchSearch =
+                  !q ||
+                  (dir.name || "").toLowerCase().includes(q) ||
+                  (dir.phone || "").toLowerCase().includes(q) ||
+                  (dir.location || "").toLowerCase().includes(q)
+                const matchFilter = !dirFilter || (dir.type || "").toLowerCase() === dirFilter.toLowerCase()
+                return matchSearch && matchFilter
+              }).length === 0 && (
+                <div className="text-center py-10">
+                  <div className="text-3xl mb-2">📂</div>
+                  <p className="text-slate-400 text-xs font-medium font-['DM_Sans']">No entries found</p>
+                </div>
               )}
             </div>
           </div>
@@ -467,10 +494,7 @@ function AdminManagementPage() {
 
         {currentTab === "category" && (
           <div className="space-y-4">
-            <button
-              onClick={handleAddCategory}
-              className="bg-[#1f295b] text-white px-4 py-2 rounded-full text-[11px] font-bold font-['DM_Sans'] shadow hover:bg-[#151c3d] transition-colors"
-            >
+            <button className="bg-[#1f295b] text-white px-4 py-2 rounded-full text-[11px] font-bold font-['DM_Sans'] shadow hover:bg-[#151c3d] transition-colors">
               + New Category
             </button>
 
@@ -492,81 +516,32 @@ function AdminManagementPage() {
 
             {/* List */}
             <div className="space-y-4">
-              {categories
-                .filter((c) => {
-                  const search = catSearch.toLowerCase()
-                  return (
-                    (c.label?.toLowerCase() || "").includes(search) || (c.name?.toLowerCase() || "").includes(search)
-                  )
-                })
-                .map((cat) => (
-                  <div
-                    key={`cat-${cat.id || Math.random()}`}
-                    className={`bg-white rounded-2xl p-5 shadow-[0px_8px_24px_rgba(149,157,165,0.08)] border-l-[6px] ${
-                      cat.priority === "critical"
-                        ? "border-red-500"
-                        : cat.priority === "high"
-                          ? "border-amber-400"
-                          : cat.priority === "low"
-                            ? "border-slate-300"
-                            : "border-[#1f295b]"
-                    } flex flex-col relative`}
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="text-slate-400 text-[10px] font-bold font-['DM_Sans'] uppercase tracking-widest">
-                        ID: {cat.id}
-                      </span>
-                      <span
-                        className={`px-2 py-0.5 rounded text-[9px] font-bold font-['DM_Sans'] uppercase ${
-                          cat.priority === "critical"
-                            ? "bg-red-50 text-red-600"
-                            : cat.priority === "high"
-                              ? "bg-amber-50 text-amber-600"
-                              : cat.priority === "low"
-                                ? "bg-slate-100 text-slate-500"
-                                : "bg-blue-50 text-blue-600"
-                        }`}
-                      >
-                        {cat.priority}
-                      </span>
-                    </div>
-                    <h3 className="text-[#1f295b] text-base font-extrabold font-['DM_Sans'] mb-1">{cat.label}</h3>
-                    <p className="text-slate-500 text-xs font-medium font-['DM_Sans'] leading-relaxed mb-3">
-                      {cat.description || `Category for ${cat.label} incidents.`}
-                    </p>
-                    <div className="flex items-center gap-1.5 mb-4">
-                      <Tag size={11} className="text-slate-400" />
-                      <span className="text-slate-500 text-[10px] font-bold font-['DM_Sans']">
-                        {cat.report_count ?? 0} report
-                        {(cat.report_count ?? 0) !== 1 ? "s" : ""}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between mt-auto">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`w-1.5 h-1.5 rounded-full ${cat.is_active ? "bg-emerald-500" : "bg-slate-300"}`}
-                        />
-                        <span className="text-[#1f295b] text-[10px] font-bold font-['DM_Sans']">
-                          {cat.is_active ? "ACTIVE" : "INACTIVE"}
-                        </span>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleDeleteCategory(cat.id)}
-                          className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleEditCategory(cat)}
-                          className="p-2 bg-slate-100 text-[#1f295b] rounded-lg hover:bg-slate-200 transition-colors"
-                        >
-                          <Settings2 size={16} />
-                        </button>
-                      </div>
+              {categories.map((cat) => (
+                <div
+                  key={cat.id}
+                  className={`bg-white rounded-2xl p-5 shadow-[0px_8px_24px_rgba(149,157,165,0.1)] border-l-4 ${cat.borderColor} border-y border-r border-y-slate-100 border-r-slate-100 flex flex-col`}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-slate-400 text-[10px] font-bold font-['DM_Sans']">CAT-ID: {cat.catId}</span>
+                    <div className="flex gap-3 text-slate-400">
+                      <button className="hover:text-[#1f295b] transition-colors">
+                        <Edit2 size={14} />
+                      </button>
+                      <button className="hover:text-red-500 transition-colors">
+                        <Trash2 size={14} />
+                      </button>
                     </div>
                   </div>
-                ))}
+                  <h3 className="text-[#1f295b] text-base font-bold font-['DM_Sans'] mb-2">{cat.name}</h3>
+                  <p className="text-slate-500 text-xs font-medium font-['DM_Sans'] mb-4 leading-relaxed">{cat.desc}</p>
+                  <div className="flex gap-2">
+                    <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded text-[9px] font-bold">
+                      {cat.incidents} INCIDENTS
+                    </span>
+                    <span className={`px-2 py-1 rounded text-[9px] font-bold ${cat.prioColor}`}>{cat.priority}</span>
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* Global Tags */}
@@ -591,9 +566,9 @@ function AdminManagementPage() {
                     "Night-Shift \u00d7",
                     "Legal-Review \u00d7",
                     "Verified \u00d7",
-                  ].map((tag) => (
+                  ].map((tag, i) => (
                     <span
-                      key={tag}
+                      key={i}
                       className="px-3 py-1.5 bg-white border border-blue-100 text-[#1f295b] text-xs font-semibold rounded-full shadow-sm cursor-pointer hover:border-blue-300 transition-colors"
                     >
                       {tag}
@@ -633,7 +608,24 @@ function AdminManagementPage() {
       </div>
 
       {/* Overlay Dialogs could be rendered here later */}
-      <DirectoryAddDialog isOpen={isAddDirOpen} onClose={() => setIsAddDirOpen(false)} onAdd={handleAddDirectory} />
+      <DirectoryAddDialog
+        isOpen={isAddDirOpen}
+        onClose={() => {
+          setIsAddDirOpen(false)
+          setEditContact(null)
+        }}
+        onAdd={() => refreshDirectories()}
+        editContact={editContact}
+      />
+
+      <DirectoryMapDialog
+        isOpen={isMapOpen}
+        onClose={() => {
+          setIsMapOpen(false)
+          setMapContact(null)
+        }}
+        contact={mapContact}
+      />
     </AdminLayout>
   )
 }

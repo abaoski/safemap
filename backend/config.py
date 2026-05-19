@@ -86,7 +86,7 @@ class DevelopmentConfig(Config):
     """Development configuration"""
     DEBUG = True
     TESTING = False
-    SQLALCHEMY_ECHO = True
+    SQLALCHEMY_ECHO = False
 
 
 class ProductionConfig(Config):

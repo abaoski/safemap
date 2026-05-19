@@ -86,7 +86,12 @@ export default function ReportPage() {
       {/* Map Section - Static Map of General Santos City */}
       <div className="w-full max-w-md mx-auto mt-8 shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)]">
         <div className="w-full h-56 rounded-t-xl overflow-hidden">
-          <Map center={[125.1667, 6.1167]} zoom={12} className="h-full w-full" theme="light" interactive={false} />
+          <Map
+            viewport={{ center: [125.1667, 6.1167], zoom: 12 }}
+            className="h-full w-full pointer-events-none"
+            theme="light"
+            interactive={false}
+          />
         </div>
         <div className="w-full h-10 bg-white flex items-center px-4">
           <div className="flex items-center gap-2">
