@@ -201,7 +201,7 @@ const LandingPage = () => {
               <Reveal className="order-2 md:order-1">
                 <div className="aspect-4/3 bg-slate-50 rounded-3xl border border-slate-200 overflow-hidden shadow-lg">
                   <img
-                    src="https://placehold.co/800x600?text=About+Us+Image"
+                    src="https://res.cloudinary.com/djc0ndwqf/image/upload/v1779182728/23345_jhpd5c.png"
                     alt="About Us Illustration"
                     className="w-full h-full object-cover"
                   />
