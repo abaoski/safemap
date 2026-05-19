@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import {
   Search,
   Map,
@@ -68,8 +68,12 @@ function AdminManagementPage() {
   // Category State
   const [categories, setCategories] = useState([])
   const [catSearch, setCatSearch] = useState("")
+  const [catPriorityFilter, setCatPriorityFilter] = useState("")
   const [isCatDialogOpen, setIsCatDialogOpen] = useState(false)
   const [editCategory, setEditCategory] = useState(null)
+  const [confirmDelete, setConfirmDelete] = useState({ open: false, cat: null })
+  const [alertModal, setAlertModal] = useState({ open: false, message: "" })
+  const [tagFilter, setTagFilter] = useState("")
 
   const refreshCategories = useCallback(async () => {
     try {
@@ -98,21 +102,28 @@ function AdminManagementPage() {
     }
   }, [])
 
-  const handleDeleteCategory = async (cat) => {
-    if (!confirm(`Delete category "${cat.name}"? This cannot be undone.`)) return
+  const openConfirmDelete = (cat) => setConfirmDelete({ open: true, cat })
+
+  const performDeleteCategory = async () => {
+    const cat = confirmDelete.cat
+    if (!cat) return setConfirmDelete({ open: false, cat: null })
     const token = localStorage.getItem("token")
     try {
       const res = await fetch(`${API_BASE}/reports/categories/${cat.id}`, {
         method: "DELETE",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       })
-      if (res.ok) refreshCategories()
-      else {
+      if (res.ok) {
+        setConfirmDelete({ open: false, cat: null })
+        refreshCategories()
+      } else {
         const err = await res.json().catch(() => ({}))
-        alert(err.error || "Failed to delete category.")
+        setConfirmDelete({ open: false, cat: null })
+        setAlertModal({ open: true, message: err.error || "Failed to delete category." })
       }
     } catch {
-      alert("Network error. Please try again.")
+      setConfirmDelete({ open: false, cat: null })
+      setAlertModal({ open: true, message: "Network error. Please try again." })
     }
   }
 
@@ -172,7 +183,7 @@ function AdminManagementPage() {
         name: "Emotional Distress",
         desc: "Incidents involving severe psychological impact or trauma responses requiring...",
         incidents: 42,
-        priority: "HIGH PRIORITY",
+        priority: "HIGH",
         prioColor: "bg-red-100 text-red-600",
         borderColor: "border-red-500",
       },
@@ -182,7 +193,7 @@ function AdminManagementPage() {
         name: "Harassment",
         desc: "Reports of targeted exclusionary behavior, verbal abuse, or persistent unwanted...",
         incidents: 28,
-        priority: "MEDIUM PRIORITY",
+        priority: "MEDIUM",
         prioColor: "bg-amber-100 text-amber-600",
         borderColor: "border-amber-400",
       },
@@ -192,7 +203,7 @@ function AdminManagementPage() {
         name: "Physical Safety",
         desc: "Threats or actual incidents concerning physical infrastructure, environment, or...",
         incidents: 15,
-        priority: "LOW PRIORITY",
+        priority: "LOW",
         prioColor: "bg-green-100 text-green-600",
         borderColor: "border-[#1f295b]", // Mockup shows dark blue line for physical safety
       },
@@ -229,7 +240,7 @@ function AdminManagementPage() {
               location: c.address || "—",
               lat: c.location?.latitude != null ? `${c.location.latitude.toFixed(4)}° N` : "—",
               lng: c.location?.longitude != null ? `${c.location.longitude.toFixed(4)}° E` : "—",
-              type: (c.category || "other").toUpperCase(),
+              type: c.category.toUpperCase(),
               typeColor: categoryColor(c.category),
               raw: c,
             }))
@@ -253,7 +264,7 @@ function AdminManagementPage() {
                 rawName: c.name,
                 desc: c.description || c.name,
                 incidents: c.report_count || 0,
-                priority: (c.priority || "medium").toUpperCase() + " PRIORITY",
+                priority: (c.priority || "medium").toUpperCase(),
                 prioColor: priorityColor(c.priority),
                 borderColor: priorityBorder(c.priority),
                 raw: c,
@@ -291,7 +302,7 @@ function AdminManagementPage() {
           location: c.address || "—",
           lat: c.location?.latitude != null ? `${c.location.latitude.toFixed(4)}° N` : "—",
           lng: c.location?.longitude != null ? `${c.location.longitude.toFixed(4)}° E` : "—",
-          type: (c.category || "other").toUpperCase(),
+          type: c.category.toUpperCase(),
           typeColor: categoryColor(c.category),
           raw: c,
         }))
@@ -300,6 +311,50 @@ function AdminManagementPage() {
       /* ignore */
     }
   }, [])
+
+  // Canonical category groups with aliases for matching
+  const CATEGORY_GROUPS = [
+    { key: "", label: "All", aliases: [] },
+    { key: "hospital", label: "Medical", aliases: ["hospital", "medical"] },
+    { key: "police", label: "Police", aliases: ["police", "pnp"] },
+    { key: "wcpd", label: "WCPD", aliases: ["wcpd"] },
+    { key: "fire", label: "Fire", aliases: ["fire"] },
+    { key: "rescue", label: "Rescue", aliases: ["rescue"] },
+    { key: "dswd", label: "DSWD", aliases: ["dswd"] },
+    { key: "vawc", label: "VAWC", aliases: ["vawc"] },
+    { key: "emergency", label: "Emergency", aliases: ["emergency"] },
+    { key: "disaster", label: "Disaster", aliases: ["disaster"] },
+  ]
+
+  // Precompute counts for each canonical group from `directories`
+  const groupCounts = useMemo(() => {
+    const counts = {}
+    CATEGORY_GROUPS.forEach((g) => {
+      if (!g.aliases || g.aliases.length === 0) {
+        counts[g.key] = directories.length
+      } else {
+        counts[g.key] = directories.filter((dir) => g.aliases.includes((dir.type || "").toLowerCase())).length
+      }
+    })
+    return counts
+  }, [directories])
+
+  const PRIORITY_LEVELS = [
+    { key: "", label: "All" },
+    { key: "critical", label: "Critical" },
+    { key: "high", label: "High" },
+    { key: "medium", label: "Medium" },
+    { key: "low", label: "Low" },
+  ]
+
+  const GLOBAL_TAGS = [
+    { key: "urgent", label: "Urgent" },
+    { key: "first-response", label: "First-Response" },
+    { key: "escalated", label: "Escalated" },
+    { key: "night-shift", label: "Night-Shift" },
+    { key: "legal-review", label: "Legal-Review" },
+    { key: "verified", label: "Verified" },
+  ]
 
   return (
     <AdminLayout activeTab="management">
@@ -343,73 +398,15 @@ function AdminManagementPage() {
                   }}
                   className="w-full bg-[#1f295b] text-white py-3 rounded-xl font-bold text-sm font-['DM_Sans'] shadow-sm hover:bg-[#151c3d] transition-colors"
                 >
-                  New Entry
+                  + New Directory
                 </button>
-                <button className="w-full bg-white text-[#1f295b] py-3 rounded-xl font-bold text-sm font-['DM_Sans'] border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
+                {/* <button className="w-full bg-white text-[#1f295b] py-3 rounded-xl font-bold text-sm font-['DM_Sans'] border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
                   Export CSV
-                </button>
+                </button> */}
               </div>
             </div>
 
-            {/* Categories Box */}
-            <div className="bg-white rounded-2xl shadow-[0px_8px_24px_rgba(149,157,165,0.1)] border border-slate-100 overflow-hidden">
-              <div className="p-4 border-b border-slate-100">
-                <h3 className="text-slate-400 text-xs font-bold font-['DM_Sans']">Categories</h3>
-              </div>
-              <div className="divide-y divide-slate-100">
-                <div
-                  onClick={() => setDirFilter("emergency")}
-                  className={`p-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${dirFilter === "emergency" ? "bg-slate-50 font-bold" : ""}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-1.5 bg-blue-50 rounded-md text-[#1f295b]">
-                      <AlertTriangle size={16} />
-                    </div>
-                    <span className="text-[#1f295b] font-bold text-sm font-['DM_Sans']">Emergency</span>
-                  </div>
-                  <span className="px-2 py-1 bg-[#1f295b] text-white text-[10px] font-bold rounded-full">
-                    {directories.filter((d) => d.type === "EMERGENCY").length}
-                  </span>
-                </div>
-                <div
-                  onClick={() => setDirFilter("medical")}
-                  className={`p-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${dirFilter === "medical" ? "bg-slate-50 font-bold" : ""}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-1.5 bg-slate-50 rounded-md text-[#1f295b]">
-                      <Activity size={16} />
-                    </div>
-                    <span className="text-[#1f295b] font-bold text-sm font-['DM_Sans']">Medical / Hospital</span>
-                  </div>
-                  <span className="text-slate-500 text-xs font-medium">
-                    {directories.filter((d) => d.type === "MEDICAL" || d.type === "HOSPITAL").length}
-                  </span>
-                </div>
-                <div
-                  onClick={() => setDirFilter("pnp")}
-                  className={`p-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${dirFilter === "pnp" ? "bg-slate-50 font-bold" : ""}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-1.5 bg-slate-50 rounded-md text-[#1f295b]">
-                      <Settings2 size={16} />
-                    </div>
-                    <span className="text-[#1f295b] font-bold text-sm font-['DM_Sans']">Police / PNP</span>
-                  </div>
-                  <span className="text-slate-500 text-xs font-medium">
-                    {directories.filter((d) => d.type === "POLICE" || d.type === "PNP").length}
-                  </span>
-                </div>
-                <div
-                  onClick={() => setDirFilter("")}
-                  className="p-3.5 flex items-center gap-3 hover:bg-slate-50 transition-colors cursor-pointer"
-                >
-                  <div className="p-1.5 bg-slate-50 rounded-md text-[#1f295b]">
-                    <Tag size={16} />
-                  </div>
-                  <span className="text-[#1f295b] font-bold text-sm font-['DM_Sans']">Show All Labels</span>
-                </div>
-              </div>
-            </div>
+            {/* Removed the static category box — use the filter pills below for categorization. */}
 
             {/* Search + Filters */}
             <div className="space-y-3">
@@ -423,32 +420,28 @@ function AdminManagementPage() {
                   className="w-full bg-white border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-xs font-medium font-['DM_Sans'] outline-none focus:border-[#1f295b] shadow-[0px_8px_24px_rgba(149,157,165,0.05)]"
                 />
               </div>
-              {/* Category filter chips */}
+              {/* Category filter chips — canonicalized and deduplicated. */}
               <div className="flex gap-2 flex-wrap">
-                {[
-                  { key: "", label: "All" },
-                  { key: "hospital", label: "Hospital" },
-                  { key: "medical", label: "Medical" },
-                  { key: "police", label: "Police" },
-                  { key: "pnp", label: "PNP" },
-                  { key: "wcpd", label: "WCPD" },
-                  { key: "fire", label: "Fire" },
-                  { key: "rescue", label: "Rescue" },
-                  { key: "dswd", label: "DSWD" },
-                  { key: "vawc", label: "VAWC" },
-                  { key: "emergency", label: "Emergency" },
-                  { key: "disaster", label: "Disaster" },
-                ].map((f) => (
+                {CATEGORY_GROUPS.map((g) => (
                   <button
-                    key={f.key}
-                    onClick={() => setDirFilter(f.key)}
+                    key={g.key}
+                    onClick={() => setDirFilter(g.key)}
                     className={`px-3 py-1.5 rounded-full text-[10px] font-bold font-['DM_Sans'] uppercase transition-colors whitespace-nowrap ${
-                      dirFilter === f.key
+                      dirFilter === g.key
                         ? "bg-[#1f295b] text-white shadow-sm"
                         : "bg-white text-slate-500 border border-slate-200 hover:border-[#1f295b] hover:text-[#1f295b]"
                     }`}
                   >
-                    {f.label}
+                    <span className="inline-flex items-center gap-2">
+                      <span>{g.label}</span>
+                      <span
+                        className={`ml-1 inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          dirFilter === g.key ? "bg-white text-[#1f295b]" : "bg-slate-100 text-slate-600"
+                        }`}
+                      >
+                        {groupCounts[g.key] ?? 0}
+                      </span>
+                    </span>
                   </button>
                 ))}
               </div>
@@ -465,8 +458,30 @@ function AdminManagementPage() {
                     (dir.name || "").toLowerCase().includes(q) ||
                     (dir.phone || "").toLowerCase().includes(q) ||
                     (dir.location || "").toLowerCase().includes(q)
-                  const matchFilter = !dirFilter || (dir.type || "").toLowerCase() === dirFilter.toLowerCase()
-                  return matchSearch && matchFilter
+
+                  const matchFilter = (() => {
+                    if (!dirFilter) return true
+                    const group = CATEGORY_GROUPS.find((g) => g.key === dirFilter)
+                    const t = (dir.type || "").toLowerCase()
+                    if (group) return group.aliases.includes(t)
+                    return t === dirFilter.toLowerCase()
+                  })()
+
+                  const matchTag = (() => {
+                    if (!tagFilter) return true
+                    const rawTags = dir.raw?.tags || dir.raw?.tag || []
+                    if (Array.isArray(rawTags))
+                      return rawTags.map((x) => (x || "").toLowerCase()).includes(tagFilter.toLowerCase())
+                    if (typeof rawTags === "string")
+                      return rawTags
+                        .toLowerCase()
+                        .split(",")
+                        .map((s) => s.trim())
+                        .includes(tagFilter.toLowerCase())
+                    return false
+                  })()
+
+                  return matchSearch && matchFilter && matchTag
                 })
                 .map((dir) => (
                   <div
@@ -544,26 +559,56 @@ function AdminManagementPage() {
 
         {currentTab === "category" && (
           <div className="space-y-4">
-            <button
-                onClick={() => { setEditCategory(null); setIsCatDialogOpen(true) }}
-                className="bg-[#1f295b] text-white px-4 py-2 rounded-full text-[11px] font-bold font-['DM_Sans'] shadow hover:bg-[#151c3d] transition-colors">
-              + New Category
-            </button>
+            <div className="bg-white rounded-2xl p-4 shadow-[0px_8px_24px_rgba(149,157,165,0.1)] border border-slate-100">
+              <h3 className="text-slate-400 text-xs font-bold font-['DM_Sans'] mb-3">Quick Actions</h3>
+              <div className="space-y-2">
+                <button
+                  onClick={() => {
+                    setEditCategory(null)
+                    setIsCatDialogOpen(true)
+                  }}
+                  className="w-full bg-[#1f295b] text-white py-3 rounded-xl font-bold text-sm font-['DM_Sans'] shadow-sm hover:bg-[#151c3d] transition-colors"
+                >
+                  + New Category
+                </button>
+                {/* <button className="w-full bg-white text-[#1f295b] py-3 rounded-xl font-bold text-sm font-['DM_Sans'] border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
+                  Export CSV
+                </button> */}
+              </div>
+            </div>
 
-            <div className="bg-white rounded-2xl p-4 shadow-[0px_8px_24px_rgba(149,157,165,0.1)] border border-slate-100 flex flex-col gap-3">
+            <div className="space-y-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                 <input
                   type="text"
-                  placeholder="Search by name, number, or location..."
+                  placeholder="Search categories..."
                   value={catSearch}
                   onChange={(e) => setCatSearch(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-xs font-medium font-['DM_Sans'] outline-none focus:border-[#1f295b]"
+                  className="w-full bg-white border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-xs font-medium font-['DM_Sans'] outline-none focus:border-[#1f295b] shadow-[0px_8px_24px_rgba(149,157,165,0.05)]"
                 />
               </div>
+              <div className="flex gap-2 flex-wrap mt-3">
+                {PRIORITY_LEVELS.map((p) => (
+                  <button
+                    key={`priority-${p.key}`}
+                    onClick={() => setCatPriorityFilter(p.key)}
+                    className={`px-3 py-1.5 rounded-full text-[10px] font-bold font-['DM_Sans'] uppercase transition-colors whitespace-nowrap ${
+                      catPriorityFilter === p.key
+                        ? "bg-[#1f295b] text-white shadow-sm"
+                        : "bg-white text-slate-500 border border-slate-200 hover:border-[#1f295b] hover:text-[#1f295b]"
+                    }`}
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <span>{p.label}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+              {/* 
               <button className="w-full bg-blue-50/50 text-[#1f295b] py-3 rounded-xl font-bold text-sm font-['DM_Sans'] border border-blue-50 flex items-center justify-center gap-2 hover:bg-blue-100 transition-colors">
                 <Filter size={16} /> Filter
-              </button>
+              </button> */}
             </div>
 
             {/* List */}
@@ -571,45 +616,60 @@ function AdminManagementPage() {
               {categories
                 .filter((cat) => {
                   const q = catSearch.toLowerCase().trim()
-                  if (!q) return true
-                  return (
+                  const matchesSearch =
+                    !q ||
                     (cat.name || "").toLowerCase().includes(q) ||
                     (cat.desc || "").toLowerCase().includes(q) ||
                     (cat.priority || "").toLowerCase().includes(q)
-                  )
+
+                  if (!matchesSearch) return false
+
+                  // Priority filter for Category tab (separate from directory filters)
+                  if (catPriorityFilter) {
+                    const p = (cat.priority || "").toLowerCase()
+                    if (p !== catPriorityFilter) return false
+                  }
+
+                  return true
                 })
                 .map((cat) => (
-                <div
-                  key={cat.id}
-                  className="bg-white rounded-2xl p-4 shadow-[0px_8px_24px_rgba(149,157,165,0.1)] border border-slate-100 flex flex-col"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-slate-400 text-[10px] font-bold font-['DM_Sans']">CAT-ID: {cat.catId}</span>
-                    <div className="flex gap-3 text-slate-400">
-                      <button
-                        onClick={() => { setEditCategory(cat.raw || cat); setIsCatDialogOpen(true) }}
-                        className="hover:text-[#1f295b] transition-colors"
-                      >
-                        <Edit2 size={14} />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteCategory(cat)}
-                        className="hover:text-red-500 transition-colors"
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                  <div
+                    key={cat.id}
+                    className="bg-white rounded-2xl p-4 shadow-[0px_8px_24px_rgba(149,157,165,0.1)] border border-slate-100 flex flex-col relative"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-slate-400 text-[10px] font-bold font-['DM_Sans']">CAT-ID: {cat.catId}</span>
+                      <div className="flex gap-3 text-slate-400">
+                        <button
+                          onClick={() => {
+                            setEditCategory(cat.raw || cat)
+                            setIsCatDialogOpen(true)
+                          }}
+                          className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+                        >
+                          <Edit2 size={14} />
+                        </button>
+                        <button
+                          onClick={() => openConfirmDelete(cat)}
+                          className="p-2 rounded-lg hover:bg-slate-100 transition-colors text-red-500"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                    <h3 className="text-base font-bold font-['DM_Sans'] text-[#1f295b] mb-1">{cat.name}</h3>
+                    <p className="text-slate-500 text-sm font-medium font-['DM_Sans'] mb-3 leading-relaxed">
+                      {cat.desc}
+                    </p>
+
+                    <div className="flex gap-2 mt-auto">
+                      <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded text-[9px] font-bold">
+                        {cat.incidents} INCIDENTS
+                      </span>
+                      <span className={`px-2 py-1 rounded text-[9px] font-bold ${cat.prioColor}`}>{cat.priority}</span>
                     </div>
                   </div>
-                  <h3 className="text-[#1f295b] text-base font-bold font-['DM_Sans'] mb-2">{cat.name}</h3>
-                  <p className="text-slate-500 text-xs font-medium font-['DM_Sans'] mb-4 leading-relaxed">{cat.desc}</p>
-                  <div className="flex gap-2">
-                    <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded text-[9px] font-bold">
-                      {cat.incidents} INCIDENTS
-                    </span>
-                    <span className={`px-2 py-1 rounded text-[9px] font-bold ${cat.prioColor}`}>{cat.priority}</span>
-                  </div>
-                </div>
-              ))}
+                ))}
               {categories.filter((cat) => {
                 const q = catSearch.toLowerCase().trim()
                 if (!q) return false
@@ -618,11 +678,14 @@ function AdminManagementPage() {
                   (cat.desc || "").toLowerCase().includes(q) ||
                   (cat.priority || "").toLowerCase().includes(q)
                 )
-              }).length === 0 && catSearch.trim() && (
-                <div className="text-center py-8">
-                  <p className="text-slate-400 text-xs font-medium font-['DM_Sans']">No categories match "{catSearch}"</p>
-                </div>
-              )}
+              }).length === 0 &&
+                catSearch.trim() && (
+                  <div className="text-center py-8">
+                    <p className="text-slate-400 text-xs font-medium font-['DM_Sans']">
+                      No categories match "{catSearch}"
+                    </p>
+                  </div>
+                )}
             </div>
 
             {/* Global Tags */}
@@ -640,20 +703,19 @@ function AdminManagementPage() {
               </div>
               <div className="p-4 bg-slate-50/50">
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {[
-                    "Urgent \u00d7",
-                    "First-Response \u00d7",
-                    "Escalated \u00d7",
-                    "Night-Shift \u00d7",
-                    "Legal-Review \u00d7",
-                    "Verified \u00d7",
-                  ].map((tag, i) => (
-                    <span
-                      key={i}
-                      className="px-3 py-1.5 bg-white border border-blue-100 text-[#1f295b] text-xs font-semibold rounded-full shadow-sm cursor-pointer hover:border-blue-300 transition-colors"
+                  {GLOBAL_TAGS.map((tag) => (
+                    <button
+                      key={tag.key}
+                      onClick={() => setTagFilter(tagFilter === tag.key ? "" : tag.key)}
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-full shadow-sm transition-colors ${
+                        tagFilter === tag.key
+                          ? "bg-[#1f295b] text-white"
+                          : "bg-white border border-blue-100 text-[#1f295b] hover:border-blue-300"
+                      }`}
                     >
-                      {tag}
-                    </span>
+                      {tag.label}
+                      {tagFilter === tag.key ? " \u00d7" : ""}
+                    </button>
                   ))}
                 </div>
                 <div className="relative mt-2">
@@ -689,6 +751,46 @@ function AdminManagementPage() {
       </div>
 
       {/* Overlay Dialogs could be rendered here later */}
+      {/* Confirmation Modal for destructive actions */}
+      {confirmDelete.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-md bg-white rounded-2xl p-6 shadow-lg">
+            <h3 className="text-[#1f295b] text-lg font-bold mb-2">Confirm Delete</h3>
+            <p className="text-slate-600 text-sm mb-4">
+              Are you sure you want to delete "{confirmDelete.cat?.name}"? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setConfirmDelete({ open: false, cat: null })}
+                className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700"
+              >
+                Cancel
+              </button>
+              <button onClick={() => performDeleteCategory()} className="px-4 py-2 rounded-lg bg-red-500 text-white">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Alert Modal for errors or info */}
+      {alertModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-sm bg-white rounded-2xl p-6 shadow-lg">
+            <h3 className="text-[#1f295b] text-lg font-bold mb-2">Notice</h3>
+            <p className="text-slate-600 text-sm mb-4">{alertModal.message}</p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setAlertModal({ open: false, message: "" })}
+                className="px-4 py-2 rounded-lg bg-[#1f295b] text-white"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <DirectoryAddDialog
         isOpen={isAddDirOpen}
         onClose={() => {
@@ -710,7 +812,10 @@ function AdminManagementPage() {
 
       <CategoryDialog
         isOpen={isCatDialogOpen}
-        onClose={() => { setIsCatDialogOpen(false); setEditCategory(null) }}
+        onClose={() => {
+          setIsCatDialogOpen(false)
+          setEditCategory(null)
+        }}
         onSave={() => refreshCategories()}
         editCategory={editCategory}
       />

@@ -220,7 +220,7 @@ function AdminAuditPage() {
         </div>
       </div>
 
-      <AuditSummaryCards stats={auditStats} />
+      <AuditSummaryCards stats={auditStats} loading={loading} />
 
       <div className="w-full max-w-sm px-4 mt-4 space-y-3">
         <div className="w-full h-12 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center px-4 gap-3 shadow-sm">

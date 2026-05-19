@@ -3,6 +3,7 @@ import { createPortal } from "react-dom"
 import { API_BASE } from "@/lib/api-base"
 import { MapPin, X, CheckCircle, Ban, AlertOctagon, Calendar } from "lucide-react"
 import { useNavigate } from "react-router-dom"
+import Skeleton from "@/components/ui/Skeleton"
 
 function normalizeDate(dateStr) {
   if (!dateStr) return null
@@ -72,11 +73,7 @@ function ReviewOverlay({ report, onClose, onAction }) {
   }
 
   return createPortal(
-    <div
-      className="fixed inset-0 flex items-end justify-center"
-      style={{ zIndex: 999999 }}
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 flex items-end justify-center" style={{ zIndex: 999999 }} onClick={onClose}>
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
@@ -197,6 +194,33 @@ function NeedReviewSection({ reports: initialReports, loading }) {
   const [selectedReport, setSelectedReport] = useState(null)
   const [processingIds, setProcessingIds] = useState(new Set())
 
+  const skeletonItems = Array.from({ length: 3 }, (_, idx) => (
+    <div
+      key={`skeleton-${idx}`}
+      className="w-full bg-white rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border-l-4 border-slate-200 p-4 flex gap-3"
+    >
+      <div className="flex-1">
+        <div className="flex items-center gap-2 mb-1.5">
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="h-4 w-20 rounded-full" />
+          <Skeleton className="h-4 w-16 rounded-full" />
+        </div>
+        <Skeleton className="h-4 w-3/4 mb-2" />
+        <div className="flex items-center gap-2 mb-3">
+          <Skeleton className="h-3 w-3 rounded" />
+          <Skeleton className="h-3 w-24" />
+        </div>
+        <div className="flex items-center justify-between mt-1">
+          <Skeleton className="h-3 w-32" />
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-7 w-16 rounded-lg" />
+            <Skeleton className="h-7 w-16 rounded-lg" />
+          </div>
+        </div>
+      </div>
+    </div>
+  ))
+
   useEffect(() => {
     if (initialReports) setReports(initialReports)
   }, [initialReports])
@@ -243,31 +267,46 @@ function NeedReviewSection({ reports: initialReports, loading }) {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "pending_review": return "border-amber-500"
-      case "in_progress": return "border-blue-900"
-      default: return "border-gray-200"
+      case "pending_review":
+        return "border-amber-500"
+      case "in_progress":
+        return "border-blue-900"
+      default:
+        return "border-gray-200"
     }
   }
 
   const getStatusBadge = (status) => {
     switch (status) {
-      case "pending_review": return "bg-amber-100 text-amber-600"
-      case "in_progress": return "bg-blue-100 text-blue-900"
-      case "verified": return "bg-green-100 text-green-600"       // backend value
-      case "verified_pnp": return "bg-green-100 text-green-600"   // legacy fallback
-      case "dismissed": return "bg-red-100 text-red-500"
-      default: return "bg-gray-100 text-gray-500"
+      case "pending_review":
+        return "bg-amber-100 text-amber-600"
+      case "in_progress":
+        return "bg-blue-100 text-blue-900"
+      case "verified":
+        return "bg-green-100 text-green-600" // backend value
+      case "verified_pnp":
+        return "bg-green-100 text-green-600" // legacy fallback
+      case "dismissed":
+        return "bg-red-100 text-red-500"
+      default:
+        return "bg-gray-100 text-gray-500"
     }
   }
 
   const getStatusLabel = (status) => {
     switch (status) {
-      case "pending_review": return "Pending Review"
-      case "in_progress": return "In Progress"
-      case "verified": return "Resolved"        // backend value
-      case "verified_pnp": return "Resolved"   // legacy fallback
-      case "dismissed": return "Dismissed"
-      default: return status
+      case "pending_review":
+        return "Pending Review"
+      case "in_progress":
+        return "In Progress"
+      case "verified":
+        return "Resolved" // backend value
+      case "verified_pnp":
+        return "Resolved" // legacy fallback
+      case "dismissed":
+        return "Dismissed"
+      default:
+        return status
     }
   }
 
@@ -285,8 +324,8 @@ function NeedReviewSection({ reports: initialReports, loading }) {
         </div>
 
         <div className="space-y-3">
-          {loading && reports.length === 0 ? (
-            <div className="text-center py-8 text-gray-400 text-xs italic font-['DM_Sans']">Loading reports...</div>
+          {loading ? (
+            <div className="space-y-3">{skeletonItems}</div>
           ) : reports.length === 0 ? (
             <div className="text-center py-8 text-gray-400 text-xs italic font-['DM_Sans']">
               No reports currently need review.
@@ -305,7 +344,9 @@ function NeedReviewSection({ reports: initialReports, loading }) {
                       <span className="text-gray-400 text-[10px] font-bold font-['DM_Sans']">
                         {report.reference_code || `SF-${report.id}`}
                       </span>
-                      <span className={`px-2 py-0.5 rounded text-[8px] font-bold font-['DM_Sans'] uppercase tracking-wider ${getStatusBadge(report.status)}`}>
+                      <span
+                        className={`px-2 py-0.5 rounded text-[8px] font-bold font-['DM_Sans'] uppercase tracking-wider ${getStatusBadge(report.status)}`}
+                      >
                         {getStatusLabel(report.status)}
                       </span>
                       <span className="px-2 py-0.5 rounded text-[8px] font-bold font-['DM_Sans'] uppercase tracking-wider bg-gray-100 text-gray-500">
@@ -322,16 +363,22 @@ function NeedReviewSection({ reports: initialReports, loading }) {
                     <div className="flex items-center justify-between mt-1">
                       <span className="text-gray-400 text-[10px] font-['DM_Sans']">
                         {normalizeDate(report.created_at)?.toLocaleDateString("en-US", {
-                          month: "short", day: "numeric", year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
                         }) ?? "—"}
                         {" · "}
                         {normalizeDate(report.created_at)?.toLocaleTimeString("en-US", {
-                          hour: "2-digit", minute: "2-digit",
+                          hour: "2-digit",
+                          minute: "2-digit",
                         }) ?? ""}
                       </span>
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={(e) => { e.stopPropagation(); handleQuickAction(report, "dismiss") }}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleQuickAction(report, "dismiss")
+                          }}
                           disabled={isProcessing}
                           className="h-7 px-3 bg-red-50 hover:bg-red-100 transition-colors rounded-lg text-red-500 text-[10px] font-bold font-['DM_Sans'] flex items-center justify-center min-w-16"
                         >
@@ -340,13 +387,22 @@ function NeedReviewSection({ reports: initialReports, loading }) {
                         <button
                           onClick={(e) => {
                             e.stopPropagation()
-                            if (!report.severity) { setSelectedReport(report); return }
+                            if (!report.severity) {
+                              setSelectedReport(report)
+                              return
+                            }
                             handleQuickAction(report, report.status === "in_progress" ? "verify" : "approve")
                           }}
                           disabled={isProcessing}
                           className="h-7 px-3 bg-[#1f295b] hover:bg-[#151c3d] transition-colors rounded-lg text-white text-[10px] font-bold font-['DM_Sans'] flex items-center justify-center min-w-16"
                         >
-                          {isProcessing ? "..." : !report.severity ? "Review" : report.status === "in_progress" ? "Resolve" : "Approve"}
+                          {isProcessing
+                            ? "..."
+                            : !report.severity
+                              ? "Review"
+                              : report.status === "in_progress"
+                                ? "Resolve"
+                                : "Approve"}
                         </button>
                       </div>
                     </div>
@@ -359,11 +415,7 @@ function NeedReviewSection({ reports: initialReports, loading }) {
       </div>
 
       {selectedReport && (
-        <ReviewOverlay
-          report={selectedReport}
-          onClose={() => setSelectedReport(null)}
-          onAction={handleAction}
-        />
+        <ReviewOverlay report={selectedReport} onClose={() => setSelectedReport(null)} onAction={handleAction} />
       )}
     </>
   )

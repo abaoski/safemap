@@ -6,6 +6,7 @@ import { Search, Filter, Clock, ChevronDown, X, MapPin, Calendar, Tag, AlertCirc
 import AdminLayout from "../../../components/admin/AdminLayout"
 import QueueStatsBar from "./QueueStatsBar"
 import QueueReportCard from "./QueueReportCard"
+import Skeleton from "@/components/ui/Skeleton"
 
 function AdminQueuePage() {
   const location = useLocation()
@@ -37,11 +38,11 @@ function AdminQueuePage() {
     const token = localStorage.getItem("token")
     if (!token) return
     try {
-      const statsRes = await fetch(`${API_BASE}/reports/stats`, { 
+      const statsRes = await fetch(`${API_BASE}/reports/stats`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-        }
+        },
       })
       if (statsRes.status === 401) {
         localStorage.removeItem("token")
@@ -58,7 +59,9 @@ function AdminQueuePage() {
           urgent: data.urgent || 0,
         })
       }
-    } catch (err) { /* ignore */ }
+    } catch (err) {
+      /* ignore */
+    }
   }, [])
 
   useEffect(() => {
@@ -137,8 +140,13 @@ function AdminQueuePage() {
         headers: getAuthHeaders(),
         body: JSON.stringify({ notes: "Moved to in progress", severity }),
       })
-      if (res.ok) { await fetchData(); return true }
-    } catch (err) { /* ignore */ }
+      if (res.ok) {
+        await fetchData()
+        return true
+      }
+    } catch (err) {
+      /* ignore */
+    }
     return false
   }
 
@@ -149,8 +157,13 @@ function AdminQueuePage() {
         headers: getAuthHeaders(),
         body: JSON.stringify({ reason: "Dismissed by admin", severity }),
       })
-      if (res.ok) { await fetchData(); return true }
-    } catch (err) { /* ignore */ }
+      if (res.ok) {
+        await fetchData()
+        return true
+      }
+    } catch (err) {
+      /* ignore */
+    }
     return false
   }
 
@@ -161,8 +174,13 @@ function AdminQueuePage() {
         headers: getAuthHeaders(),
         body: JSON.stringify({ notes: "Resolved by admin" }),
       })
-      if (res.ok) { await fetchData(); return true }
-    } catch (err) { /* ignore */ }
+      if (res.ok) {
+        await fetchData()
+        return true
+      }
+    } catch (err) {
+      /* ignore */
+    }
     return false
   }
 
@@ -229,260 +247,310 @@ function AdminQueuePage() {
     { key: "low", label: "Low", color: "bg-green-400" },
   ]
 
-  // Report Details Modal — rendered via portal so it's never clipped
-  const reportModal = selectedReport && createPortal(
+  const reportSkeletons = Array.from({ length: 4 }, (_, idx) => (
     <div
-      className="fixed inset-0 flex items-end justify-center"
-      style={{ zIndex: 999999 }}
-      onClick={() => setSelectedReport(null)}
+      key={`queue-skeleton-${idx}`}
+      className="w-full bg-white rounded-xl shadow-[0px_0px_3px_0px_rgba(0,0,0,0.08)] border-l-[5px] border-slate-200 p-5"
     >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-3 w-20" />
+          <Skeleton className="h-2.5 w-2.5 rounded-full" />
+        </div>
+        <Skeleton className="h-4 w-16 rounded-full" />
+      </div>
+      <div className="mb-2">
+        <Skeleton className="h-4 w-3/4 mb-2" />
+        <Skeleton className="h-4 w-20 rounded-full" />
+      </div>
+      <div className="flex items-center gap-2 mb-2">
+        <Skeleton className="h-3 w-3 rounded" />
+        <Skeleton className="h-3 w-28" />
+      </div>
+      <Skeleton className="h-3 w-full mb-4" />
+      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div className="flex flex-col gap-1">
+          <Skeleton className="h-3 w-20" />
+          <Skeleton className="h-3 w-16" />
+        </div>
+        <Skeleton className="h-9 w-20 rounded-lg" />
+      </div>
+    </div>
+  ))
 
-      {/* Bottom sheet */}
+  // Report Details Modal — rendered via portal so it's never clipped
+  const reportModal =
+    selectedReport &&
+    createPortal(
       <div
-        className="relative w-full max-w-lg bg-white rounded-t-3xl shadow-2xl flex flex-col max-h-[92vh]"
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 flex items-end justify-center"
+        style={{ zIndex: 999999 }}
+        onClick={() => setSelectedReport(null)}
       >
-        {/* Drag handle */}
-        <div className="flex justify-center pt-3 pb-1 shrink-0">
-          <div className="w-10 h-1 bg-slate-200 rounded-full" />
-        </div>
+        {/* Backdrop */}
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
-        {/* Header */}
-        <div className="px-5 pt-2 pb-4 border-b border-slate-100 flex items-start justify-between shrink-0">
-          <div>
-            <p className="text-slate-400 text-[10px] font-bold font-['DM_Sans'] uppercase tracking-widest mb-0.5">
-              {selectedReport.reference_code || `SF-${selectedReport.id}`}
-            </p>
-            <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-[#1f295b] text-base font-extrabold font-['DM_Sans'] leading-tight pr-6">
-                {selectedReport.title || "Untitled Report"}
-              </h3>
-              {selectedReport.is_urgent && (
-                <span className="flex items-center gap-1 px-2 py-0.5 bg-red-100 border border-red-300 rounded-full text-red-600 text-[9px] font-extrabold uppercase tracking-widest shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                  Urgent
-                </span>
-              )}
-            </div>
-          </div>
-          <button
-            onClick={() => setSelectedReport(null)}
-            className="p-1.5 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors shrink-0"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Scrollable content */}
+        {/* Bottom sheet */}
         <div
-          ref={reviewScrollRef}
-          onScroll={handleReviewScroll}
-          className="p-5 overflow-y-auto flex-1"
+          className="relative w-full max-w-lg bg-white rounded-t-3xl shadow-2xl flex flex-col max-h-[92vh]"
+          onClick={(e) => e.stopPropagation()}
         >
-          <div className="space-y-5">
-            {/* Status & Severity row */}
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex flex-col gap-1.5">
-                <span className="text-[10px] text-gray-400 font-bold uppercase">Status</span>
-                <span
-                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${
-                    selectedReport.status === "pending_review" ? "bg-amber-100 text-amber-600"
-                    : selectedReport.status === "in_progress" ? "bg-blue-100 text-blue-700"
-                    : selectedReport.status === "verified" ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-500"
-                  }`}
-                >
-                  {selectedReport.status.replace(/_/g, " ")}
-                </span>
-              </div>
-              <div className="flex flex-col items-end gap-1.5">
-                <span className="text-[10px] text-gray-400 font-bold uppercase">Severity</span>
-                <div className="flex items-center gap-1.5">
-                  <div className={`w-2.5 h-2.5 rounded-full ${
-                    selectedReport.severity === "critical" ? "bg-red-500"
-                    : selectedReport.severity === "high" ? "bg-orange-500"
-                    : selectedReport.severity === "medium" ? "bg-amber-400"
-                    : selectedReport.severity === "low" ? "bg-green-400"
-                    : "bg-slate-400"
-                  }`} />
-                  <span className="text-xs font-bold text-gray-700 capitalize">
-                    {selectedReport.severity || "unassigned"}
+          {/* Drag handle */}
+          <div className="flex justify-center pt-3 pb-1 shrink-0">
+            <div className="w-10 h-1 bg-slate-200 rounded-full" />
+          </div>
+
+          {/* Header */}
+          <div className="px-5 pt-2 pb-4 border-b border-slate-100 flex items-start justify-between shrink-0">
+            <div>
+              <p className="text-slate-400 text-[10px] font-bold font-['DM_Sans'] uppercase tracking-widest mb-0.5">
+                {selectedReport.reference_code || `SF-${selectedReport.id}`}
+              </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-[#1f295b] text-base font-extrabold font-['DM_Sans'] leading-tight pr-6">
+                  {selectedReport.title || "Untitled Report"}
+                </h3>
+                {selectedReport.is_urgent && (
+                  <span className="flex items-center gap-1 px-2 py-0.5 bg-red-100 border border-red-300 rounded-full text-red-600 text-[9px] font-extrabold uppercase tracking-widest shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                    Urgent
                   </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Title & Category */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-gray-400">
-                <Tag className="w-3.5 h-3.5" />
-                <span className="text-[10px] font-bold uppercase">Title & Category</span>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                <h4 className="text-zinc-800 font-bold text-sm mb-1">{selectedReport.title || "Untitled Report"}</h4>
-                <p className="text-[10px] text-gray-500 font-bold uppercase">
-                  {selectedReport.category?.replace(/_/g, " ")}
-                </p>
-              </div>
-            </div>
-
-            {/* Description */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-gray-400">
-                <AlertCircle className="w-3.5 h-3.5" />
-                <span className="text-[10px] font-bold uppercase">Description</span>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 text-gray-600 text-sm leading-relaxed italic">
-                &ldquo;{selectedReport.description}&rdquo;
-              </div>
-            </div>
-
-            {/* Contact Phone — only shown for urgent reports */}
-            {selectedReport.is_urgent && (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-red-400">
-                  <Phone className="w-3.5 h-3.5" />
-                  <span className="text-[10px] font-bold uppercase text-red-500">Reporter Contact</span>
-                </div>
-                <div className="bg-red-50 p-4 rounded-xl border border-red-200 flex items-center gap-3">
-                  <Phone className="w-4 h-4 text-red-500 shrink-0" />
-                  <span className="text-red-700 font-bold text-sm">
-                    {selectedReport.contact_phone || "—"}
-                  </span>
-                  {selectedReport.contact_phone && (
-                    <a
-                      href={`tel:${selectedReport.contact_phone}`}
-                      className="ml-auto px-3 py-1 bg-red-600 text-white text-[10px] font-bold rounded-lg hover:bg-red-700 transition-colors"
-                    >
-                      Call
-                    </a>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Location */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-gray-400">
-                <MapPin className="w-3.5 h-3.5" />
-                <span className="text-[10px] font-bold uppercase">Location</span>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-[10px] text-gray-400 font-bold">BARANGAY</span>
-                  <span className="text-xs font-bold text-gray-700">{selectedReport.location?.barangay || "—"}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-[10px] text-gray-400 font-bold">CITY</span>
-                  <span className="text-xs font-bold text-gray-700">{selectedReport.location?.city || "General Santos City"}</span>
-                </div>
-                {selectedReport.location?.address && (
-                  <div className="pt-2 border-t border-gray-200">
-                    <span className="text-[10px] text-gray-400 font-bold block mb-1">ADDRESS</span>
-                    <p className="text-xs text-gray-600">{selectedReport.location.address}</p>
-                  </div>
                 )}
               </div>
             </div>
+            <button
+              onClick={() => setSelectedReport(null)}
+              className="p-1.5 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors shrink-0"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
 
-            {/* Date */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-gray-400">
-                <Calendar className="w-3.5 h-3.5" />
-                <span className="text-[10px] font-bold uppercase">Submission Date</span>
+          {/* Scrollable content */}
+          <div ref={reviewScrollRef} onScroll={handleReviewScroll} className="p-5 overflow-y-auto flex-1">
+            <div className="space-y-5">
+              {/* Status & Severity row */}
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[10px] text-gray-400 font-bold uppercase">Status</span>
+                  <span
+                    className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${
+                      selectedReport.status === "pending_review"
+                        ? "bg-amber-100 text-amber-600"
+                        : selectedReport.status === "in_progress"
+                          ? "bg-blue-100 text-blue-700"
+                          : selectedReport.status === "verified"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-500"
+                    }`}
+                  >
+                    {selectedReport.status.replace(/_/g, " ")}
+                  </span>
+                </div>
+                <div className="flex flex-col items-end gap-1.5">
+                  <span className="text-[10px] text-gray-400 font-bold uppercase">Severity</span>
+                  <div className="flex items-center gap-1.5">
+                    <div
+                      className={`w-2.5 h-2.5 rounded-full ${
+                        selectedReport.severity === "critical"
+                          ? "bg-red-500"
+                          : selectedReport.severity === "high"
+                            ? "bg-orange-500"
+                            : selectedReport.severity === "medium"
+                              ? "bg-amber-400"
+                              : selectedReport.severity === "low"
+                                ? "bg-green-400"
+                                : "bg-slate-400"
+                      }`}
+                    />
+                    <span className="text-xs font-bold text-gray-700 capitalize">
+                      {selectedReport.severity || "unassigned"}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex justify-between">
-                <span className="text-xs font-bold text-gray-700">
-                  {new Date((/Z|[+-]\d{2}:\d{2}$/.test(selectedReport.created_at) ? selectedReport.created_at : selectedReport.created_at + "Z")).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-                </span>
-                <span className="text-xs font-bold text-gray-400">
-                  {new Date((/Z|[+-]\d{2}:\d{2}$/.test(selectedReport.created_at) ? selectedReport.created_at : selectedReport.created_at + "Z")).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
-                </span>
-              </div>
-            </div>
 
-            {/* Severity picker — only for pending_review */}
-            {selectedReport?.status === "pending_review" && (
-              <div className="space-y-2 pt-1">
+              {/* Title & Category */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-gray-400">
+                  <Tag className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-bold uppercase">Title & Category</span>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                  <h4 className="text-zinc-800 font-bold text-sm mb-1">{selectedReport.title || "Untitled Report"}</h4>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase">
+                    {selectedReport.category?.replace(/_/g, " ")}
+                  </p>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="space-y-2">
                 <div className="flex items-center gap-2 text-gray-400">
                   <AlertCircle className="w-3.5 h-3.5" />
-                  <span className="text-[10px] font-bold uppercase">Severity <span className="text-red-400">(Required)</span></span>
+                  <span className="text-[10px] font-bold uppercase">Description</span>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {SEVERITY_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.key}
-                      type="button"
-                      onClick={() => setSelectedSeverity(opt.key)}
-                      className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold uppercase transition-colors ${
-                        selectedSeverity === opt.key
-                          ? "border-[#1f295b] bg-[#eef2ff] text-[#1f295b]"
-                          : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
-                      }`}
-                    >
-                      <span className={`h-2.5 w-2.5 rounded-full ${opt.color}`} />
-                      {opt.label}
-                    </button>
-                  ))}
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 text-gray-600 text-sm leading-relaxed italic">
+                  &ldquo;{selectedReport.description}&rdquo;
                 </div>
-                <p className="text-[10px] text-gray-400">Select a severity level to enable actions.</p>
               </div>
-            )}
 
-            {/* Actions */}
-            <div className="space-y-3 pt-4 border-t border-gray-100 pb-4">
-              {selectedReport?.status === "pending_review" && (
-                <p className="text-[10px] text-gray-400 italic">
-                  {!hasScrolled
-                    ? "Scroll through all details before taking action."
-                    : selectedSeverity ? "Ready to take action." : "Select a severity level above."}
-                </p>
-              )}
-
-              {selectedReport?.status === "pending_review" && (
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => handleReviewAction("dismiss")}
-                    disabled={!hasScrolled || !selectedSeverity || !!actionLoading}
-                    className="flex-1 py-3.5 bg-red-50 text-red-600 text-xs font-bold uppercase tracking-wider rounded-2xl hover:bg-red-100 active:scale-95 transition-all disabled:opacity-40"
-                  >
-                    {actionLoading === "dismiss" ? "Dismissing..." : "Dismiss"}
-                  </button>
-                  <button
-                    onClick={() => handleReviewAction("approve")}
-                    disabled={!hasScrolled || !selectedSeverity || !!actionLoading}
-                    className="flex-1 py-3.5 bg-[#1f295b] text-white text-xs font-bold uppercase tracking-wider rounded-2xl hover:bg-[#151c3d] active:scale-95 transition-all disabled:opacity-40"
-                  >
-                    {actionLoading === "approve" ? "Approving..." : "Approve"}
-                  </button>
+              {/* Contact Phone — only shown for urgent reports */}
+              {selectedReport.is_urgent && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-red-400">
+                    <Phone className="w-3.5 h-3.5" />
+                    <span className="text-[10px] font-bold uppercase text-red-500">Reporter Contact</span>
+                  </div>
+                  <div className="bg-red-50 p-4 rounded-xl border border-red-200 flex items-center gap-3">
+                    <Phone className="w-4 h-4 text-red-500 shrink-0" />
+                    <span className="text-red-700 font-bold text-sm">{selectedReport.contact_phone || "—"}</span>
+                    {selectedReport.contact_phone && (
+                      <a
+                        href={`tel:${selectedReport.contact_phone}`}
+                        className="ml-auto px-3 py-1 bg-red-600 text-white text-[10px] font-bold rounded-lg hover:bg-red-700 transition-colors"
+                      >
+                        Call
+                      </a>
+                    )}
+                  </div>
                 </div>
               )}
 
-              {selectedReport?.status === "in_progress" && (
-                <button
-                  onClick={() => handleReviewAction("verify")}
-                  disabled={!!actionLoading}
-                  className="w-full py-3.5 bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider rounded-2xl hover:bg-emerald-700 active:scale-95 transition-all disabled:opacity-50"
-                >
-                  {actionLoading === "verify" ? "Resolving..." : "Resolve Report"}
-                </button>
+              {/* Location */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-gray-400">
+                  <MapPin className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-bold uppercase">Location</span>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] text-gray-400 font-bold">BARANGAY</span>
+                    <span className="text-xs font-bold text-gray-700">{selectedReport.location?.barangay || "—"}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] text-gray-400 font-bold">CITY</span>
+                    <span className="text-xs font-bold text-gray-700">
+                      {selectedReport.location?.city || "General Santos City"}
+                    </span>
+                  </div>
+                  {selectedReport.location?.address && (
+                    <div className="pt-2 border-t border-gray-200">
+                      <span className="text-[10px] text-gray-400 font-bold block mb-1">ADDRESS</span>
+                      <p className="text-xs text-gray-600">{selectedReport.location.address}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Date */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-gray-400">
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-bold uppercase">Submission Date</span>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex justify-between">
+                  <span className="text-xs font-bold text-gray-700">
+                    {new Date(
+                      /Z|[+-]\d{2}:\d{2}$/.test(selectedReport.created_at)
+                        ? selectedReport.created_at
+                        : selectedReport.created_at + "Z"
+                    ).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                  </span>
+                  <span className="text-xs font-bold text-gray-400">
+                    {new Date(
+                      /Z|[+-]\d{2}:\d{2}$/.test(selectedReport.created_at)
+                        ? selectedReport.created_at
+                        : selectedReport.created_at + "Z"
+                    ).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                </div>
+              </div>
+
+              {/* Severity picker — only for pending_review */}
+              {selectedReport?.status === "pending_review" && (
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <AlertCircle className="w-3.5 h-3.5" />
+                    <span className="text-[10px] font-bold uppercase">
+                      Severity <span className="text-red-400">(Required)</span>
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {SEVERITY_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.key}
+                        type="button"
+                        onClick={() => setSelectedSeverity(opt.key)}
+                        className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold uppercase transition-colors ${
+                          selectedSeverity === opt.key
+                            ? "border-[#1f295b] bg-[#eef2ff] text-[#1f295b]"
+                            : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
+                        }`}
+                      >
+                        <span className={`h-2.5 w-2.5 rounded-full ${opt.color}`} />
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-gray-400">Select a severity level to enable actions.</p>
+                </div>
               )}
 
-              <button
-                onClick={() => setSelectedReport(null)}
-                className="w-full py-3 bg-gray-50 text-gray-500 text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-gray-100 transition-colors"
-              >
-                Close
-              </button>
+              {/* Actions */}
+              <div className="space-y-3 pt-4 border-t border-gray-100 pb-4">
+                {selectedReport?.status === "pending_review" && (
+                  <p className="text-[10px] text-gray-400 italic">
+                    {!hasScrolled
+                      ? "Scroll through all details before taking action."
+                      : selectedSeverity
+                        ? "Ready to take action."
+                        : "Select a severity level above."}
+                  </p>
+                )}
+
+                {selectedReport?.status === "pending_review" && (
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => handleReviewAction("dismiss")}
+                      disabled={!hasScrolled || !selectedSeverity || !!actionLoading}
+                      className="flex-1 py-3.5 bg-red-50 text-red-600 text-xs font-bold uppercase tracking-wider rounded-2xl hover:bg-red-100 active:scale-95 transition-all disabled:opacity-40"
+                    >
+                      {actionLoading === "dismiss" ? "Dismissing..." : "Dismiss"}
+                    </button>
+                    <button
+                      onClick={() => handleReviewAction("approve")}
+                      disabled={!hasScrolled || !selectedSeverity || !!actionLoading}
+                      className="flex-1 py-3.5 bg-[#1f295b] text-white text-xs font-bold uppercase tracking-wider rounded-2xl hover:bg-[#151c3d] active:scale-95 transition-all disabled:opacity-40"
+                    >
+                      {actionLoading === "approve" ? "Approving..." : "Approve"}
+                    </button>
+                  </div>
+                )}
+
+                {selectedReport?.status === "in_progress" && (
+                  <button
+                    onClick={() => handleReviewAction("verify")}
+                    disabled={!!actionLoading}
+                    className="w-full py-3.5 bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider rounded-2xl hover:bg-emerald-700 active:scale-95 transition-all disabled:opacity-50"
+                  >
+                    {actionLoading === "verify" ? "Resolving..." : "Resolve Report"}
+                  </button>
+                )}
+
+                <button
+                  onClick={() => setSelectedReport(null)}
+                  className="w-full py-3 bg-gray-50 text-gray-500 text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-gray-100 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>,
-    document.body
-  )
+      </div>,
+      document.body
+    )
 
   return (
     <AdminLayout activeTab="queue">
@@ -492,7 +560,10 @@ function AdminQueuePage() {
           <h1 className="text-zinc-800 text-2xl font-extrabold font-['DM_Sans']">Report Queue</h1>
           <div className="px-3 py-1.5 bg-amber-50 rounded-full border border-amber-200 flex items-center gap-1.5">
             <Clock className="w-3 h-3 text-amber-500" />
-            <span className="text-amber-600 text-[11px] font-semibold font-['DM_Sans']">{stats.pending} Pending</span>
+            <span className="text-amber-600 text-[11px] font-semibold font-['DM_Sans'] inline-flex items-center gap-1">
+              {loading ? <Skeleton className="h-3 w-6" /> : stats.pending}
+              Pending
+            </span>
           </div>
         </div>
       </div>
@@ -503,6 +574,7 @@ function AdminQueuePage() {
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
         setSearchQuery={setSearchQuery}
+        loading={loading}
       />
 
       {/* Search & Filters */}
@@ -539,7 +611,9 @@ function AdminQueuePage() {
                 key={cat}
                 onClick={() => setCategoryFilter(cat)}
                 className={`px-3 py-1.5 rounded-full text-[10px] font-bold font-['DM_Sans'] uppercase transition-colors ${
-                  categoryFilter === cat ? "bg-[#1f295b] text-white" : "bg-white text-gray-500 border border-gray-200 hover:border-gray-300"
+                  categoryFilter === cat
+                    ? "bg-[#1f295b] text-white"
+                    : "bg-white text-gray-500 border border-gray-200 hover:border-gray-300"
                 }`}
               >
                 {cat ? cat.replace(/_/g, " ") : "All Categories"}
@@ -552,7 +626,7 @@ function AdminQueuePage() {
       {/* Report list — single column, tab-like */}
       <div className="w-full max-w-sm px-4 mt-5 space-y-3">
         {loading ? (
-          <div className="text-center py-12 text-gray-400 text-sm font-['DM_Sans']">Loading reports...</div>
+          <div className="space-y-3">{reportSkeletons}</div>
         ) : filteredReports.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-300 text-4xl mb-3">📋</div>

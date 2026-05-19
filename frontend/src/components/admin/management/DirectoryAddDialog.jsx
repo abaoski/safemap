@@ -132,6 +132,17 @@ export default function DirectoryAddDialog({ isOpen, onClose, onAdd, editContact
     setErrors((prev) => ({ ...prev, coords: undefined }))
   }, [])
 
+  const handleMapPick = useCallback(
+    (lat, lng) => {
+      updateCoords(lat, lng)
+      const coordsKey = `${lat.toFixed(6)},${lng.toFixed(6)}`
+      if (lastGeocodedCoordsRef.current === coordsKey) return
+      lastGeocodedCoordsRef.current = coordsKey
+      reverseGeocode(lat, lng)
+    },
+    [reverseGeocode, updateCoords]
+  )
+
   useEffect(() => {
     if (isOpen) {
       if (editContact) {
@@ -275,7 +286,10 @@ export default function DirectoryAddDialog({ isOpen, onClose, onAdd, editContact
       <div className="bg-white rounded-3xl w-full max-w-[680px] overflow-hidden shadow-2xl relative">
         {/* Header */}
         <div className="bg-white p-5 text-center relative border-b border-slate-200">
-          <button onClick={onClose} className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition-colors">
+          <button
+            onClick={onClose}
+            className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition-colors"
+          >
             <X size={20} />
           </button>
           <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -379,42 +393,34 @@ export default function DirectoryAddDialog({ isOpen, onClose, onAdd, editContact
               />
             </div>
 
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <label className="block text-slate-700 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wider mb-1.5">
-                  Latitude
-                </label>
-                <input
-                  type="text"
-                  placeholder="Lat"
-                  value={formData.lat}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      lat: e.target.value,
-                    })
-                  }
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium focus:border-[#1f295b] outline-none shadow-sm"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="block text-slate-700 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wider mb-1.5">
-                  Longitude
-                </label>
-                <input
-                  type="text"
-                  placeholder="Lng"
-                  value={formData.lng}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      lng: e.target.value,
-                    })
-                  }
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium focus:border-[#1f295b] outline-none shadow-sm"
-                />
-              </div>
+            <div className="flex items-center justify-between text-[10px] font-semibold text-slate-500 mb-2">
+              <span>Pin the location on the map to auto-fill the address.</span>
+              {isResolvingAddress && (
+                <span className="flex items-center gap-1 text-slate-500">
+                  <Loader2 size={12} className="animate-spin" /> Updating
+                </span>
+              )}
             </div>
+            <div className="h-44 w-full rounded-xl overflow-hidden border border-slate-200">
+              <Map center={[markerLng, markerLat]} zoom={14} className="h-full w-full" theme="light">
+                <MapControls
+                  position="top-right"
+                  showLocate
+                  onLocate={({ latitude, longitude }) => handleMapPick(latitude, longitude)}
+                />
+                <MapClickCapture onPick={handleMapPick} />
+                <MapMarker
+                  longitude={markerLng}
+                  latitude={markerLat}
+                  draggable
+                  onDragEnd={({ lat, lng }) => handleMapPick(lat, lng)}
+                >
+                  <MarkerContent />
+                </MapMarker>
+              </Map>
+            </div>
+            {errors.coords && <p className="text-[10px] text-red-600 font-medium mt-2">{errors.coords}</p>}
+            {geocodeHint && <p className="text-[10px] text-slate-500 font-medium mt-2">{geocodeHint}</p>}
           </div>
 
           <div className="px-6 pt-3 pb-4 bg-white border-t border-slate-100 shrink-0">
