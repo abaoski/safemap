@@ -35,15 +35,15 @@ export default function DirectoryMapDialog({ isOpen, onClose, contact }) {
     >
       <div className="bg-white rounded-3xl w-full max-w-90 h-[calc(100dvh-1.5rem)] sm:h-auto sm:max-h-[92vh] overflow-hidden shadow-2xl relative flex flex-col my-auto border border-slate-100">
         {/* Header */}
-        <div className="bg-[#1f295b] p-5 text-center relative border-b-4 border-blue-400 shrink-0">
-          <button onClick={onClose} className="absolute right-4 top-4 text-white/70 hover:text-white transition-colors">
+        <div className="bg-white p-5 text-center relative border-b border-slate-200 shrink-0">
+          <button onClick={onClose} className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition-colors">
             <X size={20} />
           </button>
-          <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Building2 className="text-white w-6 h-6" />
+          <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
+            <Building2 className="text-[#1f295b] w-6 h-6" />
           </div>
-          <h2 className="text-white text-lg font-bold font-['DM_Sans'] tracking-wide">{contact.name}</h2>
-          <p className="text-[#a4b4f0] text-xs mt-1 font-medium capitalize">
+          <h2 className="text-slate-900 text-lg font-bold font-['DM_Sans'] tracking-wide">{contact.name}</h2>
+          <p className="text-slate-500 text-xs mt-1 font-medium capitalize">
             {contact.category || contact.type || "Other"} Contact
           </p>
         </div>

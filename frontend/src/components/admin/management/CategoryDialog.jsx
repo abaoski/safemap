@@ -109,20 +109,20 @@ export default function CategoryDialog({ isOpen, onClose, onSave, editCategory }
     <div className="fixed inset-0 z-99999 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
       <div className="bg-white rounded-3xl w-full max-w-[680px] overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="bg-[#1f295b] p-5 text-center relative border-b-4 border-blue-400">
+        <div className="bg-white p-5 text-center relative border-b border-slate-200">
           <button
             onClick={onClose}
-            className="absolute right-4 top-4 text-white/70 hover:text-white transition-colors"
+            className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition-colors"
           >
             <X size={20} />
           </button>
-          <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Tag className="text-white w-6 h-6" />
+          <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
+            <Tag className="text-[#1f295b] w-6 h-6" />
           </div>
-          <h2 className="text-white text-lg font-bold font-['DM_Sans'] tracking-wide">
+          <h2 className="text-slate-900 text-lg font-bold font-['DM_Sans'] tracking-wide">
             {editCategory ? "Edit Category" : "New Category"}
           </h2>
-          <p className="text-[#a4b4f0] text-xs mt-1 font-medium">
+          <p className="text-slate-500 text-xs mt-1 font-medium">
             {editCategory ? "Update an existing report category" : "Add a new incident report category"}
           </p>
         </div>
