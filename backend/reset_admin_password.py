@@ -1,8 +1,3 @@
-"""
-SafeMap-PH Admin Password Reset Script
-Reset the admin user password
-"""
-
 import os
 import getpass
 import re

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { X, Tag, Loader2 } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx"
 import { API_BASE } from "@/lib/api-base"
 
 const PRIORITY_OPTIONS = [
@@ -106,7 +107,7 @@ export default function CategoryDialog({ isOpen, onClose, onSave, editCategory }
 
   return (
     <div className="fixed inset-0 z-99999 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-      <div className="bg-white rounded-3xl w-full max-w-85 overflow-hidden shadow-2xl">
+      <div className="bg-white rounded-3xl w-full max-w-[680px] overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="bg-[#1f295b] p-5 text-center relative border-b-4 border-blue-400">
           <button
@@ -140,6 +141,9 @@ export default function CategoryDialog({ isOpen, onClose, onSave, editCategory }
               onChange={(e) => handleLabelChange(e.target.value)}
               className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-800 placeholder:font-normal focus:border-[#1f295b] focus:ring-1 focus:ring-[#1f295b] outline-none transition-all shadow-sm"
             />
+            <p className="text-slate-400 text-xs mt-2 font-medium font-['DM_Sans']">
+              The category name/key is generated automatically from the label.
+            </p>
             {errors.label && <p className="text-[10px] text-red-600 font-medium mt-1">{errors.label}</p>}
           </div>
 
@@ -148,17 +152,18 @@ export default function CategoryDialog({ isOpen, onClose, onSave, editCategory }
             <label className="block text-slate-700 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wider mb-1.5">
               Priority
             </label>
-            <select
-              value={formData.priority}
-              onChange={(e) => setFormData((prev) => ({ ...prev, priority: e.target.value }))}
-              className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-[#1f295b] bg-slate-50 focus:border-[#1f295b] focus:ring-1 focus:ring-[#1f295b] outline-none transition-all shadow-sm appearance-none"
-            >
-              {PRIORITY_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
+            <Select value={formData.priority} onValueChange={(value) => setFormData((prev) => ({ ...prev, priority: value }))}>
+              <SelectTrigger className="w-full h-12 border border-slate-200 rounded-xl px-4 text-sm font-bold text-slate-800 bg-white focus:border-[#1f295b] focus:ring-1 focus:ring-[#1f295b] outline-none transition-all shadow-sm">
+                <SelectValue placeholder="Select priority" />
+              </SelectTrigger>
+              <SelectContent className="z-[100000] w-full min-w-full">
+                {PRIORITY_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>
+                    {o.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Description */}

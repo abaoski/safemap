@@ -1,5 +1,6 @@
 import { useEffect, useId, useMemo, useState } from "react"
 import { Map, useMap, MapMarker, MarkerContent, MarkerTooltip, MarkerPopup } from "@/components/ui/map"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx"
 import { Settings2, Sliders, Filter, Sparkles, Layers, ChevronDown, ChevronUp, Eye } from "lucide-react"
 
 // Color configurations for categories and severities
@@ -363,17 +364,18 @@ function IncidentHeatmapView({ heatPoints = [] }) {
               <label className="text-slate-400 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
                 <Filter className="w-3 h-3 text-slate-400" /> Severity Filter
               </label>
-              <select
-                value={selectedSeverity}
-                onChange={(e) => setSelectedSeverity(e.target.value)}
-                className="w-full text-xs bg-slate-50 border border-slate-200/80 rounded-lg px-2.5 py-2 text-zinc-800 font-bold focus:outline-none focus:ring-1 focus:ring-[#1e3a8a]"
-              >
-                <option value="all">🔴 All Severities</option>
-                <option value="critical">Critical Severity Only</option>
-                <option value="high">High Severity Only</option>
-                <option value="medium">Medium Severity Only</option>
-                <option value="low">Low Severity Only</option>
-              </select>
+              <Select value={selectedSeverity} onValueChange={setSelectedSeverity}>
+                <SelectTrigger className="w-full text-xs bg-slate-50 border border-slate-200/80 rounded-lg px-2.5 py-2 text-zinc-800 font-bold">
+                  <SelectValue placeholder="All Severities" />
+                </SelectTrigger>
+                <SelectContent className="w-full">
+                  <SelectItem value="all">🔴 All Severities</SelectItem>
+                  <SelectItem value="critical">Critical Severity Only</SelectItem>
+                  <SelectItem value="high">High Severity Only</SelectItem>
+                  <SelectItem value="medium">Medium Severity Only</SelectItem>
+                  <SelectItem value="low">Low Severity Only</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Filter Category */}
@@ -381,18 +383,19 @@ function IncidentHeatmapView({ heatPoints = [] }) {
               <label className="text-slate-400 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
                 <Filter className="w-3 h-3 text-slate-400" /> Category Filter
               </label>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full text-xs bg-slate-50 border border-slate-200/80 rounded-lg px-2.5 py-2 text-zinc-800 font-bold focus:outline-none focus:ring-1 focus:ring-[#1e3a8a]"
-              >
-                <option value="all">🔍 All Categories</option>
-                <option value="police">Police / PNP</option>
-                <option value="medical">Medical / Hospital</option>
-                <option value="fire">Fire Stations</option>
-                <option value="rescue">Rescue Stations</option>
-                <option value="other">Other Incidents</option>
-              </select>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-full text-xs bg-slate-50 border border-slate-200/80 rounded-lg px-2.5 py-2 text-zinc-800 font-bold">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent className="w-full">
+                  <SelectItem value="all">🔍 All Categories</SelectItem>
+                  <SelectItem value="police">Police / PNP</SelectItem>
+                  <SelectItem value="medical">Medical / Hospital</SelectItem>
+                  <SelectItem value="fire">Fire Stations</SelectItem>
+                  <SelectItem value="rescue">Rescue Stations</SelectItem>
+                  <SelectItem value="other">Other Incidents</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Heatmap Parameters */}

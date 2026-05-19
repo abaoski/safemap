@@ -581,7 +581,7 @@ function AdminManagementPage() {
                 .map((cat) => (
                 <div
                   key={cat.id}
-                  className={`bg-white rounded-2xl p-5 shadow-[0px_8px_24px_rgba(149,157,165,0.1)] border-l-4 ${cat.borderColor} border-y border-r border-y-slate-100 border-r-slate-100 flex flex-col`}
+                  className="bg-white rounded-2xl p-4 shadow-[0px_8px_24px_rgba(149,157,165,0.1)] border border-slate-100 flex flex-col"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-slate-400 text-[10px] font-bold font-['DM_Sans']">CAT-ID: {cat.catId}</span>
