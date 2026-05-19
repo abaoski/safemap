@@ -90,15 +90,9 @@ export default function ReviewSubmitPage() {
   }
 
   const mapCategory = (incidentType) => {
-    const mapping = {
-      "Sexual Assault": "sexual_assault",
-      "Physical Abuse": "physical_abuse",
-      "Domestic Violence": "domestic_violence",
-      Stalking: "stalking",
-      "Verbal Abuse": "verbal_abuse",
-      "Emotional Abuse": "emotional_abuse",
-    }
-    return mapping[incidentType] || "other"
+    // Convert display label back to snake_case key for the backend
+    // e.g. "Sexual Assault" → "sexual_assault"
+    return incidentType.toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "")
   }
 
   // ── Phone validation ────────────────────────────────────────────────────────
@@ -178,6 +172,19 @@ export default function ReviewSubmitPage() {
 
     setSubmitting(true)
     try {
+      // Extract just the barangay name from the full landmark/address string.
+      // Nominatim returns strings like "Jollibee, Magsaysay Ave, Barangay Lagao, General Santos City, ..."
+      // We look for a segment that starts with "Barangay" (case-insensitive), otherwise fall back to
+      // the first segment of the landmark string so we never send the full address as barangay.
+      const extractBarangay = (landmark) => {
+        if (!landmark) return ""
+        const parts = landmark.split(",").map((p) => p.trim())
+        const brgy = parts.find((p) => /^barangay\b/i.test(p))
+        if (brgy) return brgy
+        // Fallback: return only the first meaningful segment (building / street name)
+        return parts[0] || ""
+      }
+
       const payload = {
         title: data.incidentType,
         description: data.description,
@@ -185,7 +192,7 @@ export default function ReviewSubmitPage() {
         longitude: data.locationCoords.lng,
         category: mapCategory(data.incidentType),
         city: "General Santos",
-        barangay: data.landmark || "",
+        barangay: extractBarangay(data.landmark),
         address: data.landmark || "",
         is_urgent: isUrgent,
         contact_phone: isUrgent ? phone : null,

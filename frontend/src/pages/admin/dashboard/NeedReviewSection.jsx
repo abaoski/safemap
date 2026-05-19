@@ -4,6 +4,12 @@ import { API_BASE } from "@/lib/api-base"
 import { MapPin, X, CheckCircle, Ban, AlertOctagon, Calendar } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
+function normalizeDate(dateStr) {
+  if (!dateStr) return null
+  // Backend returns ISO without 'Z'; append it so JS treats it as UTC
+  return /Z|[+-]\d{2}:\d{2}$/.test(dateStr) ? new Date(dateStr) : new Date(dateStr + "Z")
+}
+
 function ReviewOverlay({ report, onClose, onAction }) {
   const [loading, setLoading] = useState(null)
   const navigate = useNavigate()
@@ -135,7 +141,7 @@ function ReviewOverlay({ report, onClose, onAction }) {
           </div>
           <div className="flex items-center gap-2 text-slate-500 text-xs font-['DM_Sans']">
             <Calendar size={13} className="text-slate-400" />
-            {new Date(report.created_at).toLocaleString()}
+            {normalizeDate(report.created_at)?.toLocaleString() ?? "—"}
           </div>
         </div>
 
@@ -315,7 +321,13 @@ function NeedReviewSection({ reports: initialReports, loading }) {
                     </div>
                     <div className="flex items-center justify-between mt-1">
                       <span className="text-gray-400 text-[10px] font-['DM_Sans']">
-                        {new Date(report.created_at).toLocaleDateString()}
+                        {normalizeDate(report.created_at)?.toLocaleDateString("en-US", {
+                          month: "short", day: "numeric", year: "numeric",
+                        }) ?? "—"}
+                        {" · "}
+                        {normalizeDate(report.created_at)?.toLocaleTimeString("en-US", {
+                          hour: "2-digit", minute: "2-digit",
+                        }) ?? ""}
                       </span>
                       <div className="flex items-center gap-2">
                         <button

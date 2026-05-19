@@ -42,7 +42,9 @@ const SEVERITY_COLORS = {
 
 function formatDate(dateStr) {
   if (!dateStr) return "—"
-  return new Date(dateStr).toLocaleDateString("en-US", {
+  // Append 'Z' if no timezone info so it's treated as UTC
+  const normalized = /Z|[+-]\d{2}:\d{2}$/.test(dateStr) ? dateStr : dateStr + "Z"
+  return new Date(normalized).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -51,7 +53,8 @@ function formatDate(dateStr) {
 
 function formatTime(dateStr) {
   if (!dateStr) return ""
-  return new Date(dateStr).toLocaleTimeString("en-US", {
+  const normalized = /Z|[+-]\d{2}:\d{2}$/.test(dateStr) ? dateStr : dateStr + "Z"
+  return new Date(normalized).toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
   })

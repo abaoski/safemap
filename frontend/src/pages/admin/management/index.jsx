@@ -19,6 +19,7 @@ import { API_BASE } from "@/lib/api-base"
 import AdminLayout from "../../../components/admin/AdminLayout"
 import DirectoryAddDialog from "../../../components/admin/management/DirectoryAddDialog"
 import DirectoryMapDialog from "../../../components/admin/management/DirectoryMapDialog"
+import CategoryDialog from "../../../components/admin/management/CategoryDialog"
 
 const categoryColor = (cat) => {
   const map = {
@@ -67,6 +68,53 @@ function AdminManagementPage() {
   // Category State
   const [categories, setCategories] = useState([])
   const [catSearch, setCatSearch] = useState("")
+  const [isCatDialogOpen, setIsCatDialogOpen] = useState(false)
+  const [editCategory, setEditCategory] = useState(null)
+
+  const refreshCategories = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/reports/categories`)
+      if (!res.ok) return
+      const data = await res.json()
+      const cats = data.categories || []
+      if (cats.length > 0) {
+        setCategories(
+          cats.map((c, i) => ({
+            id: c.id || i,
+            catId: String(c.id || i).padStart(4, "0") + "-C",
+            name: c.label || c.name,
+            rawName: c.name,
+            desc: c.description || c.name,
+            incidents: c.report_count || 0,
+            priority: (c.priority || "medium").toUpperCase() + " PRIORITY",
+            prioColor: priorityColor(c.priority),
+            borderColor: priorityBorder(c.priority),
+            raw: c,
+          }))
+        )
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [])
+
+  const handleDeleteCategory = async (cat) => {
+    if (!confirm(`Delete category "${cat.name}"? This cannot be undone.`)) return
+    const token = localStorage.getItem("token")
+    try {
+      const res = await fetch(`${API_BASE}/reports/categories/${cat.id}`, {
+        method: "DELETE",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+      if (res.ok) refreshCategories()
+      else {
+        const err = await res.json().catch(() => ({}))
+        alert(err.error || "Failed to delete category.")
+      }
+    } catch {
+      alert("Network error. Please try again.")
+    }
+  }
 
   useEffect(() => {
     // Fallback mock data arrays
@@ -202,11 +250,13 @@ function AdminManagementPage() {
                 id: c.id || i,
                 catId: String(c.id || i).padStart(4, "0") + "-C",
                 name: c.label || c.name,
+                rawName: c.name,
                 desc: c.description || c.name,
-                incidents: 0,
+                incidents: c.report_count || 0,
                 priority: (c.priority || "medium").toUpperCase() + " PRIORITY",
                 prioColor: priorityColor(c.priority),
                 borderColor: priorityBorder(c.priority),
+                raw: c,
               }))
             )
           } else {
@@ -494,7 +544,9 @@ function AdminManagementPage() {
 
         {currentTab === "category" && (
           <div className="space-y-4">
-            <button className="bg-[#1f295b] text-white px-4 py-2 rounded-full text-[11px] font-bold font-['DM_Sans'] shadow hover:bg-[#151c3d] transition-colors">
+            <button
+                onClick={() => { setEditCategory(null); setIsCatDialogOpen(true) }}
+                className="bg-[#1f295b] text-white px-4 py-2 rounded-full text-[11px] font-bold font-['DM_Sans'] shadow hover:bg-[#151c3d] transition-colors">
               + New Category
             </button>
 
@@ -524,10 +576,16 @@ function AdminManagementPage() {
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-slate-400 text-[10px] font-bold font-['DM_Sans']">CAT-ID: {cat.catId}</span>
                     <div className="flex gap-3 text-slate-400">
-                      <button className="hover:text-[#1f295b] transition-colors">
+                      <button
+                        onClick={() => { setEditCategory(cat.raw || cat); setIsCatDialogOpen(true) }}
+                        className="hover:text-[#1f295b] transition-colors"
+                      >
                         <Edit2 size={14} />
                       </button>
-                      <button className="hover:text-red-500 transition-colors">
+                      <button
+                        onClick={() => handleDeleteCategory(cat)}
+                        className="hover:text-red-500 transition-colors"
+                      >
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -625,6 +683,13 @@ function AdminManagementPage() {
           setMapContact(null)
         }}
         contact={mapContact}
+      />
+
+      <CategoryDialog
+        isOpen={isCatDialogOpen}
+        onClose={() => { setIsCatDialogOpen(false); setEditCategory(null) }}
+        onSave={() => refreshCategories()}
+        editCategory={editCategory}
       />
     </AdminLayout>
   )

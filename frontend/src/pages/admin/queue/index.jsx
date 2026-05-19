@@ -395,10 +395,10 @@ function AdminQueuePage() {
               </div>
               <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex justify-between">
                 <span className="text-xs font-bold text-gray-700">
-                  {new Date(selectedReport.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                  {new Date((/Z|[+-]\d{2}:\d{2}$/.test(selectedReport.created_at) ? selectedReport.created_at : selectedReport.created_at + "Z")).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                 </span>
                 <span className="text-xs font-bold text-gray-400">
-                  {new Date(selectedReport.created_at).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                  {new Date((/Z|[+-]\d{2}:\d{2}$/.test(selectedReport.created_at) ? selectedReport.created_at : selectedReport.created_at + "Z")).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
                 </span>
               </div>
             </div>

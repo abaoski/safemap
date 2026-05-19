@@ -331,14 +331,14 @@ export default function LocationDetailsPage() {
 
         {/* Victim Gender */}
         <div className="w-full mb-4">
-          <label className="block text-neutral-600 text-xs font-medium font-['DM_Sans'] tracking-tight mb-2">
+          <label className="block text-neutral-600 text-xs font-medium font-['DM_Sans'] tracking-tight mb-1.5">
             Victim Gender
           </label>
           <div className="relative">
             <select
               value={gender}
               onChange={(e) => setGender(e.target.value)}
-              className="w-full h-12 bg-white rounded-xl border border-gray-300 px-4 text-gray-800 text-sm appearance-none cursor-pointer"
+              className="w-full h-10 bg-white rounded-xl border border-gray-300 px-3 pr-8 text-gray-800 text-xs appearance-none cursor-pointer"
             >
               <option value="" disabled>
                 Select Gender
@@ -349,15 +349,9 @@ export default function LocationDetailsPage() {
                 </option>
               ))}
             </select>
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M2.5 4.5L6 8L9.5 4.5"
-                  stroke="#6B7280"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+                <path d="M2.5 4.5L6 8L9.5 4.5" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
           </div>
@@ -365,14 +359,14 @@ export default function LocationDetailsPage() {
 
         {/* Victim Age Group */}
         <div className="w-full mb-4">
-          <label className="block text-neutral-600 text-xs font-medium font-['DM_Sans'] tracking-tight mb-2">
+          <label className="block text-neutral-600 text-xs font-medium font-['DM_Sans'] tracking-tight mb-1.5">
             Victim Age Group
           </label>
           <div className="relative">
             <select
               value={ageGroup}
               onChange={(e) => setAgeGroup(e.target.value)}
-              className="w-full h-12 bg-white rounded-xl border border-gray-300 px-4 text-gray-800 text-sm appearance-none cursor-pointer"
+              className="w-full h-10 bg-white rounded-xl border border-gray-300 px-3 pr-8 text-gray-800 text-xs appearance-none cursor-pointer"
             >
               <option value="" disabled>
                 Select Age Group
@@ -383,15 +377,9 @@ export default function LocationDetailsPage() {
                 </option>
               ))}
             </select>
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M2.5 4.5L6 8L9.5 4.5"
-                  stroke="#6B7280"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+                <path d="M2.5 4.5L6 8L9.5 4.5" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
           </div>
@@ -399,14 +387,14 @@ export default function LocationDetailsPage() {
 
         {/* Perpetrator Relationship */}
         <div className="w-full mb-4">
-          <label className="block text-neutral-600 text-xs font-medium font-['DM_Sans'] tracking-tight mb-2">
+          <label className="block text-neutral-600 text-xs font-medium font-['DM_Sans'] tracking-tight mb-1.5">
             Perpetrator Relationship
           </label>
           <div className="relative">
             <select
               value={relationship}
               onChange={(e) => setRelationship(e.target.value)}
-              className="w-full h-12 bg-white rounded-xl border border-gray-300 px-4 text-gray-800 text-sm appearance-none cursor-pointer"
+              className="w-full h-10 bg-white rounded-xl border border-gray-300 px-3 pr-8 text-gray-800 text-xs appearance-none cursor-pointer"
             >
               <option value="" disabled>
                 What is the connection?
@@ -417,15 +405,9 @@ export default function LocationDetailsPage() {
                 </option>
               ))}
             </select>
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M2.5 4.5L6 8L9.5 4.5"
-                  stroke="#6B7280"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+                <path d="M2.5 4.5L6 8L9.5 4.5" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
           </div>

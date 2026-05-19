@@ -1,10 +1,62 @@
 import { useNavigate, useLocation } from "react-router-dom"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import logoImg from "/src/assets/images/Logo.svg"
 import rptBackImg from "/src/assets/images/rpt_back.svg"
 import rptImpReminderImg from "/src/assets/images/rpt_imp_reminder.svg"
 import { Button } from "@/components/ui/button"
 import BottomNav from "@/components/BottomNav"
+import { ChevronDown, Check } from "lucide-react"
+
+function CustomSelect({ value, onChange, options, placeholder }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [])
+
+  const selected = options.find((o) => o === value)
+
+  return (
+    <div ref={ref} className="relative w-full">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl border text-xs font-medium transition-all bg-white ${
+          open ? "border-blue-900 ring-1 ring-blue-900" : "border-gray-300"
+        } ${value ? "text-gray-800" : "text-gray-400"}`}
+      >
+        <span>{selected || placeholder}</span>
+        <ChevronDown
+          size={14}
+          className={`text-gray-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+          {options.map((opt) => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => { onChange(opt); setOpen(false) }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-left transition-colors ${
+                value === opt
+                  ? "bg-blue-50 text-blue-900"
+                  : "text-gray-700 hover:bg-slate-50"
+              }`}
+            >
+              {opt}
+              {value === opt && <Check size={13} className="text-blue-900 shrink-0" />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function IncidentDetailsPage() {
   const navigate = useNavigate()
@@ -91,14 +143,30 @@ export default function IncidentDetailsPage() {
     })
   }
 
-  const incidentTypes = [
+  const [incidentTypes, setIncidentTypes] = useState([
     "Sexual Assault",
     "Physical Abuse",
     "Domestic Violence",
     "Stalking",
     "Verbal Abuse",
     "Emotional Abuse",
-  ]
+  ])
+
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace(/\/$/, "") : "/api"}/reports/categories`)
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        const cats = data?.categories
+        if (Array.isArray(cats) && cats.length > 0) {
+          setIncidentTypes(
+            cats
+              .filter((c) => c.is_active !== false)
+              .map((c) => c.label || c.name.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()))
+          )
+        }
+      })
+      .catch(() => { /* keep fallback */ })
+  }, [])
 
   return (
     <div className="w-full h-screen bg-slate-50 overflow-y-auto">
@@ -153,14 +221,14 @@ export default function IncidentDetailsPage() {
 
         {/* Type of Abuse Dropdown */}
         <div className="w-full mb-4">
-          <label className="block text-neutral-600 text-xs font-medium font-['DM_Sans'] tracking-tight mb-2">
+          <label className="block text-neutral-600 text-xs font-medium font-['DM_Sans'] tracking-tight mb-1.5">
             Type of Abuse
           </label>
           <div className="relative">
             <select
               value={incidentType}
               onChange={(e) => setIncidentType(e.target.value)}
-              className="w-full h-12 bg-white rounded-xl border border-gray-300 px-4 text-gray-800 text-sm appearance-none cursor-pointer"
+              className="w-full h-10 bg-white rounded-xl border border-gray-300 px-3 pr-8 text-gray-800 text-xs appearance-none cursor-pointer"
             >
               <option value="" disabled>
                 Select incident category
@@ -171,7 +239,7 @@ export default function IncidentDetailsPage() {
                 </option>
               ))}
             </select>
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M2.5 4.5L6 8L9.5 4.5"
@@ -186,35 +254,31 @@ export default function IncidentDetailsPage() {
         </div>
 
         {/* Date and Time Row */}
-        <div className="flex gap-4 mb-4">
+        <div className="flex gap-3 mb-4">
           {/* Date */}
           <div className="w-1/2">
-            <label className="block text-neutral-600 text-xs font-medium font-['DM_Sans'] tracking-tight mb-2">
+            <label className="block text-neutral-600 text-xs font-medium font-['DM_Sans'] tracking-tight mb-1.5">
               Date
             </label>
-            <div className="relative">
-              <input
-                type="date"
-                value={date}
-                readOnly
-                className="w-full h-12 bg-gray-100 rounded-xl border border-gray-300 px-4 text-gray-800 text-sm cursor-not-allowed"
-              />
-            </div>
+            <input
+              type="date"
+              value={date}
+              readOnly
+              className="w-full h-10 bg-gray-100 rounded-xl border border-gray-300 px-3 text-gray-800 text-xs cursor-not-allowed"
+            />
           </div>
 
           {/* Time */}
           <div className="w-1/2">
-            <label className="block text-neutral-600 text-xs font-medium font-['DM_Sans'] tracking-tight mb-2">
+            <label className="block text-neutral-600 text-xs font-medium font-['DM_Sans'] tracking-tight mb-1.5">
               Time
             </label>
-            <div className="relative">
-              <input
-                type="time"
-                value={time}
-                readOnly
-                className="w-full h-12 bg-gray-100 rounded-xl border border-gray-300 px-4 text-gray-800 text-sm cursor-not-allowed"
-              />
-            </div>
+            <input
+              type="time"
+              value={time}
+              readOnly
+              className="w-full h-10 bg-gray-100 rounded-xl border border-gray-300 px-3 text-gray-800 text-xs cursor-not-allowed"
+            />
           </div>
         </div>
 

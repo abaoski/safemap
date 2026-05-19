@@ -1,8 +1,9 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Hospital, Siren, Flame, Ambulance, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@radix-ui/react-collapsible"
+import { API_BASE } from "@/lib/api-base"
 
 const services = [
   {
@@ -35,7 +36,8 @@ const services = [
   },
 ]
 
-const abuseTypes = [
+// Fallback list shown while loading or if the API is unreachable
+const FALLBACK_ABUSE_TYPES = [
   { key: "sexual_assault",    label: "Sexual Assault" },
   { key: "physical_abuse",    label: "Physical Abuse" },
   { key: "domestic_violence", label: "Domestic Violence" },
@@ -50,7 +52,9 @@ function FilterChip({ active, activeBg, onClick, children }) {
       onClick={onClick}
       className={cn(
         "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all",
-        active ? `${activeBg} text-slate-800 shadow-sm` : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50"
+        active
+          ? `${activeBg} text-slate-800 shadow-sm`
+          : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50"
       )}
     >
       {children}
@@ -60,6 +64,28 @@ function FilterChip({ active, activeBg, onClick, children }) {
 
 function RiskLegend({ onFilterChange, activeFilter }) {
   const [open, setOpen] = useState(false)
+  const [abuseTypes, setAbuseTypes] = useState(FALLBACK_ABUSE_TYPES)
+
+  useEffect(() => {
+    fetch(`${API_BASE}/reports/categories`)
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        const cats = data?.categories
+        if (Array.isArray(cats) && cats.length > 0) {
+          setAbuseTypes(
+            cats
+              .filter((c) => c.is_active !== false)
+              .map((c) => ({
+                key: c.name,
+                label: c.label || c.name.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+              }))
+          )
+        }
+      })
+      .catch(() => {
+        // keep fallback list on network error
+      })
+  }, [])
 
   const toggle = (type) => onFilterChange(activeFilter === type ? null : type)
 
@@ -102,7 +128,7 @@ function RiskLegend({ onFilterChange, activeFilter }) {
               {/* Divider */}
               <div className="border-t border-slate-100" />
 
-              {/* Abuse Types */}
+              {/* Abuse Types — fetched from backend */}
               <div>
                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Abuse Type</p>
                 <div className="flex flex-col gap-1">
