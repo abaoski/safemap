@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { X, MapPin, Phone, Building2, Loader2 } from "lucide-react"
 import { Map, MapMarker, MarkerContent, MapControls, useMap } from "@/components/ui/map"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx"
 import { API_BASE } from "@/lib/api-base"
 import { createPortal } from "react-dom"
 
@@ -32,7 +33,7 @@ export default function DirectoryAddDialog({ isOpen, onClose, onAdd, editContact
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
-    type: "SOCIAL CARE",
+    type: "hospital",
     location: "",
     lat: DEFAULT_COORDS.lat.toFixed(6),
     lng: DEFAULT_COORDS.lng.toFixed(6),
@@ -261,7 +262,7 @@ export default function DirectoryAddDialog({ isOpen, onClose, onAdd, editContact
     setFormData({
       name: "",
       phone: "",
-      type: "SOCIAL CARE",
+      type: "hospital",
       location: "",
       lat: "",
       lng: "",
@@ -271,7 +272,7 @@ export default function DirectoryAddDialog({ isOpen, onClose, onAdd, editContact
 
   return (
     <div className="fixed inset-0 z-99999 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-      <div className="bg-white rounded-3xl w-full max-w-85 overflow-hidden shadow-2xl relative">
+      <div className="bg-white rounded-3xl w-full max-w-[680px] overflow-hidden shadow-2xl relative">
         {/* Header */}
         <div className="bg-[#1f295b] p-5 text-center relative border-b-4 border-blue-400">
           <button onClick={onClose} className="absolute right-4 top-4 text-white/70 hover:text-white transition-colors">
@@ -314,28 +315,24 @@ export default function DirectoryAddDialog({ isOpen, onClose, onAdd, editContact
               <label className="block text-slate-700 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wider mb-1.5">
                 Category Type
               </label>
-              <select
-                value={formData.type}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    type: e.target.value,
-                  })
-                }
-                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-[#1f295b] bg-slate-50 focus:border-[#1f295b] focus:ring-1 focus:ring-[#1f295b] outline-none transition-all shadow-sm appearance-none"
-              >
-                <option value="hospital">Hospital</option>
-                <option value="medical">Medical</option>
-                <option value="police">Police</option>
-                <option value="pnp">PNP Police</option>
-                <option value="wcpd">WCPD</option>
-                <option value="vawc">VAWC</option>
-                <option value="fire">Fire / BFP</option>
-                <option value="rescue">Rescue</option>
-                <option value="dswd">DSWD</option>
-                <option value="disaster">Disaster / CDRRMO</option>
-                <option value="emergency">Emergency / 911</option>
-              </select>
+              <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
+                <SelectTrigger className="w-full h-12 border border-slate-200 rounded-xl px-4 text-sm font-bold text-slate-800 bg-white focus:border-[#1f295b] focus:ring-1 focus:ring-[#1f295b] outline-none transition-all shadow-sm">
+                  <SelectValue placeholder="Select category type" />
+                </SelectTrigger>
+                <SelectContent className="w-full min-w-full">
+                  <SelectItem value="hospital">Hospital</SelectItem>
+                  <SelectItem value="medical">Medical</SelectItem>
+                  <SelectItem value="police">Police</SelectItem>
+                  <SelectItem value="pnp">PNP Police</SelectItem>
+                  <SelectItem value="wcpd">WCPD</SelectItem>
+                  <SelectItem value="vawc">VAWC</SelectItem>
+                  <SelectItem value="fire">Fire / BFP</SelectItem>
+                  <SelectItem value="rescue">Rescue</SelectItem>
+                  <SelectItem value="dswd">DSWD</SelectItem>
+                  <SelectItem value="disaster">Disaster / CDRRMO</SelectItem>
+                  <SelectItem value="emergency">Emergency / 911</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex-1">
               <label className="block text-slate-700 text-[11px] font-bold font-['DM_Sans'] uppercase tracking-wider mb-1.5">

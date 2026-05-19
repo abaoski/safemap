@@ -1,62 +1,11 @@
 import { useNavigate, useLocation } from "react-router-dom"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import logoImg from "/src/assets/images/Logo.svg"
 import rptBackImg from "/src/assets/images/rpt_back.svg"
 import rptImpReminderImg from "/src/assets/images/rpt_imp_reminder.svg"
 import { Button } from "@/components/ui/button"
 import BottomNav from "@/components/BottomNav"
-import { ChevronDown, Check } from "lucide-react"
-
-function CustomSelect({ value, onChange, options, placeholder }) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef(null)
-
-  useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
-    document.addEventListener("mousedown", handler)
-    return () => document.removeEventListener("mousedown", handler)
-  }, [])
-
-  const selected = options.find((o) => o === value)
-
-  return (
-    <div ref={ref} className="relative w-full">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl border text-xs font-medium transition-all bg-white ${
-          open ? "border-blue-900 ring-1 ring-blue-900" : "border-gray-300"
-        } ${value ? "text-gray-800" : "text-gray-400"}`}
-      >
-        <span>{selected || placeholder}</span>
-        <ChevronDown
-          size={14}
-          className={`text-gray-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-
-      {open && (
-        <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
-          {options.map((opt) => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => { onChange(opt); setOpen(false) }}
-              className={`w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-left transition-colors ${
-                value === opt
-                  ? "bg-blue-50 text-blue-900"
-                  : "text-gray-700 hover:bg-slate-50"
-              }`}
-            >
-              {opt}
-              {value === opt && <Check size={13} className="text-blue-900 shrink-0" />}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx"
 
 export default function IncidentDetailsPage() {
   const navigate = useNavigate()
@@ -225,31 +174,18 @@ export default function IncidentDetailsPage() {
             Type of Abuse
           </label>
           <div className="relative">
-            <select
-              value={incidentType}
-              onChange={(e) => setIncidentType(e.target.value)}
-              className="w-full h-10 bg-white rounded-xl border border-gray-300 px-3 pr-8 text-gray-800 text-xs appearance-none cursor-pointer"
-            >
-              <option value="" disabled>
-                Select incident category
-              </option>
-              {incidentTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M2.5 4.5L6 8L9.5 4.5"
-                  stroke="#6B7280"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
+            <Select value={incidentType} onValueChange={setIncidentType}>
+              <SelectTrigger className="w-full h-10 bg-white rounded-xl border border-gray-300 px-3 text-gray-800 text-xs cursor-pointer">
+                <SelectValue placeholder="Select incident category" />
+              </SelectTrigger>
+              <SelectContent className="w-full">
+                {incidentTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 

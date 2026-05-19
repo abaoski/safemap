@@ -6,6 +6,7 @@ import rptImpReminderImg from "/src/assets/images/rpt_imp_reminder.svg"
 import { Button } from "@/components/ui/button"
 import BottomNav from "@/components/BottomNav"
 import { Map, MapMarker, MarkerContent, useMap } from "@/components/ui/map"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx"
 
 function MapClickHandler({ onMapClick }) {
   const { map, isLoaded } = useMap()
@@ -335,25 +336,18 @@ export default function LocationDetailsPage() {
             Victim Gender
           </label>
           <div className="relative">
-            <select
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-              className="w-full h-10 bg-white rounded-xl border border-gray-300 px-3 pr-8 text-gray-800 text-xs appearance-none cursor-pointer"
-            >
-              <option value="" disabled>
-                Select Gender
-              </option>
-              {genderOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2.5 4.5L6 8L9.5 4.5" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
+            <Select value={gender} onValueChange={setGender}>
+              <SelectTrigger className="w-full h-10 bg-white rounded-xl border border-gray-300 px-3 text-gray-800 text-xs cursor-pointer">
+                <SelectValue placeholder="Select Gender" />
+              </SelectTrigger>
+              <SelectContent className="w-full">
+                {genderOptions.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -363,25 +357,18 @@ export default function LocationDetailsPage() {
             Victim Age Group
           </label>
           <div className="relative">
-            <select
-              value={ageGroup}
-              onChange={(e) => setAgeGroup(e.target.value)}
-              className="w-full h-10 bg-white rounded-xl border border-gray-300 px-3 pr-8 text-gray-800 text-xs appearance-none cursor-pointer"
-            >
-              <option value="" disabled>
-                Select Age Group
-              </option>
-              {ageGroupOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2.5 4.5L6 8L9.5 4.5" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
+            <Select value={ageGroup} onValueChange={setAgeGroup}>
+              <SelectTrigger className="w-full h-10 bg-white rounded-xl border border-gray-300 px-3 text-gray-800 text-xs cursor-pointer">
+                <SelectValue placeholder="Select Age Group" />
+              </SelectTrigger>
+              <SelectContent className="w-full">
+                {ageGroupOptions.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -391,25 +378,18 @@ export default function LocationDetailsPage() {
             Perpetrator Relationship
           </label>
           <div className="relative">
-            <select
-              value={relationship}
-              onChange={(e) => setRelationship(e.target.value)}
-              className="w-full h-10 bg-white rounded-xl border border-gray-300 px-3 pr-8 text-gray-800 text-xs appearance-none cursor-pointer"
-            >
-              <option value="" disabled>
-                What is the connection?
-              </option>
-              {relationshipOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2.5 4.5L6 8L9.5 4.5" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
+            <Select value={relationship} onValueChange={setRelationship}>
+              <SelectTrigger className="w-full h-10 bg-white rounded-xl border border-gray-300 px-3 text-gray-800 text-xs cursor-pointer">
+                <SelectValue placeholder="What is the connection?" />
+              </SelectTrigger>
+              <SelectContent className="w-full">
+                {relationshipOptions.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
