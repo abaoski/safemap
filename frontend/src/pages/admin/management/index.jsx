@@ -568,7 +568,17 @@ function AdminManagementPage() {
 
             {/* List */}
             <div className="space-y-4">
-              {categories.map((cat) => (
+              {categories
+                .filter((cat) => {
+                  const q = catSearch.toLowerCase().trim()
+                  if (!q) return true
+                  return (
+                    (cat.name || "").toLowerCase().includes(q) ||
+                    (cat.desc || "").toLowerCase().includes(q) ||
+                    (cat.priority || "").toLowerCase().includes(q)
+                  )
+                })
+                .map((cat) => (
                 <div
                   key={cat.id}
                   className={`bg-white rounded-2xl p-5 shadow-[0px_8px_24px_rgba(149,157,165,0.1)] border-l-4 ${cat.borderColor} border-y border-r border-y-slate-100 border-r-slate-100 flex flex-col`}
@@ -600,6 +610,19 @@ function AdminManagementPage() {
                   </div>
                 </div>
               ))}
+              {categories.filter((cat) => {
+                const q = catSearch.toLowerCase().trim()
+                if (!q) return false
+                return (
+                  (cat.name || "").toLowerCase().includes(q) ||
+                  (cat.desc || "").toLowerCase().includes(q) ||
+                  (cat.priority || "").toLowerCase().includes(q)
+                )
+              }).length === 0 && catSearch.trim() && (
+                <div className="text-center py-8">
+                  <p className="text-slate-400 text-xs font-medium font-['DM_Sans']">No categories match "{catSearch}"</p>
+                </div>
+              )}
             </div>
 
             {/* Global Tags */}
