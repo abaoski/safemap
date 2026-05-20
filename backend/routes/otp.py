@@ -19,7 +19,7 @@ from flask import request, jsonify
 from routes import api_bp
 
 DBUDDYZ_API_URL = "https://dbuddyz.prismswift.com/send/"
-DBUDDYZ_TOKEN   = os.environ.get("DBUDDYZ_TOKEN", "")
+DBUDDYZ_TOKEN = os.getenv("DBUDDYZ_TOKEN", "")
 
 OTP_EXPIRY_SECONDS = 300   # 5 minutes
 OTP_MAX_ATTEMPTS   = 5
@@ -84,6 +84,9 @@ def send_otp():
 
     code = _generate_otp()
 
+    # Debug: confirm token is loaded and number is normalized correctly
+    print(f"[DEBUG] Token loaded: '{DBUDDYZ_TOKEN[:6]}...' | Sending to: {normalized}")
+
     # Send via dbuddyz WhatsApp OTP service
     try:
         resp = requests.post(
@@ -98,7 +101,10 @@ def send_otp():
         resp.raise_for_status()
     except requests.exceptions.Timeout:
         return jsonify({"error": "OTP service timed out. Please try again."}), 504
-    except requests.exceptions.RequestException:
+    except requests.exceptions.RequestException as e:
+        print(f"[OTP ERROR] {type(e).__name__}: {e}")
+        if hasattr(e, "response") and e.response is not None:
+            print(f"[OTP ERROR] Status: {e.response.status_code} | Body: {e.response.text}")
         return jsonify({"error": "Failed to send OTP. Please try again."}), 502
 
     # Store hashed entry
